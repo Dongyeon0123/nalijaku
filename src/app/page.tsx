@@ -75,7 +75,7 @@ export default function Landing() {
           fontWeight: 400,
           letterSpacing: '-0.5px'
         }}>
-          문의: <a href="proteolee2@gmail.com" style={{ color: '#fff', textDecoration: 'underline', opacity: 0.8 }}>proteolee2@gmail.com</a>
+          문의: <a href="proteolee2@gmail.com" style={{ color: '#fff', textDecoration: 'none', opacity: 0.8,}}>proteolee2@gmail.com</a>
         </div>
       </div>
     </div>
