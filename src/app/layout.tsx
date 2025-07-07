@@ -8,6 +8,9 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
+      <head>
+        <link rel="icon" type="image/png" href="/nallijaku.png" />
+      </head>
       <body>{children}</body>
     </html>
   );
