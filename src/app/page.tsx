@@ -1,5 +1,4 @@
 import React from 'react';
-import Head from 'next/head';
 
 const slideStyle = `
 @keyframes slide {
@@ -35,10 +34,6 @@ export default function Landing() {
       minHeight: '100vh',
       minWidth: '100vw',
     }}>
-      <Head>
-        <title>날리자 KU</title>
-        <meta name="description" content="현재 날리자 KU 사이트를 준비 중입니다. 곧 찾아뵐게요!" />
-      </Head>
       <style>{slideStyle}</style>
       <div style={{
         background: 'rgba(255,255,255,0.12)',
