@@ -17,14 +17,22 @@ const baseColor = '#52CC7A';
 export default function Landing() {
   return (
     <div style={{
-      minHeight: '100vh',
-      width: '100vw',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
       background: baseColor,
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       flexDirection: 'column',
-      fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif"
+      fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif",
+      zIndex: 9999,
+      margin: 0,
+      padding: 0,
+      minHeight: '100vh',
+      minWidth: '100vw',
     }}>
       
       <style>{slideStyle}</style>
@@ -68,7 +76,7 @@ export default function Landing() {
           fontWeight: 400,
           letterSpacing: '-0.5px'
         }}>
-          문의: <a href="mailto:info@nalija.ku" style={{ color: '#fff', textDecoration: 'underline', opacity: 0.8 }}>info@nalija.ku</a>
+          문의: <a href="proteolee2@gmail.com" style={{ color: '#fff', textDecoration: 'underline', opacity: 0.8 }}>proteolee2@gmail.com</a>
         </div>
       </div>
     </div>
