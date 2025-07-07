@@ -1,103 +1,76 @@
-import Image from "next/image";
+import React from 'react';
 
-export default function Home() {
+const slideStyle = `
+@keyframes slide {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(18px); }
+  100% { transform: translateX(0); }
+}
+.slideText {
+  display: inline-block;
+  animation: slide 2s ease-in-out infinite;
+}
+`;
+
+const baseColor = '#52CC7A';
+
+export default function Landing() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div style={{
+      minHeight: '100vh',
+      width: '100vw',
+      background: baseColor,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      flexDirection: 'column',
+      fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif"
+    }}>
+      
+      <style>{slideStyle}</style>
+      <div style={{
+        background: 'rgba(255,255,255,0.12)',
+        borderRadius: 32,
+        boxShadow: '0 8px 32px 0 rgba(82,204,122,0.25)',
+        padding: '56px 36px 48px 36px',
+        maxWidth: 420,
+        width: '90%',
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <svg width="60" height="60" viewBox="0 0 60 60" style={{ marginBottom: 28 }}>
+          <circle cx="30" cy="30" r="30" fill="#fff" opacity="0.22"/>
+          <path d="M20 33L28 41L42 25" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <h1 style={{
+          color: '#fff',
+          fontSize: 28,
+          fontWeight: 800,
+          margin: 0,
+          marginBottom: 18,
+          letterSpacing: '-1px',
+          lineHeight: 1.25
+        }}>
+          <span className="slideText">
+            현재 날리자 KU 사이트를<br/>준비 중입니다.<br />
+            <span style={{ fontWeight: 500, fontSize: 22, opacity: 0.85 }}>
+              곧 찾아뵐게요!
+            </span>
+          </span>
+        </h1>
+        <div style={{
+          marginTop: 30,
+          color: '#fff',
+          fontSize: 15,
+          opacity: 0.65,
+          fontWeight: 400,
+          letterSpacing: '-0.5px'
+        }}>
+          문의: <a href="mailto:info@nalija.ku" style={{ color: '#fff', textDecoration: 'underline', opacity: 0.8 }}>info@nalija.ku</a>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
   );
 }
