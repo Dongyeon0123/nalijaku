@@ -1,12 +1,12 @@
 .cooperationSection {
-  padding: 80px 24px;
+  padding: 80px 24px 120px 24px;
   background: #ffffff;
   margin-top: 70px;
 }
 
 @media (max-width: 768px) {
   .cooperationSection {
-    padding: 60px 16px;
+    padding: 60px 16px 100px 16px;
     margin-top: 40px;
   }
 }
@@ -146,6 +146,15 @@
 @keyframes scrollLeft {
   0% { transform: translateX(-50%); }
   100% { transform: translateX(0%); }
+}
+
+/* 애니메이션 클래스 */
+.scrollRightAnimation {
+  animation: scrollRight 20s linear infinite;
+}
+
+.scrollLeftAnimation {
+  animation: scrollLeft 20s linear infinite;
 }
 
 @media (max-width: 1024px) {

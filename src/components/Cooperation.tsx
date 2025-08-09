@@ -35,52 +35,24 @@ export default function Cooperation() {
     };
   }, []);
 
-  // 연속 스크롤 애니메이션
+  // CSS 클래스 기반 애니메이션
   React.useEffect(() => {
     if (!isVisible) return;
 
-    let topPosition = 0;
-    let bottomPosition = -200; // 초기값을 음수로 설정하여 왼쪽에서 시작
-    const speed = 0.8; // 픽셀/프레임 속도
+    const topRow = topRowRef.current;
+    const bottomRow = bottomRowRef.current;
 
-    const animate = () => {
-      const topRow = topRowRef.current;
-      const bottomRow = bottomRowRef.current;
-
-      if (topRow && bottomRow) {
-        // 첫 번째 행: 오른쪽으로 이동
-        topPosition -= speed;
-        topRow.style.transform = `translateX(${topPosition}px)`;
-
-        // 두 번째 행: 왼쪽으로 이동 (오른쪽에서 시작해서 왼쪽으로)
-        bottomPosition += speed;
-        bottomRow.style.transform = `translateX(${bottomPosition}px)`;
-
-        // 더 정교한 리셋 로직
-        // 실제 카드 너비를 계산해서 정확한 리셋 지점 설정
-        const sampleCard = topRow.querySelector(`.${styles.card}`) as HTMLElement;
-        if (sampleCard) {
-          const cardWidth = sampleCard.offsetWidth + 20; // gap 포함
-          const originalSetWidth = cardWidth * 5; // 원본 5개
-          
-          // 첫 번째 세트가 완전히 지나가면 리셋
-          if (Math.abs(topPosition) >= originalSetWidth) {
-            topPosition = 0;
-          }
-          // 두 번째 행은 양수가 되어 화면 오른쪽 끝에 도달하면 다시 왼쪽으로
-          if (bottomPosition >= originalSetWidth) {
-            bottomPosition = -originalSetWidth;
-          }
-        }
-      }
-
-      requestAnimationFrame(animate);
-    };
-
-    const animationId = requestAnimationFrame(animate);
+    if (topRow && bottomRow) {
+      // CSS 클래스 추가
+      topRow.classList.add(styles.scrollRightAnimation);
+      bottomRow.classList.add(styles.scrollLeftAnimation);
+    }
 
     return () => {
-      cancelAnimationFrame(animationId);
+      if (topRow && bottomRow) {
+        topRow.classList.remove(styles.scrollRightAnimation);
+        bottomRow.classList.remove(styles.scrollLeftAnimation);
+      }
     };
   }, [isVisible]);
 
