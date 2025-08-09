@@ -150,11 +150,22 @@
 
 /* 애니메이션 클래스 */
 .scrollRightAnimation {
-  animation: scrollRight 20s linear infinite;
+  animation: scrollRight 30s linear infinite;
 }
 
 .scrollLeftAnimation {
-  animation: scrollLeft 20s linear infinite;
+  animation: scrollLeft 30s linear infinite;
+}
+
+/* 모바일에서 더 빠른 애니메이션 */
+@media (max-width: 768px) {
+  .scrollRightAnimation {
+    animation: scrollRight 15s linear infinite;
+  }
+
+  .scrollLeftAnimation {
+    animation: scrollLeft 15s linear infinite;
+  }
 }
 
 @media (max-width: 1024px) {

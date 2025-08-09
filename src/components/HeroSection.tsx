@@ -34,130 +34,53 @@ export default function HeroSection() {
     setIsMounted(true);
   }, []);
 
-  // 동적 비디오 생성 및 강제 재생
+  // 간단하고 확실한 비디오 자동재생
   React.useEffect(() => {
-    if (!isMounted || !containerRef.current) return;
+    if (!isMounted) return;
 
-    const createAndPlayVideo = () => {
-      // 기존 비디오 제거
-      const existingVideo = videoRef.current;
-      if (existingVideo) {
-        existingVideo.remove();
-      }
+    const video = videoRef.current;
+    if (!video) return;
 
-      // 새 비디오 요소 동적 생성
-      const video = document.createElement('video');
-      video.className = styles.backgroundVideo;
-      video.muted = true;
-      video.autoplay = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.preload = 'auto';
-      video.poster = '/nallijaku.png';
-      video.src = '/background.mp4';
-      
-      // 모든 볼륨 관련 설정
-      video.volume = 0;
-      video.defaultMuted = true;
-      (video as HTMLVideoElement & { 'webkit-playsinline'?: boolean })['webkit-playsinline'] = true;
-
-      videoRef.current = video;
-
-      // 이벤트 리스너 추가
-      const playVideo = async () => {
-        try {
-          video.currentTime = 0;
-          await video.play();
-          console.log('✅ 비디오 재생 성공!');
-        } catch (error) {
-          console.log('🔄 재생 시도 중...', error);
-        }
-      };
-
-      video.addEventListener('canplay', playVideo);
-      video.addEventListener('loadeddata', playVideo);
-      video.addEventListener('loadedmetadata', playVideo);
-
-      // DOM에 추가
-      containerRef.current?.appendChild(video);
-
-      // 즉시 로드 및 재생 시도
-      video.load();
-      playVideo();
-
-      return video;
-    };
-
-    const video = createAndPlayVideo();
-
-    // 강력한 사용자 상호작용 감지
-    const forcePlay = async () => {
-      if (!video) return;
+    // 비디오 자동재생 시도
+    const tryPlay = async () => {
       try {
         video.muted = true;
         video.volume = 0;
         await video.play();
-        console.log('🎯 상호작용으로 재생 성공!');
+        console.log('✅ 비디오 자동재생 성공!');
+      } catch (error) {
+        console.log('자동재생 실패, 사용자 상호작용 대기 중...', error);
+      }
+    };
+
+    // 비디오가 로드되면 재생 시도
+    video.addEventListener('loadeddata', tryPlay);
+    video.addEventListener('canplay', tryPlay);
+
+    // 사용자 상호작용 시 재생
+    const playOnInteraction = async () => {
+      try {
+        await video.play();
+        console.log('🎯 사용자 상호작용으로 재생 성공!');
+        // 성공 후 이벤트 리스너 제거
+        document.removeEventListener('click', playOnInteraction);
+        document.removeEventListener('touchstart', playOnInteraction);
       } catch (error) {
         console.log('재생 실패:', error);
       }
     };
 
-    // 모든 종류의 사용자 이벤트 감지
-    const handleUserEvent = () => {
-      forcePlay();
-      // 한 번 성공하면 이벤트 제거
-      removeAllListeners();
-    };
+    document.addEventListener('click', playOnInteraction, { once: true });
+    document.addEventListener('touchstart', playOnInteraction, { once: true });
 
-    const events = [
-      'click', 'mousedown', 'mouseup', 'mousemove',
-      'touchstart', 'touchend', 'touchmove',
-      'keydown', 'keyup', 'scroll', 'wheel',
-      'focus', 'blur', 'resize'
-    ];
-
-    const removeAllListeners = () => {
-      events.forEach(event => {
-        document.removeEventListener(event, handleUserEvent);
-        window.removeEventListener(event, handleUserEvent);
-      });
-    };
-
-    // 모든 이벤트에 리스너 추가
-    events.forEach(event => {
-      document.addEventListener(event, handleUserEvent, { passive: true, once: true });
-      window.addEventListener(event, handleUserEvent, { passive: true, once: true });
-    });
-
-    // visibility change
-    const visibilityHandler = () => {
-      if (document.visibilityState === 'visible') {
-        forcePlay();
-      }
-    };
-    document.addEventListener('visibilitychange', visibilityHandler);
-
-    // 정기적 재시도 (더 공격적으로)
-    let attempts = 0;
-    const maxAttempts = 20;
-    const retryInterval = setInterval(() => {
-      if (video && video.paused && attempts < maxAttempts) {
-        attempts++;
-        forcePlay();
-        console.log(`🔄 자동 재시도 ${attempts}/${maxAttempts}`);
-      } else if (attempts >= maxAttempts || !video.paused) {
-        clearInterval(retryInterval);
-      }
-    }, 500); // 0.5초마다
+    // 즉시 재생 시도
+    tryPlay();
 
     return () => {
-      clearInterval(retryInterval);
-      removeAllListeners();
-      document.removeEventListener('visibilitychange', visibilityHandler);
-      if (video && video.parentNode) {
-        video.remove();
-      }
+      video.removeEventListener('loadeddata', tryPlay);
+      video.removeEventListener('canplay', tryPlay);
+      document.removeEventListener('click', playOnInteraction);
+      document.removeEventListener('touchstart', playOnInteraction);
     };
   }, [isMounted]);
 
@@ -166,7 +89,18 @@ export default function HeroSection() {
 
   return (
     <section ref={containerRef} className={styles.heroSection}>
-      {/* 비디오는 동적으로 생성되므로 여기서는 빈 공간 */}
+      <video
+        ref={videoRef}
+        className={styles.backgroundVideo}
+        muted
+        autoPlay
+        loop
+        playsInline
+        preload="auto"
+        poster="/nallijaku.png"
+      >
+        <source src="/background.mp4" type="video/mp4" />
+      </video>
       
       <div className={styles.videoOverlay} />
       <div className={styles.heroContent}>
