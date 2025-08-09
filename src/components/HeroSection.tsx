@@ -5,6 +5,11 @@ import { IoChevronForward } from 'react-icons/io5';
 import styles from '@/styles/HeroSection.module.css';
 
 export default function HeroSection() {
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
+  const containerRef = React.useRef<HTMLElement | null>(null);
+  const [isMounted, setIsMounted] = React.useState(false);
+  const [videoReady, setVideoReady] = React.useState(false);
+
   const renderAnimatedText = (
     text: string,
     className: string,
@@ -26,22 +31,146 @@ export default function HeroSection() {
     });
   };
 
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // 동적 비디오 생성 및 강제 재생
+  React.useEffect(() => {
+    if (!isMounted || !containerRef.current) return;
+
+    const createAndPlayVideo = () => {
+      // 기존 비디오 제거
+      const existingVideo = videoRef.current;
+      if (existingVideo) {
+        existingVideo.remove();
+      }
+
+      // 새 비디오 요소 동적 생성
+      const video = document.createElement('video');
+      video.className = styles.backgroundVideo;
+      video.muted = true;
+      video.autoplay = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.poster = '/nallijaku.png';
+      video.src = '/background.mp4';
+      
+      // 모든 볼륨 관련 설정
+      video.volume = 0;
+      video.defaultMuted = true;
+      (video as any)['webkit-playsinline'] = true;
+
+      videoRef.current = video;
+
+      // 이벤트 리스너 추가
+      const playVideo = async () => {
+        try {
+          video.currentTime = 0;
+          await video.play();
+          console.log('✅ 비디오 재생 성공!');
+          setVideoReady(true);
+        } catch (error) {
+          console.log('🔄 재생 시도 중...', error);
+        }
+      };
+
+      video.addEventListener('canplay', playVideo);
+      video.addEventListener('loadeddata', playVideo);
+      video.addEventListener('loadedmetadata', playVideo);
+
+      // DOM에 추가
+      containerRef.current?.appendChild(video);
+
+      // 즉시 로드 및 재생 시도
+      video.load();
+      playVideo();
+
+      return video;
+    };
+
+    const video = createAndPlayVideo();
+
+    // 강력한 사용자 상호작용 감지
+    const forcePlay = async () => {
+      if (!video) return;
+      try {
+        video.muted = true;
+        video.volume = 0;
+        await video.play();
+        console.log('🎯 상호작용으로 재생 성공!');
+        setVideoReady(true);
+      } catch (error) {
+        console.log('재생 실패:', error);
+      }
+    };
+
+    // 모든 종류의 사용자 이벤트 감지
+    const handleUserEvent = () => {
+      forcePlay();
+      // 한 번 성공하면 이벤트 제거
+      removeAllListeners();
+    };
+
+    const events = [
+      'click', 'mousedown', 'mouseup', 'mousemove',
+      'touchstart', 'touchend', 'touchmove',
+      'keydown', 'keyup', 'scroll', 'wheel',
+      'focus', 'blur', 'resize'
+    ];
+
+    const removeAllListeners = () => {
+      events.forEach(event => {
+        document.removeEventListener(event, handleUserEvent);
+        window.removeEventListener(event, handleUserEvent);
+      });
+    };
+
+    // 모든 이벤트에 리스너 추가
+    events.forEach(event => {
+      document.addEventListener(event, handleUserEvent, { passive: true, once: true });
+      window.addEventListener(event, handleUserEvent, { passive: true, once: true });
+    });
+
+    // visibility change
+    const visibilityHandler = () => {
+      if (document.visibilityState === 'visible') {
+        forcePlay();
+      }
+    };
+    document.addEventListener('visibilitychange', visibilityHandler);
+
+    // 정기적 재시도 (더 공격적으로)
+    let attempts = 0;
+    const maxAttempts = 20;
+    const retryInterval = setInterval(() => {
+      if (video && video.paused && attempts < maxAttempts) {
+        attempts++;
+        forcePlay();
+        console.log(`🔄 자동 재시도 ${attempts}/${maxAttempts}`);
+      } else if (attempts >= maxAttempts || !video.paused) {
+        clearInterval(retryInterval);
+      }
+    }, 500); // 0.5초마다
+
+    return () => {
+      clearInterval(retryInterval);
+      removeAllListeners();
+      document.removeEventListener('visibilitychange', visibilityHandler);
+      if (video && video.parentNode) {
+        video.remove();
+      }
+    };
+  }, [isMounted]);
+
   const titleText = '드론과 꿈을 하늘로 날리자쿠!';
   const subtitleText = '국내 최초 학교 & 기관 대상, AI/XR 기반 드론 교육 전문 플랫폼';
 
   return (
-    <section className={styles.heroSection}>
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className={styles.backgroundVideo}
-      >
-        <source src="/background.mp4" type="video/mp4" />
-        브라우저에서 비디오를 지원하지 않습니다.
-      </video>
-
+    <section ref={containerRef} className={styles.heroSection}>
+      {/* 비디오는 동적으로 생성되므로 여기서는 빈 공간 */}
+      
       <div className={styles.videoOverlay} />
       <div className={styles.heroContent}>
         <h1 className={styles.heroTitle}>

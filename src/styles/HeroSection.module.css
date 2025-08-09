@@ -1,6 +1,9 @@
 .heroSection {
   position: relative;
-  height: calc(100vh - 80px);
+  /* iOS/Safari 100vh 이슈 대응: 100svh/100dvh가 지원되면 우선 사용 */
+  height: calc(100svh - var(--header-height, 80px));
+  height: calc(100dvh - var(--header-height, 80px));
+  height: calc(100vh - var(--header-height, 80px));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,7 +21,29 @@
   transform: translate(-50%, -50%);
   z-index: 1;
   object-fit: cover;
+  /* Safari에서 영상 자동재생 최적화 */
+  pointer-events: none;
+  /* 비디오 강제 설정 */
+  opacity: 1;
+  visibility: visible;
 }
+
+/* Safari 전용 비디오 자동재생 강화 */
+.backgroundVideo::-webkit-media-controls {
+  display: none !important;
+}
+
+.backgroundVideo::-webkit-media-controls-start-playbook-button {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .backgroundVideo {
+    will-change: auto;
+  }
+}
+
+
 
 .videoOverlay {
   position: absolute;

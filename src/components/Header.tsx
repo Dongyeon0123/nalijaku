@@ -6,6 +6,7 @@ import styles from '@/styles/Header.module.css';
 
 export default function Header() {
   const [progress, setProgress] = React.useState(0);
+  const headerRef = React.useRef<HTMLElement | null>(null);
 
   React.useEffect(() => {
     const updateProgress = () => {
@@ -24,12 +25,25 @@ export default function Header() {
     };
   }, []);
 
+  React.useEffect(() => {
+    const updateHeaderHeight = () => {
+      const height = headerRef.current?.offsetHeight ?? 80;
+      document.documentElement.style.setProperty('--header-height', `${height}px`);
+    };
+
+    updateHeaderHeight();
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => {
+      window.removeEventListener('resize', updateHeaderHeight);
+    };
+  }, []);
+
   const handleScrollTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <header className={styles.header}>
+    <header ref={headerRef} className={styles.header}>
       <div className={styles.container}>
         <div className={styles.logoSection} onClick={handleScrollTop}>
           <Image 
