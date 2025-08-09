@@ -7,6 +7,7 @@ import styles from '@/styles/SidebarNav.module.css';
 export default function SidebarNav() {
   const [activeSection, setActiveSection] = React.useState('home');
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isDarkBackground, setIsDarkBackground] = React.useState(true);
 
   const navItems = [
     { id: 'home', label: 'Home', icon: IoHomeOutline },
@@ -69,6 +70,9 @@ export default function SidebarNav() {
       }
 
       setActiveSection(currentActiveSection);
+      
+      // home 섹션일 때는 다크 배경, 나머지는 라이트 배경
+      setIsDarkBackground(currentActiveSection === 'home');
     };
 
     const mainElement = document.querySelector('main');
@@ -82,7 +86,7 @@ export default function SidebarNav() {
 
   return (
     <nav 
-      className={`${styles.sidebarNav} ${isExpanded ? styles.expanded : styles.collapsed}`}
+      className={`${styles.sidebarNav} ${isExpanded ? styles.expanded : styles.collapsed} ${isDarkBackground ? styles.darkTheme : styles.lightTheme}`}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
