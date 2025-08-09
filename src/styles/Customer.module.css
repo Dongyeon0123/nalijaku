@@ -146,21 +146,22 @@
   100% { transform: translateX(0%); }
 }
 
+/* CSS 애니메이션 제거 - JavaScript가 제어 */
 .rowTop .marqueeInner {
-  animation: scrollRight 16s linear infinite;
+  /* animation: scrollRight 16s linear infinite; */
 }
 
 .rowBottom .marqueeInner {
-  animation: scrollLeft 16s linear infinite;
+  /* animation: scrollLeft 16s linear infinite; */
 }
 
 @media (max-width: 768px) {
   .rowTop .marqueeInner {
-    animation: scrollRight 8s linear infinite;
+    /* animation: scrollRight 8s linear infinite; */
   }
 
   .rowBottom .marqueeInner {
-    animation: scrollLeft 8s linear infinite;
+    /* animation: scrollLeft 8s linear infinite; */
   }
 }
 

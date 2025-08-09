@@ -5,6 +5,8 @@ import styles from '@/styles/Customer.module.css';
 
 export default function Customer() {
   const sectionRef = React.useRef<HTMLElement | null>(null);
+  const topRowRef = React.useRef<HTMLDivElement | null>(null);
+  const bottomRowRef = React.useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = React.useState(false);
 
   React.useEffect(() => {
@@ -19,8 +21,8 @@ export default function Customer() {
         }
       },
       {
-        threshold: 0.1, // 10% 보일 때 애니메이션 시작 (더 일찍)
-        rootMargin: '-100px 0px', // 더 많은 마진으로 스크롤 시 확실하게 보이도록
+        threshold: 0.1,
+        rootMargin: '-100px 0px',
       }
     );
 
@@ -32,6 +34,48 @@ export default function Customer() {
       }
     };
   }, []);
+
+  // 연속 스크롤 애니메이션
+  React.useEffect(() => {
+    if (!isVisible) return;
+
+    let topPosition = 0;
+    let bottomPosition = 0;
+    const speed = 1.4; // 픽셀/프레임 속도 (조정 가능)
+
+    const animate = () => {
+      const topRow = topRowRef.current;
+      const bottomRow = bottomRowRef.current;
+
+      if (topRow && bottomRow) {
+        // 첫 번째 행: 오른쪽으로 이동
+        topPosition -= speed;
+        topRow.style.transform = `translateX(${topPosition}px)`;
+
+        // 두 번째 행: 왼쪽으로 이동
+        bottomPosition += speed;
+        bottomRow.style.transform = `translateX(${bottomPosition}px)`;
+
+        // 리셋 조건 (이미지가 완전히 화면을 벗어나면 다시 시작)
+        const containerWidth = topRow.scrollWidth / 2; // 복제본이 있으므로 절반
+        
+        if (Math.abs(topPosition) >= containerWidth) {
+          topPosition = 0;
+        }
+        if (Math.abs(bottomPosition) >= containerWidth) {
+          bottomPosition = 0;
+        }
+      }
+
+      requestAnimationFrame(animate);
+    };
+
+    const animationId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
+  }, [isVisible]);
 
   return (
     <section 
@@ -45,7 +89,7 @@ export default function Customer() {
         </p>
 
         <div className={`${styles.marquee} ${styles.rowTop} ${styles.animateUp} ${styles.delay2}`}>
-          <div className={styles.marqueeInner}>
+          <div ref={topRowRef} className={styles.marqueeInner}>
             <div className={styles.card}><img className={styles.logo} src="/Company/11edu.jpg" alt="고객사 1" /></div>
             <div className={styles.card}><img className={styles.logo} src="/Company/12lib.jpg" alt="고객사 2" /></div>
             <div className={styles.card}><img className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3" /></div>
@@ -65,7 +109,7 @@ export default function Customer() {
         </div>
 
         <div className={`${styles.marquee} ${styles.rowBottom} ${styles.animateUp} ${styles.delay3}`}>
-          <div className={styles.marqueeInner}>
+          <div ref={bottomRowRef} className={styles.marqueeInner}>
             <div className={styles.card}><img className={styles.logo} src="/Company/16design.jpg" alt="고객사 6" /></div>
             <div className={styles.card}><img className={styles.logo} src="/Company/17tra.jpg" alt="고객사 7" /></div>
             <div className={styles.card}><img className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8" /></div>
