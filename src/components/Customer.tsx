@@ -35,35 +35,42 @@ export default function Customer() {
     };
   }, []);
 
-  // 연속 스크롤 애니메이션
+  // 연속 스크롤 애니메이션 (협력사와 반대 방향)
   React.useEffect(() => {
     if (!isVisible) return;
 
-    let topPosition = 0;
-    let bottomPosition = 0;
-    const speed = 1.4; // 픽셀/프레임 속도 (조정 가능)
+    let topPosition = 0; // 첫 번째 행: 오른쪽에서 왼쪽으로 (협력사와 동일)
+    let bottomPosition = -200; // 두 번째 행: 왼쪽에서 오른쪽으로 (협력사와 반대)
+    const speed = 0.8; // 픽셀/프레임 속도
 
     const animate = () => {
       const topRow = topRowRef.current;
       const bottomRow = bottomRowRef.current;
 
       if (topRow && bottomRow) {
-        // 첫 번째 행: 오른쪽으로 이동
+        // 첫 번째 행: 오른쪽에서 왼쪽으로 이동 (협력사와 동일)
         topPosition -= speed;
         topRow.style.transform = `translateX(${topPosition}px)`;
 
-        // 두 번째 행: 왼쪽으로 이동
+        // 두 번째 행: 왼쪽에서 오른쪽으로 이동 (협력사와 반대)
         bottomPosition += speed;
         bottomRow.style.transform = `translateX(${bottomPosition}px)`;
 
-        // 리셋 조건 (이미지가 완전히 화면을 벗어나면 다시 시작)
-        const containerWidth = topRow.scrollWidth / 2; // 복제본이 있으므로 절반
-        
-        if (Math.abs(topPosition) >= containerWidth) {
-          topPosition = 0;
-        }
-        if (Math.abs(bottomPosition) >= containerWidth) {
-          bottomPosition = 0;
+        // 더 정교한 리셋 로직
+        // 실제 카드 너비를 계산해서 정확한 리셋 지점 설정
+        const sampleCard = topRow.querySelector(`.${styles.card}`) as HTMLElement;
+        if (sampleCard) {
+          const cardWidth = sampleCard.offsetWidth + 20; // gap 포함
+          const originalSetWidth = cardWidth * 5; // 원본 5개
+          
+          // 첫 번째 행: 왼쪽으로 완전히 지나가면 리셋
+          if (Math.abs(topPosition) >= originalSetWidth) {
+            topPosition = 0;
+          }
+          // 두 번째 행: 오른쪽으로 완전히 지나가면 왼쪽에서 다시 시작
+          if (bottomPosition >= originalSetWidth) {
+            bottomPosition = -originalSetWidth;
+          }
         }
       }
 
@@ -105,6 +112,11 @@ export default function Customer() {
             <div className={styles.card}><img className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3-dup2" /></div>
             <div className={styles.card}><img className={styles.logo} src="/Company/14bang.jpg" alt="고객사 4-dup2" /></div>
             <div className={styles.card}><img className={styles.logo} src="/Company/15center.jpg" alt="고객사 5-dup2" /></div>
+            <div className={styles.card}><img className={styles.logo} src="/Company/11edu.jpg" alt="고객사 1-dup3" /></div>
+            <div className={styles.card}><img className={styles.logo} src="/Company/12lib.jpg" alt="고객사 2-dup3" /></div>
+            <div className={styles.card}><img className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3-dup3" /></div>
+            <div className={styles.card}><img className={styles.logo} src="/Company/14bang.jpg" alt="고객사 4-dup3" /></div>
+            <div className={styles.card}><img className={styles.logo} src="/Company/15center.jpg" alt="고객사 5-dup3" /></div>
           </div>
         </div>
 
@@ -125,6 +137,11 @@ export default function Customer() {
             <div className={styles.card}><img className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8-dup2" /></div>
             <div className={styles.card}><img className={styles.logo} src="/Company/19chungju.jpg" alt="고객사 9-dup2" /></div>
             <div className={styles.card}><img className={styles.logo} src="/Company/20squ.jpg" alt="고객사 10-dup2" /></div>
+            <div className={styles.card}><img className={styles.logo} src="/Company/16design.jpg" alt="고객사 6-dup3" /></div>
+            <div className={styles.card}><img className={styles.logo} src="/Company/17tra.jpg" alt="고객사 7-dup3" /></div>
+            <div className={styles.card}><img className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8-dup3" /></div>
+            <div className={styles.card}><img className={styles.logo} src="/Company/19chungju.jpg" alt="고객사 9-dup3" /></div>
+            <div className={styles.card}><img className={styles.logo} src="/Company/20squ.jpg" alt="고객사 10-dup3" /></div>
           </div>
         </div>
       </div>

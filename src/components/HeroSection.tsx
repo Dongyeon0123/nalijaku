@@ -8,7 +8,6 @@ export default function HeroSection() {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const containerRef = React.useRef<HTMLElement | null>(null);
   const [isMounted, setIsMounted] = React.useState(false);
-  const [videoReady, setVideoReady] = React.useState(false);
 
   const renderAnimatedText = (
     text: string,
@@ -60,7 +59,7 @@ export default function HeroSection() {
       // 모든 볼륨 관련 설정
       video.volume = 0;
       video.defaultMuted = true;
-      (video as any)['webkit-playsinline'] = true;
+      (video as HTMLVideoElement & { 'webkit-playsinline'?: boolean })['webkit-playsinline'] = true;
 
       videoRef.current = video;
 
@@ -70,7 +69,6 @@ export default function HeroSection() {
           video.currentTime = 0;
           await video.play();
           console.log('✅ 비디오 재생 성공!');
-          setVideoReady(true);
         } catch (error) {
           console.log('🔄 재생 시도 중...', error);
         }
@@ -100,7 +98,6 @@ export default function HeroSection() {
         video.volume = 0;
         await video.play();
         console.log('🎯 상호작용으로 재생 성공!');
-        setVideoReady(true);
       } catch (error) {
         console.log('재생 실패:', error);
       }
