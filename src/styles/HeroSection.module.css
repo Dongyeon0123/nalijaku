@@ -1,9 +1,7 @@
 .heroSection {
   position: relative;
-  /* iOS/Safari 100vh 이슈 대응: 100svh/100dvh가 지원되면 우선 사용 */
-  height: calc(100svh - var(--header-height, 80px));
-  height: calc(100dvh - var(--header-height, 80px));
-  height: calc(100vh - var(--header-height, 80px));
+  height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,13 +10,10 @@
 
 .backgroundVideo {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  min-width: 100%;
-  min-height: 100%;
-  width: auto;
-  height: auto;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 1;
   object-fit: cover;
   /* Safari에서 영상 자동재생 최적화 */

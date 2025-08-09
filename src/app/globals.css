@@ -20,4 +20,15 @@ html, body {
 html {
   overflow-y: scroll;
   scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+}
+
+/* 모든 요소에 부드러운 스크롤 적용 */
+*, *::before, *::after {
+  scroll-behavior: smooth !important;
+}
+
+/* main 요소에 확실히 적용 */
+main {
+  scroll-behavior: smooth !important;
 }

@@ -6,7 +6,7 @@ import styles from '@/styles/HeroSection.module.css';
 
 export default function HeroSection() {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const containerRef = React.useRef<HTMLElement | null>(null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
   const [isMounted, setIsMounted] = React.useState(false);
 
   const renderAnimatedText = (
@@ -88,7 +88,7 @@ export default function HeroSection() {
   const subtitleText = '국내 최초 학교 & 기관 대상, AI/XR 기반 드론 교육 전문 플랫폼';
 
   return (
-    <section ref={containerRef} className={styles.heroSection}>
+    <div ref={containerRef} className={styles.heroSection}>
       <video
         ref={videoRef}
         className={styles.backgroundVideo}
@@ -134,6 +134,6 @@ export default function HeroSection() {
           </button>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
