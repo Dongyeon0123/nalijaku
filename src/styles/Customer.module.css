@@ -40,8 +40,8 @@
 
 @media (max-width: 768px) {
   .animateUp {
-    transform: translateY(40px);
-    transition-duration: 0.6s;
+    transform: translateY(30px);
+    transition-duration: 0.4s;
   }
 }
 
@@ -105,8 +105,8 @@
 
 @media (max-width: 768px) {
   .card {
-    padding: 16px;
-    min-height: 90px;
+    padding: 12px;
+    min-height: 70px;
   }
 }
 
@@ -120,7 +120,8 @@
 
 @media (max-width: 768px) {
   .logo {
-    max-height: 50px;
+    max-height: 40px;
+    max-width: 90%;
   }
 }
 
@@ -134,6 +135,20 @@
   align-items: center;
   gap: 20px;
   will-change: transform;
+}
+
+@media (max-width: 768px) {
+  .marqueeInner {
+    gap: 0px;
+  }
+  
+  .card {
+    margin-left: -20px;
+  }
+  
+  .card:first-child {
+    margin-left: 0;
+  }
 }
 
 @keyframes scrollRight {
