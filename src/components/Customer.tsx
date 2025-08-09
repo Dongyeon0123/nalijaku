@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import styles from '@/styles/Customer.module.css';
 
 export default function Customer() {
@@ -69,51 +70,51 @@ export default function Customer() {
 
         <div className={`${styles.marquee} ${styles.rowTop} ${styles.animateUp} ${styles.delay2}`}>
           <div ref={topRowRef} className={styles.marqueeInner}>
-            <div className={styles.card}><img className={styles.logo} src="/Company/11edu.jpg" alt="고객사 1" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/12lib.jpg" alt="고객사 2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/14bang.jpg" alt="고객사 4" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/15center.jpg" alt="고객사 5" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/11edu.jpg" alt="고객사 1-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/12lib.jpg" alt="고객사 2-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/14bang.jpg" alt="고객사 4-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/15center.jpg" alt="고객사 5-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/11edu.jpg" alt="고객사 1-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/12lib.jpg" alt="고객사 2-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/14bang.jpg" alt="고객사 4-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/15center.jpg" alt="고객사 5-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/11edu.jpg" alt="고객사 1-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/12lib.jpg" alt="고객사 2-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/14bang.jpg" alt="고객사 4-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/15center.jpg" alt="고객사 5-dup3" /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/11edu.jpg" alt="고객사 1" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/12lib.jpg" alt="고객사 2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/14bang.jpg" alt="고객사 4" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/15center.jpg" alt="고객사 5" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/11edu.jpg" alt="고객사 1-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/12lib.jpg" alt="고객사 2-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/14bang.jpg" alt="고객사 4-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/15center.jpg" alt="고객사 5-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/11edu.jpg" alt="고객사 1-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/12lib.jpg" alt="고객사 2-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/14bang.jpg" alt="고객사 4-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/15center.jpg" alt="고객사 5-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/11edu.jpg" alt="고객사 1-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/12lib.jpg" alt="고객사 2-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/13emart.jpg" alt="고객사 3-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/14bang.jpg" alt="고객사 4-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/15center.jpg" alt="고객사 5-dup3" width={200} height={120} /></div>
           </div>
         </div>
 
         <div className={`${styles.marquee} ${styles.rowBottom} ${styles.animateUp} ${styles.delay3}`}>
           <div ref={bottomRowRef} className={styles.marqueeInner}>
-            <div className={styles.card}><img className={styles.logo} src="/Company/16design.jpg" alt="고객사 6" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/17tra.jpg" alt="고객사 7" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/19chungju.jpg" alt="고객사 9" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/20squ.jpg" alt="고객사 10" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/16design.jpg" alt="고객사 6-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/17tra.jpg" alt="고객사 7-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/19chungju.jpg" alt="고객사 9-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/20squ.jpg" alt="고객사 10-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/16design.jpg" alt="고객사 6-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/17tra.jpg" alt="고객사 7-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/19chungju.jpg" alt="고객사 9-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/20squ.jpg" alt="고객사 10-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/16design.jpg" alt="고객사 6-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/17tra.jpg" alt="고객사 7-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/19chungju.jpg" alt="고객사 9-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Company/20squ.jpg" alt="고객사 10-dup3" /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/16design.jpg" alt="고객사 6" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/17tra.jpg" alt="고객사 7" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/19chungju.jpg" alt="고객사 9" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/20squ.jpg" alt="고객사 10" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/16design.jpg" alt="고객사 6-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/17tra.jpg" alt="고객사 7-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/19chungju.jpg" alt="고객사 9-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/20squ.jpg" alt="고객사 10-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/16design.jpg" alt="고객사 6-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/17tra.jpg" alt="고객사 7-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/19chungju.jpg" alt="고객사 9-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/20squ.jpg" alt="고객사 10-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/16design.jpg" alt="고객사 6-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/17tra.jpg" alt="고객사 7-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/18lotte.jpg" alt="고객사 8-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/19chungju.jpg" alt="고객사 9-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Company/20squ.jpg" alt="고객사 10-dup3" width={200} height={120} /></div>
           </div>
         </div>
       </div>

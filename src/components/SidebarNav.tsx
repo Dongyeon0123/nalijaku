@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { IoHomeOutline, IoBusinessOutline, IoPeopleOutline, IoSchoolOutline, IoCallOutline, IoDocumentTextOutline, IoMenuOutline, IoHelpCircleOutline, IoStarOutline, IoAddCircleOutline } from 'react-icons/io5';
+import Image from 'next/image';
+import { IoHomeOutline, IoBusinessOutline, IoPeopleOutline, IoCallOutline, IoMenuOutline, IoHelpCircleOutline, IoStarOutline, IoAddCircleOutline } from 'react-icons/io5';
 import styles from '@/styles/SidebarNav.module.css';
 
 export default function SidebarNav() {
@@ -9,7 +10,7 @@ export default function SidebarNav() {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [isDarkBackground, setIsDarkBackground] = React.useState(true);
 
-  const navItems = [
+  const navItems = React.useMemo(() => [
     { id: 'home', label: 'Home', icon: IoHomeOutline },
     { id: 'cooperation', label: '협력 업체', icon: IoPeopleOutline },
     { id: 'customer', label: '고객사', icon: IoBusinessOutline },
@@ -20,7 +21,7 @@ export default function SidebarNav() {
     { id: 'team', label: 'Team 날리자쿠', icon: IoPeopleOutline },
     { id: 'more', label: 'MORE', icon: IoAddCircleOutline },
     { id: 'contact', label: 'Contact Us', icon: IoCallOutline },
-  ];
+  ], []);
 
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
@@ -96,7 +97,7 @@ export default function SidebarNav() {
             <IoMenuOutline className={styles.hamburgerIcon} />
           ) : (
             <>
-              <img src="/logo.png" alt="날리자쿠" className={styles.logoImage} />
+              <Image src="/logo.png" alt="날리자쿠" width={120} height={40} className={styles.logoImage} />
               <span className={styles.logoText}>날리자쿠</span>
             </>
           )}

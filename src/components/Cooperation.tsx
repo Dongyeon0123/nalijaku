@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import styles from '@/styles/Cooperation.module.css';
 
 export default function Cooperation() {
@@ -69,47 +70,47 @@ export default function Cooperation() {
 
         <div className={`${styles.marquee} ${styles.rowTop} ${styles.animateUp} ${styles.delay2}`}>
           <div ref={topRowRef} className={styles.marqueeInner}>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup3" /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup3" width={200} height={120} /></div>
           </div>
         </div>
 
         <div className={`${styles.marquee} ${styles.rowBottom} ${styles.animateUp} ${styles.delay3}`}>
           <div ref={bottomRowRef} className={styles.marqueeInner}>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup2" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup3" /></div>
-            <div className={styles.card}><img className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup3" /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup2" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup3" width={200} height={120} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup3" width={200} height={120} /></div>
           </div>
         </div>
       </div>
