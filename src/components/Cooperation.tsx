@@ -8,7 +8,7 @@ export default function Cooperation() {
     <section className={styles.cooperationSection}>
       <div className={styles.container}>
         <h2 className={styles.title}>협력업체</h2>
-        <p className={styles.subtitle}>이미 많은 업체에서 <span style={{color: '#00C187', fontWeight: 'bold'}}>날리자쿠</span>와 함께하고 있습니다</p>
+        <p className={styles.subtitle}>이미 많은 업체에서 <span style={{color: '#00A169', fontWeight: 'bold'}}>날리자쿠</span>와 함께하고 있습니다</p>
 
         <div className={`${styles.marquee} ${styles.rowTop}`}>
           <div className={styles.marqueeInner}>

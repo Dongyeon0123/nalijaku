@@ -8,7 +8,7 @@ export default function Customer() {
     <section className={styles.customerSection}>
       <div className={styles.container}>
         <h2 className={styles.title}>고객사</h2>
-        <p className={styles.subtitle}>아이들과 선생님을 위해서 <span style={{color: '#00C187', fontWeight: 'bold'}}>드론 교육 솔루션</span>을 함께 만들어가고 있습니다</p>
+        <p className={styles.subtitle}>아이들과 선생님을 위해서 드론 교육 솔루션을<br></br> <span style={{color: '#00A169', fontWeight: 'bold'}}>함께</span> 만들어가고 있습니다</p>
 
         <div className={`${styles.marquee} ${styles.rowTop}`}>
           <div className={styles.marqueeInner}>

@@ -10,18 +10,19 @@
 
 .title {
   font-size: 24px;
-  font-weight: 800;
-  color: #00C187;
-  margin: 0 0 8px 0;
+  font-weight: 900;
+  color: #00A169;
+  margin: 0 0 14px 0;
   letter-spacing: -0.5px;
   text-align: center;
 }
 
 .subtitle {
   font-size: 28px;
-  color: #000;
+  color: #383838;
   margin: 0 0 40px 0;
   text-align: center;
+  font-weight: 600;
 }
 
 .gridFive {
