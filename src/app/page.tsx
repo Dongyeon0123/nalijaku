@@ -3,6 +3,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
+import Cooperation from '@/components/Cooperation';
 
 export default function Home() {
   React.useEffect(() => {
@@ -24,21 +25,7 @@ export default function Home() {
         background: '#fafafa'
       }}>
         <HeroSection />
-        
-        <section style={{
-          padding: '80px 24px',
-          textAlign: 'center',
-          color: '#666',
-          maxWidth: '1200px',
-          margin: '0 auto'
-        }}>
-          <h2 style={{ fontSize: '36px', margin: '0 0 24px 0', color: '#1a1a1a' }}>
-            다음 섹션들이 여기에 추가됩니다
-          </h2>
-          <p style={{ fontSize: '18px', margin: 0 }}>
-            스크롤형 페이지의 추가 컨텐츠 영역입니다.
-          </p>
-        </section>
+        <Cooperation />
       </main>
     </div>
   );

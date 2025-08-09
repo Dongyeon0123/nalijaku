@@ -24,10 +24,14 @@ export default function Header() {
     };
   }, []);
 
+  const handleScrollTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <div className={styles.logoSection}>
+        <div className={styles.logoSection} onClick={handleScrollTop}>
           <Image 
             src="/logo.png" 
             alt="날리자쿠 로고" 

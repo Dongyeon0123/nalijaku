@@ -34,6 +34,7 @@
   color: #1a1a1a;
   letter-spacing: -0.5px;
   margin-left: -10px;
+  cursor: pointer;
 }
 
 .navigation {
@@ -102,6 +103,7 @@
   bottom: 0;
   height: 3px;
   pointer-events: none;
+  margin-bottom: -1px;
 }
 
 .progressBar {
