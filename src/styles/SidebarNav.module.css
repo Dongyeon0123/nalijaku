@@ -180,10 +180,9 @@
 }
 
 /* 모바일에서 숨기기 */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .sidebarNav {
-    transform: translateX(-100%);
-    pointer-events: none;
+    display: none;
   }
 }
 
