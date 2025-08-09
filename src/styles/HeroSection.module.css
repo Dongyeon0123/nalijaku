@@ -1,0 +1,130 @@
+.heroSection {
+  position: relative;
+  height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.backgroundVideo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  object-fit: cover;
+}
+
+.videoOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  color: #ffffff;
+  max-width: 800px;
+  padding: 0 24px;
+}
+
+.heroTitle {
+  font-size: 56px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  line-height: 1.2;
+  letter-spacing: -1px;
+}
+
+.heroDescription {
+  font-size: 20px;
+  margin: 0 0 40px 0;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.serviceButton {
+  width: calc(100% - 32px);
+  max-width: 380px;
+  padding: 16px 32px;
+  background: transparent;
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 60px;
+}
+
+.serviceButton:hover {
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+.primaryButton {
+  padding: 16px 32px;
+  background: #00C187;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 193, 135, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 193, 135, 0.4);
+}
+
+.secondaryButton {
+  padding: 16px 32px;
+  background: transparent;
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+}
+
+.secondaryButton:hover {
+  background: #ffffff;
+  color: #1a1a1a;
+}

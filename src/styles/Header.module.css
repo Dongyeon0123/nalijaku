@@ -1,0 +1,112 @@
+.header {
+  background: #ffffff;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 280px;
+}
+
+.logoImage {
+  border-radius: 8px;
+}
+
+.logoText {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+  margin-left: -10px;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.navLink {
+  font-size: 16px;
+  font-weight: 500;
+  color: #4a4a4a;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.navLink:hover {
+  color: #1a1a1a;
+}
+
+.buttonSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.curriculumButton {
+  padding: 10px 20px;
+  border: 2px solid #00C187;
+  border-radius: 8px;
+  background: transparent;
+  color: #00C187;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.curriculumButton:hover {
+  background: #00C187;
+  color: #ffffff;
+}
+
+.loginButton {
+  padding: 10px 20px;
+  border: 2px solid #1a1a1a;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1a1a1a;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.loginButton:hover {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.progressContainer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  pointer-events: none;
+}
+
+.progressBar {
+  height: 100%;
+  background: #00C187;
+  width: 0%;
+  transition: width 0.1s linear;
+}
