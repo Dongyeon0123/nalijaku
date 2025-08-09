@@ -4,6 +4,13 @@
   margin-top: 70px;
 }
 
+@media (max-width: 768px) {
+  .cooperationSection {
+    padding: 60px 16px;
+    margin-top: 40px;
+  }
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -18,12 +25,26 @@
   text-align: center;
 }
 
+@media (max-width: 768px) {
+  .title {
+    font-size: 20px;
+  }
+}
+
 .subtitle {
   font-size: 28px;
   font-weight: 600;
   color: #383838;
   margin: 0 0 40px 0;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .subtitle {
+    font-size: 18px;
+    margin: 0 0 30px 0;
+    line-height: 1.4;
+  }
 }
 
 .gridFive {
@@ -53,12 +74,25 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 768px) {
+  .card {
+    padding: 16px;
+    min-height: 90px;
+  }
+}
+
 .logo {
   max-width: 100%;
   max-height: 80px;
   object-fit: contain;
   transition: transform 200ms ease;
   will-change: transform;
+}
+
+@media (max-width: 768px) {
+  .logo {
+    max-height: 50px;
+  }
 }
 
 .marquee {

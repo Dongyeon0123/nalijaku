@@ -39,6 +39,13 @@
   padding: 0 24px;
 }
 
+@media (max-width: 768px) {
+  .heroContent {
+    padding: 0 16px;
+    max-width: 100%;
+  }
+}
+
 /* Animations */
 @keyframes fadeUp {
   0% { opacity: 0; transform: translateY(10px); }
@@ -73,6 +80,14 @@
   letter-spacing: -1px;
 }
 
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 32px;
+    margin: 0 0 16px 0;
+    line-height: 1.3;
+  }
+}
+
 .heroDescription {
   font-size: 20px;
   margin: 0 0 40px 0;
@@ -80,11 +95,27 @@
   line-height: 1.6;
 }
 
+@media (max-width: 768px) {
+  .heroDescription {
+    font-size: 16px;
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+  }
+}
+
 .buttonContainer {
   display: flex;
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .buttonContainer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
 }
 
 .serviceButton {
@@ -105,6 +136,17 @@
   justify-content: center;
   gap: 8px;
   height: 60px;
+}
+
+@media (max-width: 768px) {
+  .serviceButton {
+    width: 90%;
+    max-width: 300px;
+    padding: 14px 24px;
+    font-size: 16px;
+    height: 52px;
+    margin-bottom: 12px;
+  }
 }
 
 .serviceButton:hover {
@@ -129,6 +171,16 @@
   height: 56px;
 }
 
+@media (max-width: 768px) {
+  .primaryButton {
+    padding: 14px 24px;
+    font-size: 16px;
+    height: 48px;
+    width: 90%;
+    max-width: 300px;
+  }
+}
+
 .primaryButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(0, 193, 135, 0.4);
@@ -148,6 +200,16 @@
   align-items: center;
   justify-content: center;
   height: 56px;
+}
+
+@media (max-width: 768px) {
+  .secondaryButton {
+    padding: 14px 24px;
+    font-size: 16px;
+    height: 48px;
+    width: 90%;
+    max-width: 300px;
+  }
 }
 
 .secondaryButton:hover {

@@ -35,8 +35,8 @@ export default function Header() {
           <Image 
             src="/logo.png" 
             alt="날리자쿠 로고" 
-            width={90} 
-            height={50}
+            width={72} 
+            height={40}
             className={styles.logoImage}
           />
           <span className={styles.logoText}>
