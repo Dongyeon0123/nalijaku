@@ -4,6 +4,7 @@ import React from 'react';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import Cooperation from '@/components/Cooperation';
+import Customer from '@/components/Customer';
 
 export default function Home() {
   React.useEffect(() => {
@@ -26,6 +27,7 @@ export default function Home() {
       }}>
         <HeroSection />
         <Cooperation />
+        <Customer />
       </main>
     </div>
   );

@@ -1,7 +1,6 @@
-.cooperationSection {
+.customerSection {
   padding: 80px 24px;
   background: #ffffff;
-  margin-top: 70px;
 }
 
 .container {
@@ -20,7 +19,7 @@
 
 .subtitle {
   font-size: 28px;
-  color: #383838;
+  color: #000;
   margin: 0 0 40px 0;
   text-align: center;
 }
