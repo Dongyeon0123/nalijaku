@@ -125,11 +125,11 @@
 
 @media (max-width: 768px) {
   .rowTop .marqueeInner {
-    animation: slideRight 6s linear infinite;
+    animation: slideRight 8s linear infinite;
   }
 
   .rowBottom .marqueeInner {
-    animation: slideLeft 6s linear infinite;
+    animation: slideLeft 8s linear infinite;
   }
 }
 
