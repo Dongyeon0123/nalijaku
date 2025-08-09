@@ -123,6 +123,16 @@
   animation: slideLeft 16s linear infinite;
 }
 
+@media (max-width: 768px) {
+  .rowTop .marqueeInner {
+    animation: slideRight 6s linear infinite;
+  }
+
+  .rowBottom .marqueeInner {
+    animation: slideLeft 6s linear infinite;
+  }
+}
+
 @media (max-width: 1024px) {
   .gridFive {
     grid-template-columns: repeat(3, minmax(0, 1fr));
