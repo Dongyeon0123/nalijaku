@@ -16,6 +16,37 @@
   margin: 0 auto;
 }
 
+/* 단순하고 확실한 애니메이션 */
+.animateUp {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.visible .animateUp {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.delay1 {
+  transition-delay: 0.2s;
+}
+
+.delay2 {
+  transition-delay: 0.4s;
+}
+
+.delay3 {
+  transition-delay: 0.6s;
+}
+
+@media (max-width: 768px) {
+  .animateUp {
+    transform: translateY(40px);
+    transition-duration: 0.6s;
+  }
+}
+
 .title {
   font-size: 24px;
   font-weight: 900;
