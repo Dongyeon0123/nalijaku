@@ -30,14 +30,40 @@ export default function SidebarNav() {
     const mainElement = document.querySelector('main');
     
     if (targetElement && mainElement) {
+      // CSS scroll-behavior 제거하고 JavaScript로 애니메이션 처리
+      const originalScrollBehavior = mainElement.style.scrollBehavior;
+      mainElement.style.scrollBehavior = 'auto';
+      
       // main 요소 내에서의 상대적 위치 계산
       const targetTop = targetElement.offsetTop - mainElement.offsetTop;
       
-      // main 요소 내에서 스크롤
-      mainElement.scrollTo({
-        top: targetTop,
-        behavior: 'smooth'
-      });
+      // 부드러운 스크롤 애니메이션 구현
+      const startScrollTop = mainElement.scrollTop;
+      const distance = targetTop - startScrollTop;
+      const duration = 800; // 800ms 애니메이션
+      let startTime = 0;
+      
+      const animate = (currentTime: number) => {
+        if (startTime === 0) startTime = currentTime;
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+        
+        // easeInOutCubic 이징 함수
+        const ease = progress < 0.5 
+          ? 4 * progress * progress * progress 
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        
+        mainElement.scrollTop = startScrollTop + distance * ease;
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // 애니메이션 완료 후 원래 scroll-behavior 복원
+          mainElement.style.scrollBehavior = originalScrollBehavior;
+        }
+      };
+      
+      requestAnimationFrame(animate);
     }
   };
 

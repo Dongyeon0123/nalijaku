@@ -41,9 +41,10 @@
 
 .header.transparent:hover .loginButton {
   border: 2px solid #1a1a1a;
-  background: #ffffff;
+  background: #f8f8f8;
   color: #1a1a1a;
   text-shadow: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header.scrolled {
@@ -278,11 +279,11 @@
 }
 
 .header.transparent .loginButton:hover {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(255, 255, 255, 0.9);
-  color: #1a1a1a;
+  background: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+  color: #ffffff !important;
   text-shadow: none;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 15px rgba(26, 26, 26, 0.6);
 }
 
 .header.scrolled .loginButton {
