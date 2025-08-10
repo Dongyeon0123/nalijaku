@@ -6,23 +6,43 @@ import styles from '@/styles/Header.module.css';
 
 export default function Header() {
   const [progress, setProgress] = React.useState(0);
+  const [isScrolled, setIsScrolled] = React.useState(false);
   const headerRef = React.useRef<HTMLElement | null>(null);
 
   React.useEffect(() => {
-    const updateProgress = () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    const handleScroll = () => {
+      const mainElement = document.querySelector('main');
+      if (!mainElement) return;
+
+      const scrollTop = mainElement.scrollTop;
+      
+      // 스크롤 진행도 계산
+      const { scrollHeight, clientHeight } = mainElement;
       const maxScrollable = scrollHeight - clientHeight;
       const percent = maxScrollable > 0 ? (scrollTop / maxScrollable) * 100 : 0;
       setProgress(percent);
+      
+      // 현재 섹션 확인하여 헤더 스타일 결정
+      const homeSection = document.getElementById('home');
+      if (homeSection) {
+        const homeSectionBottom = homeSection.offsetTop + homeSection.offsetHeight - mainElement.offsetTop;
+        const isInHomeSection = scrollTop < homeSectionBottom - 100; // 100px 여유
+        setIsScrolled(!isInHomeSection);
+      } else {
+        // fallback: 50px 이상 스크롤하면 흰색 배경 활성화
+        setIsScrolled(scrollTop > 50);
+      }
     };
 
-    updateProgress();
-    window.addEventListener('scroll', updateProgress, { passive: true });
-    window.addEventListener('resize', updateProgress);
-    return () => {
-      window.removeEventListener('scroll', updateProgress);
-      window.removeEventListener('resize', updateProgress);
-    };
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      mainElement.addEventListener('scroll', handleScroll, { passive: true });
+      // 초기 상태 설정
+      handleScroll();
+      return () => {
+        mainElement.removeEventListener('scroll', handleScroll);
+      };
+    }
   }, []);
 
   React.useEffect(() => {
@@ -56,7 +76,7 @@ export default function Header() {
   };
 
   return (
-    <header ref={headerRef} className={styles.header}>
+    <header ref={headerRef} className={`${styles.header} ${isScrolled ? styles.scrolled : styles.transparent}`}>
       <div className={styles.container}>
         <div className={styles.logoSection} onClick={handleScrollToHome}>
           <Image 

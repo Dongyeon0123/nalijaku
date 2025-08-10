@@ -1,14 +1,56 @@
 .header {
-  background: #ffffff;
-  backdrop-filter: blur(10px);
   padding: 16px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.header.transparent {
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: none;
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+
+.header.transparent:hover {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header.transparent:hover .logoText {
+  color: #000000;
+  text-shadow: none;
+}
+
+.header.transparent:hover .navLink {
+  color: #333333;
+  text-shadow: none;
+}
+
+.header.transparent:hover .curriculumButton {
+  border: 2px solid #00C187;
+  color: #00C187;
+  text-shadow: none;
+}
+
+.header.transparent:hover .loginButton {
+  border: 2px solid #1a1a1a;
+  background: #ffffff;
+  color: #1a1a1a;
+  text-shadow: none;
+}
+
+.header.scrolled {
+  background: rgba(255, 255, 255, 1);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .container {
@@ -56,9 +98,24 @@
 .logoText {
   font-size: 20px;
   font-weight: 700;
-  color: #1a1a1a;
   letter-spacing: -0.5px;
   cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.header.transparent .logoText {
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header.transparent .logoSection:hover .logoText {
+  color: #00A169;
+  text-shadow: 0 0 8px rgba(0, 161, 105, 0.3);
+}
+
+.header.scrolled .logoText {
+  color: #000000 !important;
+  text-shadow: none;
 }
 
 @media (max-width: 768px) {
@@ -82,14 +139,49 @@
 .navLink {
   font-size: 16px;
   font-weight: 500;
-  color: #4a4a4a;
   text-decoration: none;
-  transition: color 0.2s ease;
   cursor: pointer;
+  position: relative;
+  transition: color 0.3s ease;
+  padding-bottom: 4px;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #007A50;
+  transition: width 0.3s ease;
+}
+
+.navLink:hover::after {
+  width: 100%;
 }
 
 .navLink:hover {
-  color: #1a1a1a;
+  color: #007A50;
+}
+
+.header.transparent .navLink {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.header.transparent .navLink:hover {
+  color: #00A169;
+  text-shadow: 0 0 8px rgba(0, 161, 105, 0.3);
+}
+
+.header.scrolled .navLink {
+  color: #333333 !important;
+  text-shadow: none;
+}
+
+.header.scrolled .navLink:hover {
+  color: #007A50;
 }
 
 .buttonSection {
@@ -126,7 +218,33 @@
 
 .curriculumButton:hover {
   background: #00C187;
+  border-color: #00C187;
   color: #ffffff;
+}
+
+.header.transparent .curriculumButton {
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.header.transparent .curriculumButton:hover {
+  background: #00A169;
+  border-color: #00A169;
+  color: white;
+  text-shadow: 0 0 8px rgba(0, 161, 105, 0.3);
+  box-shadow: 0 0 15px rgba(0, 161, 105, 0.4);
+}
+
+.header.scrolled .curriculumButton {
+  border: 2px solid #00C187;
+  color: #00C187;
+  text-shadow: none;
+}
+
+.header.scrolled .curriculumButton:hover {
+  background: #00C187;
+  color: white;
 }
 
 .loginButton {
@@ -142,6 +260,33 @@
 }
 
 .loginButton:hover {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.header.transparent .loginButton {
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.header.transparent .loginButton:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.9);
+  color: #1a1a1a;
+  text-shadow: none;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+}
+
+.header.scrolled .loginButton {
+  border: 2px solid #1a1a1a;
+  background: #ffffff;
+  color: #1a1a1a;
+  text-shadow: none;
+}
+
+.header.scrolled .loginButton:hover {
   background: #1a1a1a;
   color: #ffffff;
 }
