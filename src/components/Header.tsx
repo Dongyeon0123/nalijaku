@@ -38,14 +38,27 @@ export default function Header() {
     };
   }, []);
 
-  const handleScrollTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleScrollToHome = () => {
+    const homeSection = document.getElementById('home');
+    const mainElement = document.querySelector('main');
+    
+    if (homeSection && mainElement) {
+      // main 요소 내에서 home 섹션으로 스크롤
+      const targetTop = homeSection.offsetTop - mainElement.offsetTop;
+      mainElement.scrollTo({
+        top: targetTop,
+        behavior: 'smooth'
+      });
+    } else {
+      // fallback으로 맨 위로 스크롤
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
     <header ref={headerRef} className={styles.header}>
       <div className={styles.container}>
-        <div className={styles.logoSection} onClick={handleScrollTop}>
+        <div className={styles.logoSection} onClick={handleScrollToHome}>
           <Image 
             src="/logo.png" 
             alt="날리자쿠 로고" 

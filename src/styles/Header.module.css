@@ -3,7 +3,7 @@
   backdrop-filter: blur(10px);
   padding: 16px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -33,6 +33,12 @@
   align-items: center;
   gap: 12px;
   min-width: 220px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.logoSection:hover {
+  opacity: 0.8;
 }
 
 @media (max-width: 768px) {
