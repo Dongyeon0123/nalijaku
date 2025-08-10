@@ -110,12 +110,12 @@
 }
 
 .header.transparent .logoSection:hover .logoText {
-  color: #00A169;
+  color: #007A50;
   text-shadow: 0 0 8px rgba(0, 161, 105, 0.3);
 }
 
 .header.scrolled .logoSection:hover .logoText {
-  color: #00A169;
+  color: #007A50 !important;
   text-shadow: 0 0 8px rgba(0, 161, 105, 0.3);
 }
 
@@ -177,18 +177,18 @@
 }
 
 .header.transparent .navLink:hover {
-  color: #00A169;
-  text-shadow: 0 0 8px rgba(0, 161, 105, 0.3);
-}
-
-.header.scrolled .navLink:hover {
-  color: #00A169;
+  color: #007A50;
   text-shadow: 0 0 8px rgba(0, 161, 105, 0.3);
 }
 
 .header.scrolled .navLink {
   color: #333333 !important;
   text-shadow: none;
+}
+
+.header.scrolled .navLink:hover {
+  color: #007A50 !important;
+  text-shadow: 0 0 8px rgba(0, 161, 105, 0.3) !important;
 }
 
 .buttonSection {
