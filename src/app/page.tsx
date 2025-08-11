@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import Cooperation from '@/components/Cooperation';
 import Customer from '@/components/Customer';
+import Why from '@/components/Why';
 import SidebarNav from '@/components/SidebarNav';
 
 export default function Home() {
@@ -41,13 +42,8 @@ export default function Home() {
           <section id="customer">
             <Customer />
           </section>
-          <section id="why" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa' }}>
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '3rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>WHY 날리자쿠?</h2>
-              <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
-                왜 날리자쿠를 선택해야 할까요? 전문적인 교육과 혁신적인 솔루션을 제공합니다.
-              </p>
-            </div>
+          <section id="why">
+            <Why />
           </section>
           <section id="who" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' }}>
             <div style={{ textAlign: 'center', padding: '2rem' }}>

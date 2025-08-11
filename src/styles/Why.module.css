@@ -1,0 +1,361 @@
+.whySection {
+  padding: 80px 24px;
+  background: transparent;
+  margin-top: 70px;
+}
+
+@media (max-width: 768px) {
+  .whySection {
+    padding: 60px 16px;
+    margin-top: 40px;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 애니메이션 */
+.animateUp {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.visible .animateUp {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.delay1 {
+  transition-delay: 0.2s;
+}
+
+.delay2 {
+  transition-delay: 0.4s;
+}
+
+.delay3 {
+  transition-delay: 0.6s;
+}
+
+.delay4 {
+  transition-delay: 0.8s;
+}
+
+@media (max-width: 768px) {
+  .animateUp {
+    transform: translateY(40px);
+    transition-duration: 0.6s;
+  }
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #00A169;
+  margin: 0 0 14px 0;
+  letter-spacing: -0.5px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 20px;
+  }
+}
+
+.subtitle {
+  font-size: 28px;
+  font-weight: 600;
+  color: #383838;
+  margin: 0 0 60px 0;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .subtitle {
+    font-size: 18px;
+    margin: 0 0 40px 0;
+    line-height: 1.4;
+  }
+}
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 60px;
+  width: 1200px;
+  margin: 0 auto;
+  justify-content: center;
+  margin-left: -30px;
+}
+
+@media (max-width: 1024px) {
+  .imageGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    margin-left: 0;
+  }
+  
+  .whyImage {
+    width: 90%;
+  }
+  
+  .imageCard::after {
+    width: 280px;
+    height: 330px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 640px) {
+  .imageGrid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    margin-left: 0;
+  }
+  
+  .whyImage {
+    width: 85%;
+    margin: 0 auto;
+    display: block;
+  }
+  
+  .whySection {
+    padding: 50px 20px;
+  }
+  
+  .imageCard {
+    text-align: center;
+  }
+  
+  .imageCard::after {
+    width: 240px;
+    height: 280px;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0;
+  }
+  
+  .pointLabel {
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: -100px;
+    top: 15px;
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+  
+  .descriptionText {
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: -100px;
+    bottom: 15px;
+    font-size: 14px;
+  }
+  
+  .additionalText {
+    font-size: 10px;
+    margin-top: 4px;
+  }
+  
+  .arrowIcon {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+}
+
+.imageCard {
+  background: transparent;
+  border-radius: 16px;
+  padding: 0;
+  transition: all 0.3s ease;
+  overflow: visible;
+  position: relative;
+  min-height: auto;
+}
+
+.imageCard:hover {
+  transform: translateY(-8px);
+}
+
+@media (max-width: 768px) {
+  .imageCard {
+    padding: 0;
+    border-radius: 12px;
+  }
+  
+  .imageCard:hover {
+    transform: translateY(-4px);
+  }
+}
+
+.pointLabel {
+  position: absolute;
+  top: 45px;
+  left: 30px;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 18px;
+  font-weight: 700;
+  z-index: 15;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .pointLabel {
+    top: 12px;
+    left: 12px;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 16px;
+  }
+}
+
+.descriptionText {
+  position: absolute;
+  bottom: 60px;
+  left: 40px;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  z-index: 15;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .descriptionText {
+    bottom: 20px;
+    left: 20px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+.arrowIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: white;
+  font-size: 20px;
+  margin-top: 40px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  z-index: 15;
+  position: relative;
+}
+
+.arrowIcon:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .arrowIcon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    margin-top: 8px;
+  }
+}
+
+.additionalText {
+  font-size: 14px;
+  font-weight: 400;
+  color: white;
+  margin-top: 8px;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  line-height: 1.4;
+}
+
+.imageCard:hover .additionalText {
+  opacity: 1;
+  max-height: 100px;
+}
+
+.imageCard:hover .arrowIcon {
+  background: #00A169;
+  border-color: #00A169;
+}
+
+.imageCard::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 9px;
+  width: 407px;
+  height: 466px;
+  background: rgba(0, 0, 0, 0);
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.imageCard:hover::after {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.imageCard:hover {
+  transform: translateY(-12px);
+}
+
+@media (max-width: 768px) {
+  .additionalText {
+    font-size: 12px;
+    margin-top: 6px;
+  }
+  
+  .imageCard:hover .additionalText {
+    max-height: 80px;
+  }
+}
+
+.whyImage {
+  width: 120%;
+  height: auto;
+  border-radius: 0;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
+
+.imageCard:hover .whyImage {
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .whyImage {
+    border-radius: 6px;
+  }
+  
+  .imageCard:hover .whyImage {
+    transform: scale(1.02);
+  }
+} 
