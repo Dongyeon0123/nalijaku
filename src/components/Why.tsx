@@ -94,7 +94,7 @@ export default function Why() {
             <div className={styles.descriptionText}>
               특허받은 실습 키트
               <div className={styles.additionalText}>
-                특허명: '드론 조작 연습 및 테스트 시스템'<br></br>특허 출원 번호: 10-2025-0085638
+                특허명: &apos;드론 조작 연습 및 테스트 시스템&apos;<br></br>특허 출원 번호: 10-2025-0085638
               </div>
               <div className={styles.arrowIcon}>
                 <HiArrowRight />
