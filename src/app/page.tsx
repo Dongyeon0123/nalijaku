@@ -27,7 +27,7 @@ export default function Home() {
       <div className="mainContent">        
         <main style={{
           height: '100vh',
-          background: '#fafafa',
+          background: '#ffffff',
           overflowY: 'auto',
           position: 'relative',
           scrollBehavior: 'smooth'

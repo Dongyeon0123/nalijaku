@@ -46,8 +46,7 @@ export default function Why() {
           <span style={{color: '#00A169', fontWeight: 'bold'}}>날리자쿠</span> 드론 교육만의 차별성
         </p>
 
-        <div className={styles.imageGridWrapper}>
-          <div className={styles.imageGrid}>
+        <div className={styles.imageGrid}>
           <div className={`${styles.imageCard} ${styles.animateUp} ${styles.delay2}`}>
             <div className={styles.pointLabel}>Point 1</div>
             <div className={styles.descriptionText}>
@@ -110,7 +109,6 @@ export default function Why() {
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               priority={false}
             />
-          </div>
           </div>
         </div>
       </div>

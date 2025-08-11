@@ -1,6 +1,6 @@
 .whySection {
   padding: 80px 24px;
-  background: transparent;
+  background: #ffffff;
   margin-top: 70px;
 }
 
@@ -95,15 +95,58 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  opacity: 0;
+  transform: translateY(60px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.visible .imageCard {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.imageCard:nth-child(1) {
+  transition-delay: 0.2s;
+}
+
+.imageCard:nth-child(2) {
+  transition-delay: 0.4s;
+}
+
+.imageCard:nth-child(3) {
+  transition-delay: 0.6s;
 }
 
 .whyImage {
-  width: 350px;
-  height: 420px;
+  width: 400px;
+  height: 480px;
   object-fit: cover;
   border-radius: 25px;
   transition: transform 0.3s ease;
   position: relative;
+}
+
+/* 데스크톱 전용 - 1025px 이상에서만 적용 */
+@media (min-width: 1025px) {
+  .whyImage {
+    width: 450px !important;
+    height: 530px !important;
+    margin: 0 auto !important;
+    display: block !important;
+  }
+  
+  .imageGrid {
+    gap: 10px;
+    max-width: 1800px;
+    justify-content: center;
+  }
+  
+  .imageCard {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
 }
 
 /* 태블릿 */
@@ -111,12 +154,12 @@
   .imageGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 40px;
-    max-width: 800px;
+    max-width: 900px;
   }
   
   .whyImage {
-    width: 300px;
-    height: 360px;
+    width: 350px;
+    height: 420px;
     border-radius: 20px;
   }
 }
@@ -126,12 +169,12 @@
   .imageGrid {
     grid-template-columns: 1fr;
     gap: 30px;
-    max-width: 320px;
+    max-width: 350px;
   }
   
   .whyImage {
-    width: 280px;
-    height: 340px;
+    width: 320px;
+    height: 380px;
     border-radius: 18px;
   }
   
@@ -167,8 +210,8 @@
 
 .pointLabel {
   position: absolute;
-  top: 45px;
-  left: 30px;
+  top: 60px;
+  left: 35px;
   color: white;
   padding: 8px 16px;
   border-radius: 20px;
@@ -190,8 +233,8 @@
 
 .descriptionText {
   position: absolute;
-  bottom: 45px;
-  left: 40px;
+  bottom: 70px;
+  left: 45px;
   color: white;
   font-size: 20px;
   font-weight: 700;
