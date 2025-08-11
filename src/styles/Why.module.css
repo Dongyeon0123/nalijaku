@@ -82,64 +82,61 @@
   }
 }
 
-/* 데스크톱 - 기본 */
 .imageGrid {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 60px;
-  width: 100%;
-  max-width: 1400px;
-  margin-left: -30px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 50px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .imageCard {
-  flex: 0 0 auto;
-  width: 350px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .whyImage {
-  width: 100%;
-  height: auto;
+  width: 350px;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 25px;
+  transition: transform 0.3s ease;
+  position: relative;
 }
 
 /* 태블릿 */
 @media (max-width: 1024px) {
   .imageGrid {
-    flex-wrap: wrap;
+    grid-template-columns: repeat(2, 1fr);
     gap: 40px;
     max-width: 800px;
   }
   
-  .imageCard {
+  .whyImage {
     width: 300px;
+    height: 360px;
+    border-radius: 20px;
   }
 }
 
 /* 모바일 */
 @media (max-width: 640px) {
   .imageGrid {
-    flex-direction: column;
-    align-items: center;
+    grid-template-columns: 1fr;
     gap: 30px;
-    max-width: 300px;
-    margin-left: 95px;
+    max-width: 320px;
   }
   
-  .imageCard {
+  .whyImage {
     width: 280px;
+    height: 340px;
+    border-radius: 18px;
   }
   
   .whySection {
     padding: 50px 20px;
-  }
-
-  .imageCard::after {
-    top: 10px !important;
-    left: 11px !important;
-    width: 308px !important;
-    height: 350px !important;
-    border-radius: 20px !important;
   }
 }
 
@@ -193,7 +190,7 @@
 
 .descriptionText {
   position: absolute;
-  bottom: 60px;
+  bottom: 45px;
   left: 40px;
   color: white;
   font-size: 20px;
@@ -230,7 +227,7 @@
   border-radius: 50%;
   color: white;
   font-size: 20px;
-  margin-top: 40px;
+  margin-top: 10px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
@@ -257,13 +254,14 @@
   font-size: 14px;
   font-weight: 400;
   color: white;
-  margin-top: 8px;
   opacity: 0;
   max-height: 0;
   overflow: hidden;
   transition: all 0.3s ease;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
   line-height: 1.4;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .imageCard:hover .additionalText {
@@ -276,23 +274,12 @@
   border-color: #00A169;
 }
 
-.imageCard::after {
-  content: '';
-  position: absolute;
-  top: 6;
-  left: 9;
-  width: 396px;
-  height: 450px;
-  background: rgba(0, 0, 0, 0);
-  border-radius: 25px;
-  transition: all 0.3s ease;
-  pointer-events: none;
-  z-index: 10;
+.imageCard:hover .whyImage {
+  filter: brightness(0.6) contrast(1.1);
+  transition: filter 0.3s ease;
 }
 
-.imageCard:hover::after {
-  background: rgba(0, 0, 0, 0.3);
-}
+
 
 .imageCard:hover {
   transform: translateY(-12px);

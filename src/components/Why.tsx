@@ -53,7 +53,7 @@ export default function Why() {
             <div className={styles.descriptionText}>
               진로 위주의 수업 구성
               <div className={styles.additionalText}>
-                드론 활용 직업군 분석과 미래 산업 등을 반영하여 배워야 할 이유를 체계적으로 제공
+                드론 활용 직업군 분석과 미래 산업 등을 반영하여<br></br>배워야 할 이유를 체계적으로 제공
               </div>
               <div className={styles.arrowIcon}>
                 <HiArrowRight />
@@ -74,7 +74,7 @@ export default function Why() {
             <div className={styles.descriptionText}>
               특허받은 실습 키트
               <div className={styles.additionalText}>
-                특허명: '드론 조작 연습 및 테스트 시스템' 특허 출원 번호: 10-2025-0085638
+                특허명: '드론 조작 연습 및 테스트 시스템'<br></br>특허 출원 번호: 10-2025-0085638
               </div>
               <div className={styles.arrowIcon}>
                 <HiArrowRight />
@@ -95,7 +95,7 @@ export default function Why() {
             <div className={styles.descriptionText}>
               XR/AI기반의 디지털 기업
               <div className={styles.additionalText}>
-                XR과 AI 기술을 활용해 실감형, 맞춤형 디지털 학습 경험 제공
+                XR과 AI 기술을 활용해 실감형, 맞춤형 디지털<br></br>학습 경험 제공
               </div>
               <div className={styles.arrowIcon}>
                 <HiArrowRight />
