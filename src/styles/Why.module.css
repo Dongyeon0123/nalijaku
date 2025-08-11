@@ -123,6 +123,7 @@
     align-items: center;
     gap: 30px;
     max-width: 300px;
+    margin-left: 95px;
   }
   
   .imageCard {
@@ -131,6 +132,14 @@
   
   .whySection {
     padding: 50px 20px;
+  }
+
+  .imageCard::after {
+    top: 10px !important;
+    left: 11px !important;
+    width: 308px !important;
+    height: 350px !important;
+    border-radius: 20px !important;
   }
 }
 
@@ -198,9 +207,14 @@
 }
 
 @media (max-width: 768px) {
+  .pointLabel {
+    top: 40px;
+    left: 25px;
+  }
+
   .descriptionText {
-    bottom: 20px;
-    left: 20px;
+    bottom: 50px;
+    left: 35px;
     font-size: 16px;
     font-weight: 600;
   }
