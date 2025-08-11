@@ -32,6 +32,9 @@ export default function Why() {
     // 초기 가시성 체크
     checkInitialVisibility();
 
+    // 모바일과 데스크톱에 따른 다른 설정
+    const isMobile = window.innerWidth <= 768;
+    
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -42,8 +45,8 @@ export default function Why() {
         }
       },
       {
-        threshold: 0.5,
-        rootMargin: '-130px 0px',
+        threshold: isMobile ? 0.1 : 0.5,
+        rootMargin: isMobile ? '-50px 0px' : '-130px 0px',
       }
     );
 
