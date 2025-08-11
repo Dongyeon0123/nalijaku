@@ -96,13 +96,18 @@
   justify-content: center;
   align-items: center;
   opacity: 0;
-  transform: translateY(60px);
-  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform: translateY(80px) scale(0.9);
+  transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: transparent;
+  border-radius: 16px;
+  padding: 0;
+  overflow: visible;
+  min-height: auto;
 }
 
 .visible .imageCard {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .imageCard:nth-child(1) {
@@ -110,11 +115,20 @@
 }
 
 .imageCard:nth-child(2) {
-  transition-delay: 0.4s;
+  transition-delay: 0.2s;
 }
 
 .imageCard:nth-child(3) {
-  transition-delay: 0.6s;
+  transition-delay: 0.2s;
+}
+
+/* 애니메이션 완료 후에만 hover 효과 적용 */
+.visible .imageCard.animation-complete {
+  transition: transform 0.5s ease;
+}
+
+.visible .imageCard.animation-complete:hover {
+  transform: translateY(-8px);
 }
 
 .whyImage {
@@ -122,7 +136,7 @@
   height: 480px;
   object-fit: cover;
   border-radius: 25px;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
   position: relative;
 }
 
@@ -181,16 +195,6 @@
   .whySection {
     padding: 50px 20px;
   }
-}
-
-.imageCard {
-  background: transparent;
-  border-radius: 16px;
-  padding: 0;
-  transition: all 0.3s ease;
-  overflow: visible;
-  position: relative;
-  min-height: auto;
 }
 
 .imageCard:hover {
@@ -322,12 +326,6 @@
   transition: filter 0.3s ease;
 }
 
-
-
-.imageCard:hover {
-  transform: translateY(-12px);
-}
-
 @media (max-width: 768px) {
   .additionalText {
     font-size: 12px;
@@ -338,26 +336,3 @@
     max-height: 80px;
   }
 }
-
-.whyImage {
-  width: 120%;
-  height: auto;
-  border-radius: 0;
-  object-fit: contain;
-  transition: transform 0.3s ease;
-  transform-origin: center;
-}
-
-.imageCard:hover .whyImage {
-  transform: scale(1.05);
-}
-
-@media (max-width: 768px) {
-  .whyImage {
-    border-radius: 6px;
-  }
-  
-  .imageCard:hover .whyImage {
-    transform: scale(1.02);
-  }
-} 

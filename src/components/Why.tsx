@@ -8,21 +8,42 @@ import styles from '@/styles/Why.module.css';
 export default function Why() {
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const [isVisible, setIsVisible] = React.useState(false);
+  const [animationComplete, setAnimationComplete] = React.useState(false);
 
   React.useEffect(() => {
     const currentSection = sectionRef.current;
     if (!currentSection) return;
 
+    // 페이지 로딩 시 섹션이 이미 보이는지 확인
+    const checkInitialVisibility = () => {
+      const rect = currentSection.getBoundingClientRect();
+      const isInitiallyVisible = rect.top < window.innerHeight && rect.bottom > 0;
+      
+      if (isInitiallyVisible) {
+        // 로딩 시 바로 보이면 약간의 딜레이 후 애니메이션
+        setTimeout(() => {
+          setIsVisible(true);
+          // 애니메이션 완료 후 hover 효과 활성화
+          setTimeout(() => setAnimationComplete(true), 1500);
+        }, 300);
+      }
+    };
+
+    // 초기 가시성 체크
+    checkInitialVisibility();
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
+          // 애니메이션 완료 후 hover 효과 활성화
+          setTimeout(() => setAnimationComplete(true), 1500);
           observer.unobserve(currentSection);
         }
       },
       {
         threshold: 0.1,
-        rootMargin: '-100px 0px',
+        rootMargin: '-50px 0px',
       }
     );
 
@@ -47,7 +68,7 @@ export default function Why() {
         </p>
 
         <div className={styles.imageGrid}>
-          <div className={`${styles.imageCard} ${styles.animateUp} ${styles.delay2}`}>
+          <div className={`${styles.imageCard} ${styles.animateUp} ${styles.delay1} ${animationComplete ? styles.animationComplete : ''}`}>
             <div className={styles.pointLabel}>Point 1</div>
             <div className={styles.descriptionText}>
               진로 위주의 수업 구성
@@ -68,7 +89,7 @@ export default function Why() {
               priority={false}
             />
           </div>
-          <div className={`${styles.imageCard} ${styles.animateUp} ${styles.delay3}`}>
+          <div className={`${styles.imageCard} ${styles.animateUp} ${styles.delay2} ${animationComplete ? styles.animationComplete : ''}`}>
             <div className={styles.pointLabel}>Point 2</div>
             <div className={styles.descriptionText}>
               특허받은 실습 키트
@@ -89,7 +110,7 @@ export default function Why() {
               priority={false}
             />
           </div>
-          <div className={`${styles.imageCard} ${styles.animateUp} ${styles.delay4}`}>
+          <div className={`${styles.imageCard} ${styles.animateUp} ${styles.delay3} ${animationComplete ? styles.animationComplete : ''}`}>
             <div className={styles.pointLabel}>Point 3</div>
             <div className={styles.descriptionText}>
               XR/AI기반의 디지털 기업
