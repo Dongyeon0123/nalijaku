@@ -22,8 +22,8 @@ export default function Cooperation() {
         }
       },
       {
-        threshold: 0.5,
-        rootMargin: '-130px 0px',
+        threshold: 0.3,
+        rootMargin: '-80px 0px',
       }
     );
 
