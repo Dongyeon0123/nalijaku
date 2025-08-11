@@ -83,23 +83,22 @@ export default function SidebarNav() {
       let currentActiveSection = 'home';
       let minDistance = Infinity;
       
-      for (const sectionId of sections) {
-        const section = document.getElementById(sectionId);
-        if (section) {
-          const sectionTop = section.offsetTop - mainElement.offsetTop;
-          const sectionBottom = sectionTop + section.offsetHeight;
-          const sectionCenter = sectionTop + section.offsetHeight / 2;
-          
-          // 섹션의 중앙과 뷰포트 중앙 사이의 거리 계산
-          const distance = Math.abs(centerPosition - sectionCenter);
-          
-          // 가장 가까운 섹션을 찾기
-          if (distance < minDistance) {
-            minDistance = distance;
-            currentActiveSection = sectionId;
+              for (const sectionId of sections) {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            const sectionTop = section.offsetTop - mainElement.offsetTop;
+            const sectionCenter = sectionTop + section.offsetHeight / 2;
+            
+            // 섹션의 중앙과 뷰포트 중앙 사이의 거리 계산
+            const distance = Math.abs(centerPosition - sectionCenter);
+            
+            // 가장 가까운 섹션을 찾기
+            if (distance < minDistance) {
+              minDistance = distance;
+              currentActiveSection = sectionId;
+            }
           }
         }
-      }
 
       // 이전 섹션과 다를 때만 업데이트 (깜빡임 방지)
       if (activeSection !== currentActiveSection) {
