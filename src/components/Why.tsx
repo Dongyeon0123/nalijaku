@@ -42,8 +42,8 @@ export default function Why() {
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '-50px 0px',
+        threshold: 0.5,
+        rootMargin: '-130px 0px',
       }
     );
 

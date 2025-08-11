@@ -81,35 +81,54 @@ export default function SidebarNav() {
       const centerPosition = scrollPosition + viewportHeight / 2;
 
       let currentActiveSection = 'home';
+      let minDistance = Infinity;
       
       for (const sectionId of sections) {
         const section = document.getElementById(sectionId);
         if (section) {
           const sectionTop = section.offsetTop - mainElement.offsetTop;
           const sectionBottom = sectionTop + section.offsetHeight;
+          const sectionCenter = sectionTop + section.offsetHeight / 2;
           
-          // 섹션의 중앙이 뷰포트 중앙에 가장 가까운 섹션을 찾기
-          if (centerPosition >= sectionTop && centerPosition < sectionBottom) {
+          // 섹션의 중앙과 뷰포트 중앙 사이의 거리 계산
+          const distance = Math.abs(centerPosition - sectionCenter);
+          
+          // 가장 가까운 섹션을 찾기
+          if (distance < minDistance) {
+            minDistance = distance;
             currentActiveSection = sectionId;
-            break;
           }
         }
       }
 
-      setActiveSection(currentActiveSection);
-      
-      // home 섹션일 때는 다크 배경, 나머지는 라이트 배경
-      setIsDarkBackground(currentActiveSection === 'home');
+      // 이전 섹션과 다를 때만 업데이트 (깜빡임 방지)
+      if (activeSection !== currentActiveSection) {
+        setActiveSection(currentActiveSection);
+        // home 섹션일 때는 다크 배경, 나머지는 라이트 배경
+        setIsDarkBackground(currentActiveSection === 'home');
+      }
     };
 
     const mainElement = document.querySelector('main');
     if (mainElement) {
-      mainElement.addEventListener('scroll', handleScroll);
+      // 스크롤 이벤트에 throttle 적용하여 성능 개선
+      let ticking = false;
+      const throttledHandleScroll = () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            handleScroll();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      };
+
+      mainElement.addEventListener('scroll', throttledHandleScroll);
       // 초기 섹션 설정
       handleScroll();
-      return () => mainElement.removeEventListener('scroll', handleScroll);
+      return () => mainElement.removeEventListener('scroll', throttledHandleScroll);
     }
-  }, [navItems]);
+  }, [navItems, activeSection]);
 
   return (
     <nav 

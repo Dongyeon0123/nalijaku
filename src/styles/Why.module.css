@@ -1,12 +1,12 @@
 .whySection {
-  padding: 80px 24px;
-  background: #ffffff;
+  padding: 160px 24px;
+  background: #f8f9fa;
   margin-top: 70px;
 }
 
 @media (max-width: 768px) {
   .whySection {
-    padding: 60px 16px;
+    padding: 120px 16px;
     margin-top: 40px;
   }
 }

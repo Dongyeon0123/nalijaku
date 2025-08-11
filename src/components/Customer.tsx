@@ -22,8 +22,8 @@ export default function Customer() {
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '-100px 0px',
+        threshold: 0.5,
+        rootMargin: '-130px 0px',
       }
     );
 
