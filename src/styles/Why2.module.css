@@ -7,6 +7,8 @@
   opacity: 0;
   transform: translateY(50px);
   transition: all 1s ease-out;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .why2Section.visible {
@@ -18,6 +20,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .contentWrapper {
@@ -25,6 +29,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 60px;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .textContent {
@@ -237,10 +243,19 @@
 @media (max-width: 768px) {
   .why2Section {
     padding: 80px 0;
+    overflow-x: hidden;
   }
   
   .container {
     padding: 0 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .contentWrapper {
+    gap: 30px;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .textContent {
@@ -292,10 +307,6 @@
     height: 400px;
   }
   
-  .contentWrapper {
-    gap: 30px;
-  }
-  
   .rectangle60 {
     transform: translateY(-15px);
   }
@@ -318,15 +329,20 @@
 @media (max-width: 600px) {
   .why2Section {
     padding: 60px 0;
+    overflow-x: hidden;
   }
   
   .container {
-    padding: 0 25px;
+    padding: 0 15px;
     margin: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .contentWrapper {
     padding: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .textContent {
