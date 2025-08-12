@@ -159,11 +159,11 @@
     margin-right: -60px;
   }  
   .rowTop .marqueeInner {
-    animation: scrollRight 30s linear infinite;
+    animation: scrollRight 16s linear infinite;
   }
 
   .rowBottom .marqueeInner {
-    animation: scrollLeft 30s linear infinite;
+    animation: scrollLeft 16s linear infinite;
   }
 }
 
