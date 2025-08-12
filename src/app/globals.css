@@ -16,6 +16,14 @@ html, body {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
 }
 
+/* 전체 사이트를 90% 크기로 조정 */
+body {
+  transform: scale(0.9);
+  transform-origin: top center;
+  width: 111.11%; /* 100% / 0.9 = 111.11% */
+  margin-left: -5.56%; /* (111.11% - 100%) / 2 = 5.56% */
+}
+
 /* Prevent layout shift when scrollbar appears */
 html {
   overflow-y: scroll;

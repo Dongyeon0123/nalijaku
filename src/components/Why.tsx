@@ -65,7 +65,7 @@ export default function Why() {
       className={`${styles.whySection} ${isVisible ? styles.visible : ''}`}
     >
       <div className={styles.container}>
-        <h2 className={`${styles.title} ${styles.animateUp}`}>Why</h2>
+        <h2 className={`${styles.title} ${styles.animateUp}`}>WHY?</h2>
         <p className={`${styles.subtitle} ${styles.animateUp} ${styles.delay1}`}>
           <span style={{color: '#00A169', fontWeight: 'bold'}}>날리자쿠</span> 드론 교육만의 차별성
         </p>

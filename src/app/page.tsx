@@ -6,6 +6,7 @@ import HeroSection from '@/components/HeroSection';
 import Cooperation from '@/components/Cooperation';
 import Customer from '@/components/Customer';
 import Why from '@/components/Why';
+import Why2 from '@/components/Why2';
 import SidebarNav from '@/components/SidebarNav';
 
 export default function Home() {
@@ -16,7 +17,6 @@ export default function Home() {
 
   return (
     <div style={{
-      fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif",
       margin: 0,
       padding: 0,
       height: '100vh',
@@ -44,6 +44,9 @@ export default function Home() {
           </section>
           <section id="why">
             <Why />
+          </section>
+          <section id="why2">
+            <Why2 />
           </section>
           <section id="who" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' }}>
             <div style={{ textAlign: 'center', padding: '2rem' }}>
