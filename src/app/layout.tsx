@@ -1,4 +1,5 @@
 import React from 'react';
+import CollaborationSidebar from '@/components/CollaborationSidebar';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -6,7 +7,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" type="image/png" href="/logo.png" />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <CollaborationSidebar />
+      </body>
     </html>
   );
 }
