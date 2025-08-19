@@ -8,6 +8,7 @@ import Customer from '@/components/Customer';
 import Why from '@/components/Why';
 import Why2 from '@/components/Why2';
 import SidebarNav from '@/components/SidebarNav';
+import Who from '@/components/Who';
 
 export default function Home() {
   React.useEffect(() => {
@@ -48,13 +49,8 @@ export default function Home() {
           <section id="why2">
             <Why2 />
           </section>
-          <section id="who" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' }}>
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '3rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>WHO는 누구인가?</h2>
-              <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
-                날리자쿠와 함께하는 사람들과 대상을 소개합니다.
-              </p>
-            </div>
+          <section id="who">
+            <Who />
           </section>
           <section id="how" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa' }}>
             <div style={{ textAlign: 'center', padding: '2rem' }}>

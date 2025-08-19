@@ -106,7 +106,7 @@ export default function Why2() {
             </div>
           </div>
 
-                     <div className={`${styles.imageSection} ${styles.animateUp} ${styles.delay6}`}>
+          <div className={`${styles.imageSection} ${styles.animateUp} ${styles.delay6}`}>
              <div className={styles.imagePlaceholder}>
                <img 
                  src="/Why/Rectangle 60.png" 
