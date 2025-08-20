@@ -63,6 +63,13 @@ export default function Why() {
     <section 
       ref={sectionRef}
       className={`${styles.whySection} ${isVisible ? styles.visible : ''}`}
+      style={{
+        backgroundImage: 'url(/Why/backImage1.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        width: '100%',
+      }}
     >
       <div className={styles.container}>
         <h2 className={`${styles.title} ${styles.animateUp}`}>WHY?</h2>
