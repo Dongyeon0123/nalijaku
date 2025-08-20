@@ -14,6 +14,8 @@ html, body {
   padding: 0;
   background: #fafafa;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* 전체 사이트를 90% 크기로 조정 - 제거됨 */
@@ -27,8 +29,11 @@ html, body {
 /* Prevent layout shift when scrollbar appears */
 html {
   overflow-y: scroll;
+  overflow-x: hidden;
   scrollbar-gutter: stable;
   scroll-behavior: smooth;
+  width: 100%;
+  max-width: 100vw;
 }
 
 /* 모든 요소에 부드러운 스크롤 적용 */
@@ -39,4 +44,7 @@ html {
 /* main 요소에 확실히 적용 */
 main {
   scroll-behavior: smooth !important;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }

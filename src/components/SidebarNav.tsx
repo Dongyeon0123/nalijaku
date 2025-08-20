@@ -15,6 +15,7 @@ export default function SidebarNav() {
     { id: 'cooperation', label: '협력 업체', icon: IoPeopleOutline },
     { id: 'customer', label: '고객사', icon: IoBusinessOutline },
     { id: 'why', label: 'WHY?', icon: IoHelpCircleOutline },
+    { id: 'why2', label: 'WHY?', icon: IoHelpCircleOutline },
     { id: 'who', label: 'WHO?', icon: IoBusinessOutline },
     { id: 'how', label: 'HOW?', icon: IoHelpCircleOutline },
     { id: 'review', label: '교육 후기', icon: IoStarOutline },
@@ -77,55 +78,61 @@ export default function SidebarNav() {
       const scrollPosition = mainElement.scrollTop;
       const viewportHeight = mainElement.clientHeight;
       
-      // 현재 뷰포트의 중앙점을 기준으로 활성 섹션 결정
-      const centerPosition = scrollPosition + viewportHeight / 2;
+      // 현재 뷰포트의 상단을 기준으로 활성 섹션 결정 (중앙점 대신)
+      const viewportTop = scrollPosition;
+      const viewportBottom = scrollPosition + viewportHeight;
 
       let currentActiveSection = 'home';
-      let minDistance = Infinity;
+      let maxVisibleArea = 0;
       
-              for (const sectionId of sections) {
-          const section = document.getElementById(sectionId);
-          if (section) {
-            const sectionTop = section.offsetTop - mainElement.offsetTop;
-            const sectionCenter = sectionTop + section.offsetHeight / 2;
-            
-            // 섹션의 중앙과 뷰포트 중앙 사이의 거리 계산
-            const distance = Math.abs(centerPosition - sectionCenter);
-            
-            // 가장 가까운 섹션을 찾기
-            if (distance < minDistance) {
-              minDistance = distance;
-              currentActiveSection = sectionId;
-            }
+      for (const sectionId of sections) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          const sectionTop = section.offsetTop - mainElement.offsetTop;
+          const sectionBottom = sectionTop + section.offsetHeight;
+          
+          // 뷰포트와 섹션이 겹치는 영역 계산
+          const visibleTop = Math.max(viewportTop, sectionTop);
+          const visibleBottom = Math.min(viewportBottom, sectionBottom);
+          const visibleArea = Math.max(0, visibleBottom - visibleTop);
+          
+          // 섹션이 뷰포트의 30% 이상 보여야 활성 섹션으로 인정
+          const sectionHeight = sectionBottom - sectionTop;
+          const visibilityRatio = visibleArea / sectionHeight;
+          
+          if (visibilityRatio > 0.3 && visibleArea > maxVisibleArea) {
+            maxVisibleArea = visibleArea;
+            currentActiveSection = sectionId;
           }
         }
+      }
 
       // 이전 섹션과 다를 때만 업데이트 (깜빡임 방지)
       if (activeSection !== currentActiveSection) {
         setActiveSection(currentActiveSection);
-        // home 섹션일 때는 다크 배경, 나머지는 라이트 배경
+        // home 섹션일 때만 다크 배경, 나머지는 라이트 배경 (why2 포함)
         setIsDarkBackground(currentActiveSection === 'home');
       }
     };
 
     const mainElement = document.querySelector('main');
     if (mainElement) {
-      // 스크롤 이벤트에 throttle 적용하여 성능 개선
-      let ticking = false;
-      const throttledHandleScroll = () => {
-        if (!ticking) {
-          requestAnimationFrame(() => {
-            handleScroll();
-            ticking = false;
-          });
-          ticking = true;
-        }
+      // 스크롤 이벤트에 debounce 적용하여 성능 개선
+      let timeoutId: NodeJS.Timeout;
+      const debouncedHandleScroll = () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          handleScroll();
+        }, 50); // 50ms debounce
       };
 
-      mainElement.addEventListener('scroll', throttledHandleScroll);
+      mainElement.addEventListener('scroll', debouncedHandleScroll);
       // 초기 섹션 설정
       handleScroll();
-      return () => mainElement.removeEventListener('scroll', throttledHandleScroll);
+      return () => {
+        mainElement.removeEventListener('scroll', debouncedHandleScroll);
+        clearTimeout(timeoutId);
+      };
     }
   }, [navItems, activeSection]);
 

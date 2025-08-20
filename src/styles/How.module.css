@@ -7,6 +7,8 @@
   text-align: center;
   padding: 2rem;
   z-index: 2;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 .howTitle {
@@ -60,6 +62,14 @@
   z-index: 1;
 }
 
+/* 모바일 섹션 컨테이너 */
+.mobileSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
 /* 개별 이미지 스타일 */
 .howImage1 {
   position: absolute;
@@ -68,6 +78,8 @@
   height: 430px;
   width: auto;
   object-fit: contain;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 .howImage2 {
@@ -77,6 +89,8 @@
   height: 430px;
   width: auto;
   object-fit: contain;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 .howImage3 {
@@ -86,6 +100,8 @@
   height: 430px;
   width: auto;
   object-fit: contain;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 .Step1 {
@@ -128,6 +144,8 @@
   display: flex;
   align-items: center;
   gap: 25px;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 .stepContainer1 {
@@ -170,6 +188,8 @@
   padding: 25px;
   max-width: 700px;
   z-index: 3;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 .infoBox1 {
@@ -178,7 +198,7 @@
 }
 
 .infoBox2 {
-  top: 64%;
+  top: 62%;
   left: 26.7%;
   text-align: right;
 }
@@ -206,20 +226,215 @@
 
 @media (max-width: 768px) {
   .howCanvas {
-    display: none;
+    display: block;
+    position: relative;
+    padding: 2rem 1rem;
   }
   
   .howHeader {
     position: relative;
     padding: 1rem;
+    margin-bottom: 2rem;
+    margin-top: 100px;
   }
   
   .howTitle {
-    font-size: 2.5rem;
+    font-size:1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .howSubtitle {
+    font-size: 1.2rem;
+    line-height: 1.4;
+  }
+
+  .arrowIconStyle {
+    font-size: 2rem;
+  }
+
+  .howImage1, .howImage2, .howImage3 {
+    position: relative;
+    top: auto;
+    left: auto;
+    height: 250px;
+    width: 100%;
+    object-fit: contain;
+    margin: 2rem 0 1rem 0;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .stepContainer1, .stepContainer2, .stepContainer3 {
+    position: relative;
+    top: auto;
+    left: auto;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0 0 2rem 0;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .Step1, .Step2, .Step3 {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+
+  .stepText1, .stepText2, .stepText3 {
+    font-size: 20px;
+  }
+
+  .infoBox1, .infoBox2, .infoBox3 {
+    position: relative;
+    top: auto;
+    left: auto;
+    padding: 1.5rem;
+    margin: 0 0 3rem 0;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    max-width: 100%;
+  }
+
+  .infoTitle {
+    font-size: 22px;
+    margin-bottom: 1rem;
+  }
+
+  .infoSubtitle {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* 모바일에서 애니메이션은 즉시 적용 */
+  .animate {
+    animation: fadeInUp 1s ease-out forwards;
+  }
+
+  /* 모바일에서 각 섹션을 그룹화하고 애니메이션 딜레이 조정 */
+  .howImage1.animate {
+    animation: fadeInUp 1s ease-out 0.5s forwards;
+  }
+  
+  .stepContainer1.animate {
+    animation: fadeInUp 1s ease-out 0.6s forwards;
+  }
+  
+  .infoBox1.animate {
+    animation: fadeInUp 1s ease-out 0.7s forwards;
+  }
+  
+  .howImage2.animate {
+    animation: fadeInUp 1s ease-out 0.5s forwards;
+  }
+  
+  .stepContainer2.animate {
+    animation: fadeInUp 1s ease-out 0.6s forwards;
+  }
+  
+  .infoBox2.animate {
+    animation: fadeInUp 1s ease-out 0.7s forwards;
+  }
+  
+  .howImage3.animate {
+    animation: fadeInUp 1s ease-out 0.5s forwards;
+  }
+  
+  .stepContainer3.animate {
+    animation: fadeInUp 1s ease-out 0.6s forwards;
+  }
+  
+  .infoBox3.animate {
+    animation: fadeInUp 1s ease-out 0.7s forwards;
+  }
+}
+
+@media (max-width: 480px) {
+  .howTitle {
+    font-size: 2rem;
   }
   
   .howSubtitle {
     font-size: 1rem;
+  }
+
+  .howImage1, .howImage2, .howImage3 {
+    height: 200px;
+  }
+
+  .Step1, .Step2, .Step3 {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  .stepText1, .stepText2, .stepText3 {
+    font-size: 18px;
+  }
+
+  .infoTitle {
+    font-size: 20px;
+  }
+
+  .infoSubtitle {
+    font-size: 14px;
+  }
+}
+
+/* 애니메이션 클래스 */
+.animate {
+  animation: fadeInUp 1s ease-out forwards;
+}
+
+.howHeader.animate {
+  animation: fadeInUp 1s ease-out 0.2s forwards;
+}
+
+.howImage1.animate {
+  animation: fadeInUp 1s ease-out 0.3s forwards;
+}
+
+.howImage2.animate {
+  animation: fadeInUp 1s ease-out 0.3s forwards;
+}
+
+.howImage3.animate {
+  animation: fadeInUp 1s ease-out 0.3s forwards;
+}
+
+.stepContainer1.animate {
+  animation: fadeInUp 1s ease-out 0.8s forwards;
+}
+
+.stepContainer2.animate {
+  animation: fadeInUp 1s ease-out 0.8s forwards;
+}
+
+.stepContainer3.animate {
+  animation: fadeInUp 1s ease-out 0.8s forwards;
+}
+
+.infoBox1.animate {
+  animation: fadeInUp 1s ease-out 1.0s forwards;
+}
+
+.infoBox2.animate {
+  animation: fadeInUp 1s ease-out 1.1s forwards;
+}
+
+.infoBox3.animate {
+  animation: fadeInUp 1s ease-out 1.1s forwards;
+}
+
+/* fadeInUp 애니메이션 - 더 부드럽게 조정 */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

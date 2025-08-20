@@ -23,6 +23,8 @@ export default function Home() {
       padding: 0,
       height: '100vh',
       overflow: 'hidden',
+      width: '100vw',
+      maxWidth: '100%'
     }}>
       <SidebarNav />
       
@@ -31,8 +33,11 @@ export default function Home() {
           height: '100vh',
           background: '#ffffff',
           overflowY: 'auto',
+          overflowX: 'hidden',
           position: 'relative',
-          scrollBehavior: 'smooth'
+          scrollBehavior: 'smooth',
+          width: '100%',
+          maxWidth: '100vw'
         }}>
           <section id="home" style={{ height: '100vh', minHeight: '100vh', position: 'relative' }}>
             <HeroSection />
@@ -94,12 +99,24 @@ export default function Home() {
       <style jsx global>{`
         html {
           scroll-behavior: smooth;
+          overflow-x: hidden;
+          width: 100%;
+          max-width: 100vw;
+        }
+        
+        body {
+          overflow-x: hidden;
+          width: 100%;
+          max-width: 100vw;
         }
         
         .mainContent {
           margin-left: 0;
           height: 100vh;
           position: relative;
+          overflow-x: hidden;
+          width: 100%;
+          max-width: 100vw;
         }
 
         /* 모바일에서 how 섹션 하얀 배경 */

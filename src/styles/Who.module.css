@@ -6,7 +6,7 @@
 }
 
 .whoSection.animate {
-    animation: fadeInUp 1s ease-out forwards;
+    animation: fadeInUp 0.5s ease-out forwards;
 }
 
 @keyframes fadeInUp {
@@ -28,7 +28,7 @@
 }
 
 .whoSection.animate .container {
-    animation: fadeInUp 1s ease-out 0.2s forwards;
+    animation: fadeInUp 0.5s ease-out 0.05s forwards;
 }
 
 .contentWrapper {
@@ -40,7 +40,7 @@
 }
 
 .whoSection.animate .contentWrapper {
-    animation: fadeInUp 1s ease-out 0.4s forwards;
+    animation: fadeInUp 0.5s ease-out 0.1s forwards;
 }
 
 .ImageSection {
@@ -50,7 +50,7 @@
 }
 
 .whoSection.animate .ImageSection {
-    animation: fadeInUp 1s ease-out 0.6s forwards;
+    animation: fadeInUp 0.5s ease-out 0.15s forwards;
 }
 
 .ImageSection img {
@@ -77,7 +77,7 @@
 }
 
 .whoSection.animate .textContent {
-    animation: fadeInUp 1s ease-out 0.8s forwards;
+    animation: fadeInUp 0.5s ease-out 0.2s forwards;
 }
 
 .title {
@@ -90,7 +90,7 @@
 }
 
 .whoSection.animate .title {
-    animation: fadeInUp 1s ease-out 1s forwards;
+    animation: fadeInUp 0.5s ease-out 0.25s forwards;
 }
 
 .subTitle {
@@ -110,7 +110,7 @@
 }
 
 .whoSection.animate .subTitle {
-    animation: fadeInUp 1s ease-out 1.2s forwards;
+    animation: fadeInUp 0.8s ease-out 0.8s forwards;
 }
 
 .buttonSection {
@@ -122,7 +122,7 @@
 }
 
 .whoSection.animate .buttonSection {
-    animation: fadeInUp 1s ease-out 1.4s forwards;
+    animation: fadeInUp 0.8s ease-out 1.0s forwards;
 }
 
 .buttonSection::after {
