@@ -8,6 +8,27 @@
   .whySection {
     padding: 120px 16px;
     margin-top: 40px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh;
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  .container {
+    width: 100% !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .imageGrid {
+    justify-items: center !important;
+    width: 100% !important;
   }
 }
 
