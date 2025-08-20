@@ -8,6 +8,7 @@ import Customer from '@/components/Customer';
 import Why from '@/components/Why';
 import Why2 from '@/components/Why2';
 import SidebarNav from '@/components/SidebarNav';
+import How from '@/components/How';
 import Who from '@/components/Who';
 
 export default function Home() {
@@ -52,13 +53,8 @@ export default function Home() {
           <section id="who">
             <Who />
           </section>
-          <section id="how" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa' }}>
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '3rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>HOW 어떻게?</h2>
-              <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
-                날리자쿠만의 특별한 교육 방법론을 소개합니다.
-              </p>
-            </div>
+          <section id="how" style={{ minHeight: '300vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: "url('/How/HOWBackImage.png')", backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'relative' }}>
+            <How />
           </section>
           <section id="review" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' }}>
             <div style={{ textAlign: 'center', padding: '2rem' }}>
@@ -104,6 +100,27 @@ export default function Home() {
           margin-left: 0;
           height: 100vh;
           position: relative;
+        }
+
+        /* 모바일에서 how 섹션 하얀 배경 */
+        @media (max-width: 768px) {
+          #how {
+            background-image: none !important;
+            background-color: #ffffff !important;
+          }
+        }
+
+        /* 화살표 바운스 애니메이션 */
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-10px);
+          }
+          60% {
+            transform: translateY(-5px);
+          }
         }
       `}</style>
     </div>
