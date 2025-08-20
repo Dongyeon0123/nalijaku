@@ -383,47 +383,47 @@
 
 /* 애니메이션 클래스 */
 .animate {
-  animation: fadeInUp 1s ease-out forwards;
+  animation: fadeInUp 0.8s ease-out forwards;
 }
 
 .howHeader.animate {
-  animation: fadeInUp 1s ease-out 0.2s forwards;
+  animation: fadeInUp 0.8s ease-out 0.1s forwards;
 }
 
 .howImage1.animate {
-  animation: fadeInUp 1s ease-out 0.3s forwards;
+  animation: fadeInUp 0.8s ease-out 0.2s forwards;
 }
 
 .howImage2.animate {
-  animation: fadeInUp 1s ease-out 0.3s forwards;
+  animation: fadeInUp 0.8s ease-out 0.3s forwards;
 }
 
 .howImage3.animate {
-  animation: fadeInUp 1s ease-out 0.3s forwards;
+  animation: fadeInUp 0.8s ease-out 0.4s forwards;
 }
 
 .stepContainer1.animate {
-  animation: fadeInUp 1s ease-out 0.8s forwards;
+  animation: fadeInUp 0.8s ease-out 0.25s forwards;
 }
 
 .stepContainer2.animate {
-  animation: fadeInUp 1s ease-out 0.8s forwards;
+  animation: fadeInUp 0.8s ease-out 0.4s forwards;
 }
 
 .stepContainer3.animate {
-  animation: fadeInUp 1s ease-out 0.8s forwards;
+  animation: fadeInUp 0.8s ease-out 0.45s forwards;
 }
 
 .infoBox1.animate {
-  animation: fadeInUp 1s ease-out 1.0s forwards;
+  animation: fadeInUp 0.8s ease-out 0.3s forwards;
 }
 
 .infoBox2.animate {
-  animation: fadeInUp 1s ease-out 1.1s forwards;
+  animation: fadeInUp 0.8s ease-out 0.4s forwards;
 }
 
 .infoBox3.animate {
-  animation: fadeInUp 1s ease-out 1.1s forwards;
+  animation: fadeInUp 0.8s ease-out 0.5s forwards;
 }
 
 /* fadeInUp 애니메이션 - 더 부드럽게 조정 */
