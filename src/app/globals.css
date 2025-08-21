@@ -1,10 +1,49 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+/* Safari 호환성을 위한 로컬 Pretendard 폰트 설정 */
+@font-face {
+  font-family: 'Pretendard';
+  src: local('Pretendard'),
+       url('/Font/web/static/woff2/Pretendard-Regular.woff2') format('woff2'),
+       url('/Font/web/static/woff/Pretendard-Regular.woff') format('woff');
+  font-display: block;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  src: local('Pretendard'),
+       url('/Font/web/static/woff2/Pretendard-Medium.woff2') format('woff2'),
+       url('/Font/web/static/woff/Pretendard-Medium.woff') format('woff');
+  font-display: block;
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  src: local('Pretendard'),
+       url('/Font/web/static/woff2/Pretendard-SemiBold.woff2') format('woff2'),
+       url('/Font/web/static/woff/Pretendard-SemiBold.woff') format('woff');
+  font-display: block;
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  src: local('Pretendard'),
+       url('/Font/web/static/woff2/Pretendard-Bold.woff2') format('woff2'),
+       url('/Font/web/static/woff/Pretendard-Bold.woff') format('woff');
+  font-display: block;
+  font-weight: 700;
+  font-style: normal;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
 }
 
 html, body {
@@ -13,7 +52,7 @@ html, body {
   margin: 0;
   padding: 0;
   background: #fafafa;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
   overflow-x: hidden;
   max-width: 100vw;
 }

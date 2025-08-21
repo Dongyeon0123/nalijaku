@@ -224,9 +224,10 @@
     }
     
     .contentWrapper {
-        flex-direction: column;
+        flex-direction: column-reverse;
         gap: 30px;
         text-align: center;
+        display: flex;
     }
     
     .ImageSection {

@@ -330,6 +330,9 @@
     justify-content: center;
     margin-bottom: 30px;
   }
+  .infoBox1 {
+    left: -35px;
+  }
 
   .infoTitle {
     font-size: 22px;

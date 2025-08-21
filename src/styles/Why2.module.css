@@ -79,12 +79,13 @@
 .feature:not(.firstFeature)::before {
   content: '';
   position: absolute;
-  left: 33px;
-  top: -36px;
+  left: 31px;
+  top: -35px;
   width: 3px;
-  height: 32px;
+  height: 30px;
   background-color: #01C187;
   opacity: 0.6;
+  box-shadow: 0 2px 8px rgba(1, 193, 135, 0.9);
 }
 
 .featureHeader {
@@ -104,6 +105,7 @@
   flex-shrink: 0;
   transition: all 0.3s ease;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(1, 193, 135, 0.25);
 }
 
 .iconCircle:hover {
@@ -128,6 +130,8 @@
   flex-direction: column;
   gap: 8px;
   flex: 1;
+  min-width: 300px;
+  max-width: 400px;
 }
 
 .featureTitle {
@@ -135,12 +139,14 @@
   font-weight: 600;
   line-height: 1.3;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
 }
 
 .featureDescription {
   font-size: 0.9rem;
   color: #666;
   line-height: 1.6;
+  white-space: nowrap;
 }
 
 .greenText {
@@ -276,17 +282,25 @@
     font-size: 1.2rem;
   }
   
+  .featureContent {
+    min-width: 250px;
+    max-width: 350px;
+  }
+  
   .featureTitle {
     font-size: 1.3rem;
+    white-space: nowrap;
   }
   
   .featureDescription {
     font-size: 1rem;
+    white-space: nowrap;
   }
   
   .iconCircle {
     width: 55px;
     height: 55px;
+    box-shadow: 0 3px 10px rgba(1, 193, 135, 0.25);
   }
   
   .iconCircle:hover {
@@ -400,17 +414,25 @@
     font-size: 0.95rem;
   }
   
+  .featureContent {
+    min-width: 200px;
+    max-width: 300px;
+  }
+  
   .featureTitle {
     font-size: 1rem;
+    white-space: nowrap;
   }
   
   .featureDescription {
     font-size: 0.85rem;
+    white-space: nowrap;
   }
   
   .iconCircle {
     width: 45px;
     height: 45px;
+    box-shadow: 0 2px 8px rgba(1, 193, 135, 0.25);
   }
   
   .iconCircle:hover {
@@ -423,9 +445,9 @@
   }
   
   .feature:not(.firstFeature)::before {
-    left: 22px;
-    top: -40px;
-    height: 35px;
+    left: 21px;
+    top: -37px;
+    height: 30px;
     width: 3px;
   }
 }

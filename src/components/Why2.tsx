@@ -65,7 +65,7 @@ export default function Why2() {
                     <span className={styles.greenText}>찾아가는 교사 연수제</span>
                   </div>
                   <div className={styles.featureDescription}>
-                    팀이 직접 학교 현장을 방문하여 교사들의 필요에 맞춘 실질적 역량 강화 교육을 제공
+                    팀이 직접 학교 현장을 방문하여 교사들의 필요에<br></br>맞춘 실질적 역량 강화 교육을 제공
                   </div>
                 </div>
               </div>
