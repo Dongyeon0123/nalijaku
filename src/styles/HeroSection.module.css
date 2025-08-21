@@ -145,11 +145,30 @@
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
+/* 데스크탑에서는 모바일 텍스트 숨기고, 모바일에서는 데스크탑 텍스트 숨김 */
+.desktopSubtitle {
+  display: block;
+}
+
+.mobileSubtitle {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .heroDescription {
     font-size: 16px;
     margin: 0 0 24px 0;
     line-height: 1.5;
+    text-align: center;
+  }
+  
+  /* 모바일에서는 데스크탑 텍스트 숨기고 모바일 텍스트 표시 */
+  .desktopSubtitle {
+    display: none;
+  }
+  
+  .mobileSubtitle {
+    display: block;
   }
 }
 

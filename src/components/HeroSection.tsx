@@ -86,6 +86,10 @@ export default function HeroSection() {
 
   const titleText = '드론과 꿈을 하늘로 날리자쿠!';
   const subtitleText = '국내 최초 학교 & 기관 대상, AI/XR 기반 드론 교육 전문 플랫폼';
+  
+  // 모바일에서 줄바꿈을 위한 텍스트 분리
+  const subtitlePart1 = '국내 최초 학교 & 기관 대상, AI/XR 기반 ';
+  const subtitlePart2 = '드론 교육 전문 플랫폼';
 
   return (
     <div ref={containerRef} className={styles.heroSection}>
@@ -108,7 +112,15 @@ export default function HeroSection() {
           {renderAnimatedText(titleText, styles.char, 0, 35)}
         </h1>
         <p className={styles.heroDescription}>
-          {renderAnimatedText(subtitleText, styles.subtitleChar, 400, 18)}
+          {/* 데스크탑에서는 한 줄로, 모바일에서는 두 줄로 표시 */}
+          <span className={styles.desktopSubtitle}>
+            {renderAnimatedText(subtitleText, styles.subtitleChar, 400, 18)}
+          </span>
+          <span className={styles.mobileSubtitle}>
+            {renderAnimatedText(subtitlePart1, styles.subtitleChar, 400, 18)}
+            <br />
+            {renderAnimatedText(subtitlePart2, styles.subtitleChar, 400, 18)}
+          </span>
         </p>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <button

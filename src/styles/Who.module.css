@@ -105,6 +105,7 @@
 
 @media (max-width: 768px) {
     .subTitle {
+        font-size: 28px;
         margin-bottom: 50px;
     }
 }
