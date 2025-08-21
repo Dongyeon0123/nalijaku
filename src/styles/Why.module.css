@@ -8,27 +8,38 @@
   .whySection {
     padding: 120px 16px;
     margin-top: 40px;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     min-height: 100vh;
-    text-align: center !important;
-    width: 100% !important;
+    text-align: center;
+    width: 100%;
   }
   
   .container {
-    width: 100% !important;
-    text-align: center !important;
-    margin: 0 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
   
   .imageGrid {
-    justify-items: center !important;
-    width: 100% !important;
+    justify-items: flex-start;
+    width: 100%;
+  }
+  
+  /* 모바일에서 카드 내부 요소들 왼쪽 정렬 */
+  .pointLabel {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .descriptionText {
+    text-align: left;
+    width: 100%;
   }
 }
 
@@ -65,13 +76,6 @@
   transition-delay: 0.8s;
 }
 
-@media (max-width: 768px) {
-  .animateUp {
-    transform: translateY(40px);
-    transition-duration: 0.6s;
-  }
-}
-
 .title {
   font-size: 24px;
   font-weight: 900;
@@ -79,12 +83,6 @@
   margin: 0 0 14px 0;
   letter-spacing: -0.5px;
   text-align: center;
-}
-
-@media (max-width: 768px) {
-  .title {
-    font-size: 20px;
-  }
 }
 
 .subtitle {
@@ -97,10 +95,26 @@
 }
 
 @media (max-width: 768px) {
+  .animateUp {
+    transform: translateY(40px);
+    transition-duration: 0.6s;
+  }
+
+  .title {
+    font-size: 20px;
+    text-align: center;
+    width: 100%;
+    margin-right: 35px;
+  }
+
   .subtitle {
     font-size: 18px;
     margin: 0 0 40px 0;
     line-height: 1.4;
+    text-align: center;
+    width: 100%;
+    margin-right: 35px;
+    margin-bottom: 60px;
   }
 }
 
@@ -350,7 +364,9 @@
 
 @media (max-width: 768px) {
   .additionalText {
-    font-size: 12px;
+    text-align: left;
+    width: 100%;
+    font-size: 11px;
     margin-top: 6px;
   }
   

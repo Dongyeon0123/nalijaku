@@ -22,8 +22,8 @@ export default function Why2() {
         }
       },
       {
-        threshold: 0,
-        rootMargin: '0px 0px 0px 0px',
+        threshold: 0.3,
+        rootMargin: '0px 0px -100px 0px',
       }
     );
 

@@ -8,7 +8,7 @@
   transform: translateY(50px);
   transition: all 1s ease-out;
   width: 100%;
-  overflow-x: hidden;
+  will-change: transform;
 }
 
 .why2Section.visible {
@@ -200,6 +200,7 @@
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.5s ease-out;
+  will-change: transform, opacity;
 }
 
 .why2Section.visible .animateUp {
@@ -243,7 +244,6 @@
 @media (max-width: 768px) {
   .why2Section {
     padding: 80px 0;
-    overflow-x: hidden;
   }
   
   .container {
@@ -260,6 +260,8 @@
   
   .textContent {
     gap: 24px;
+    padding-left: 40px;
+    padding-right: 40px;
   }
   
   .title {
@@ -329,7 +331,6 @@
 @media (max-width: 600px) {
   .why2Section {
     padding: 60px 0;
-    overflow-x: hidden;
   }
   
   .container {
@@ -337,24 +338,20 @@
     margin: 0;
     width: 100%;
     box-sizing: border-box;
-    overflow-x: hidden;
   }
   
   .contentWrapper {
     padding: 0;
     width: 100%;
     box-sizing: border-box;
-    overflow-x: hidden;
   }
   
   .imageSection {
     height: 300px;
-    overflow-x: hidden;
     width: 100%;
   }
   
   .imagePlaceholder {
-    overflow-x: hidden;
     width: 100%;
   }
   
@@ -387,6 +384,8 @@
   .textContent {
     gap: 18px;
     margin: 0;
+    padding-left: 25px;
+    padding-right: 25px;
   }
   
   .title {

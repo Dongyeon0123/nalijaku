@@ -63,7 +63,7 @@ export default function How() {
   }, []);
 
   return (
-    <section ref={sectionRef}>
+    <section ref={sectionRef} className={styles.howSection}>
       <div 
         ref={headerRef}
         className={`${styles.howHeader} ${visibleElements.has('header') ? styles.animate : ''}`}

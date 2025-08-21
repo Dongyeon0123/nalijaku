@@ -119,24 +119,6 @@ export default function Home() {
           max-width: 100vw;
         }
 
-        /* 모바일에서 how 섹션 하얀 배경 */
-        @media (max-width: 768px) {
-          #how {
-            background-image: none !important;
-            background-color: #ffffff !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            text-align: center !important;
-          }
-          
-          #why {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            text-align: center !important;
-          }
-        }
 
         /* 화살표 바운스 애니메이션 */
         @keyframes bounce {
