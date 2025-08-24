@@ -106,9 +106,12 @@ export default function Review() {
                                     </div>
                                     <div className={styles.cardFooter}>
                                         <div className={styles.avatar}>
-                                            <img 
+                                            <Image 
                                                 src={`/Review/person${(index % 4) + 1}.png`} 
                                                 alt={`Person ${(index % 4) + 1}`}
+                                                width={50}
+                                                height={50}
+                                                style={{ objectFit: 'cover' }}
                                             />
                                         </div>
                                         <div className={styles.userInfo}>
@@ -182,9 +185,12 @@ export default function Review() {
                                     </div>
                                     <div className={styles.cardFooter}>
                                         <div className={styles.avatar}>
-                                            <img 
+                                            <Image 
                                                 src={`/Review/person${(index % 4) + 1}.png`} 
                                                 alt={`Person ${(index % 4) + 1}`}
+                                                width={50}
+                                                height={50}
+                                                style={{ objectFit: 'cover' }}
                                             />
                                         </div>
                                         <div className={styles.userInfo}>
@@ -258,9 +264,12 @@ export default function Review() {
                                     </div>
                                     <div className={styles.cardFooter}>
                                         <div className={styles.avatar}>
-                                            <img 
+                                            <Image 
                                                 src={`/Review/person${(index % 4) + 1}.png`} 
                                                 alt={`Person ${(index % 4) + 1}`}
+                                                width={50}
+                                                height={50}
+                                                style={{ objectFit: 'cover' }}
                                             />
                                         </div>
                                         <div className={styles.userInfo}>
@@ -334,9 +343,12 @@ export default function Review() {
                                     </div>
                                     <div className={styles.cardFooter}>
                                         <div className={styles.avatar}>
-                                            <img 
+                                            <Image 
                                                 src={`/Review/person${(index % 4) + 1}.png`} 
                                                 alt={`Person ${(index % 4) + 1}`}
+                                                width={50}
+                                                height={50}
+                                                style={{ objectFit: 'cover' }}
                                             />
                                         </div>
                                         <div className={styles.userInfo}>
