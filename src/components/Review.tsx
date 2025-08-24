@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import styles from '@/styles/Review.module.css';
 
 export default function Review() {
@@ -106,7 +107,7 @@ export default function Review() {
                                     <div className={styles.cardFooter}>
                                         <div className={styles.avatar}>
                                             <img 
-                                                src={`/Review/Person${(index % 4) + 1}.jpg`} 
+                                                src={`/Review/person${(index % 4) + 1}.png`} 
                                                 alt={`Person ${(index % 4) + 1}`}
                                             />
                                         </div>
@@ -258,7 +259,7 @@ export default function Review() {
                                     <div className={styles.cardFooter}>
                                         <div className={styles.avatar}>
                                             <img 
-                                                src={`/Review/Person${(index % 4) + 1}.png`} 
+                                                src={`/Review/person${(index % 4) + 1}.png`} 
                                                 alt={`Person ${(index % 4) + 1}`}
                                             />
                                         </div>
@@ -334,7 +335,7 @@ export default function Review() {
                                     <div className={styles.cardFooter}>
                                         <div className={styles.avatar}>
                                             <img 
-                                                src={`/Review/Person${(index % 4) + 1}.png`} 
+                                                src={`/Review/person${(index % 4) + 1}.png`} 
                                                 alt={`Person ${(index % 4) + 1}`}
                                             />
                                         </div>
