@@ -36,7 +36,7 @@ export default function Review() {
             <div className={styles.container}>
                 <div className={styles.contentWrapper}>
                     <div className={styles.textContent}>
-                        <h2 className={styles.title}>교육후기</h2>
+                        <h2 className={styles.title}>날리자쿠 교육후기</h2>
                         <p className={styles.subTitle}>
                             높은 만족감! <span style={{fontWeight: '500'}}>다시 찾는 교육!</span>
                         </p>

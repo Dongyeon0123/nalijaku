@@ -54,6 +54,7 @@
   margin: 0 0 14px 0;
   letter-spacing: -0.5px;
   text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
