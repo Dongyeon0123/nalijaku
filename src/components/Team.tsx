@@ -26,8 +26,10 @@ export default function Team() {
                             <Image 
                                 src="/Team/team1.png" 
                                 alt="Team 날리자쿠" 
-                                width={575} 
+                                width={655} 
                                 height={450}
+                                priority
+                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 575px"
                             />
                         </div>
                     </div>
@@ -37,16 +39,18 @@ export default function Team() {
                         <Image 
                             src="/Team/team2.png" 
                             alt="Team 날리자쿠" 
-                            width={660} 
+                            width={700} 
                             height={400}
+                            sizes="(max-width: 768px) 100vw, 50vw"
                         />
                     </div>
                     <div className={styles.rightImage}>
                         <Image 
                             src="/Team/team3.png" 
                             alt="Team 날리자쿠" 
-                            width={550} 
-                            height={400}
+                            width={605} 
+                            height={450}
+                            sizes="(max-width: 768px) 100vw, 50vw"
                         />
                     </div>
                 </div>
