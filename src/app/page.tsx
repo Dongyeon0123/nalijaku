@@ -11,6 +11,7 @@ import SidebarNav from '@/components/SidebarNav';
 import How from '@/components/How';
 import Who from '@/components/Who';
 import Review from '@/components/Review';
+import Team from '@/components/Team';
 
 export default function Home() {
   React.useEffect(() => {
@@ -65,13 +66,8 @@ export default function Home() {
           <section id="review">
             <Review />
           </section>
-          <section id="team" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa' }}>
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '3rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>Team 날리자쿠</h2>
-              <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
-                날리자쿠 팀원들을 소개합니다.
-              </p>
-            </div>
+          <section id="team">
+            <Team />
           </section>
           <section id="more" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' }}>
             <div style={{ textAlign: 'center', padding: '2rem' }}>
