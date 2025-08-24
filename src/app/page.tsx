@@ -10,6 +10,7 @@ import Why2 from '@/components/Why2';
 import SidebarNav from '@/components/SidebarNav';
 import How from '@/components/How';
 import Who from '@/components/Who';
+import Review from '@/components/Review';
 
 export default function Home() {
   React.useEffect(() => {
@@ -61,13 +62,8 @@ export default function Home() {
           <section id="how" style={{ minHeight: '230vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: "url('/How/HOWBackImage.png')", backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'relative' }}>
             <How />
           </section>
-          <section id="review" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' }}>
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '3rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>교육 후기</h2>
-              <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
-                날리자쿠 교육을 받은 분들의 생생한 후기를 확인하세요.
-              </p>
-            </div>
+          <section id="review">
+            <Review />
           </section>
           <section id="team" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa' }}>
             <div style={{ textAlign: 'center', padding: '2rem' }}>
