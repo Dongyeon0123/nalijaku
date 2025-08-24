@@ -1,7 +1,7 @@
 .sidebar {
   position: fixed;
   right: 30px;
-  top: 30%;
+  top: 25%;
   transform: translateY(-50%);
   z-index: 1000;
   pointer-events: auto;
