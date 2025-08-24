@@ -122,6 +122,38 @@ export default function SidebarNav() {
         }
       }
 
+      // HOW 섹션 체크 - 밝은 배경이므로 라이트 테마 유지
+      const howSection = document.getElementById('how');
+      if (howSection) {
+        const howTop = howSection.offsetTop - mainElement.offsetTop;
+        const howBottom = howTop + howSection.offsetHeight;
+        
+        // HOW 섹션이 뷰포트에 보이는지 확인
+        if (viewportTop < howBottom && viewportBottom > howTop) {
+          // HOW 섹션이 보이면 라이트 테마 유지
+          if (isDarkBackground) {
+            setIsDarkBackground(false);
+          }
+          return; // HOW 섹션이 보이면 다른 로직 실행하지 않음
+        }
+      }
+
+      // Team 섹션 체크 - 밝은 배경이므로 라이트 테마 유지
+      const teamSection = document.getElementById('team');
+      if (teamSection) {
+        const teamTop = teamSection.offsetTop - mainElement.offsetTop;
+        const teamBottom = teamTop + teamSection.offsetHeight;
+        
+        // Team 섹션이 뷰포트에 보이는지 확인
+        if (viewportTop < teamBottom && viewportBottom > teamTop) {
+          // Team 섹션이 보이면 라이트 테마 유지
+          if (isDarkBackground) {
+            setIsDarkBackground(false);
+          }
+          return; // Team 섹션이 보이면 다른 로직 실행하지 않음
+        }
+      }
+
       // 이전 섹션과 다를 때만 업데이트 (깜빡임 방지)
       if (activeSection !== currentActiveSection) {
         setActiveSection(currentActiveSection);
@@ -149,7 +181,7 @@ export default function SidebarNav() {
         clearTimeout(timeoutId);
       };
     }
-  }, [navItems, activeSection]);
+  }, [navItems, activeSection, isDarkBackground]);
 
   return (
     <nav 
