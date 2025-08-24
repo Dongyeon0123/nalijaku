@@ -1,11 +1,39 @@
 'use client';
 
 import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import styles from '@/styles/Team.module.css';
 
 export default function Team() {
+    const [isVisible, setIsVisible] = useState(false);
+    const teamRef = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                }
+            },
+            {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            }
+        );
+
+        if (teamRef.current) {
+            observer.observe(teamRef.current);
+        }
+
+        return () => {
+            if (teamRef.current) {
+                observer.unobserve(teamRef.current);
+            }
+        };
+    }, []);
+
     return (
-        <section className={styles.teamSection}>
+        <section ref={teamRef} className={`${styles.teamSection} ${isVisible ? styles.animate : ''}`}>
             <div className={styles.container}>
                 <div className={styles.contentWrapper}>
                     <div className={styles.leftContent}>
