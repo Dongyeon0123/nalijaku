@@ -15,7 +15,6 @@ export default function SidebarNav() {
     { id: 'cooperation', label: '협력 업체', icon: IoPeopleOutline },
     { id: 'customer', label: '고객사', icon: IoBusinessOutline },
     { id: 'why', label: 'WHY?', icon: IoHelpCircleOutline },
-    { id: 'why2', label: 'WHY?', icon: IoHelpCircleOutline },
     { id: 'who', label: 'WHO?', icon: IoBusinessOutline },
     { id: 'how', label: 'HOW?', icon: IoHelpCircleOutline },
     { id: 'review', label: '교육 후기', icon: IoStarOutline },
@@ -107,10 +106,26 @@ export default function SidebarNav() {
         }
       }
 
+      // why2 섹션 체크 (navItems에 없지만 페이지에 존재)
+      const why2Section = document.getElementById('why2');
+      if (why2Section) {
+        const why2Top = why2Section.offsetTop - mainElement.offsetTop;
+        const why2Bottom = why2Top + why2Section.offsetHeight;
+        
+        // why2 섹션이 뷰포트에 보이는지 확인
+        if (viewportTop < why2Bottom && viewportBottom > why2Top) {
+          // why2 섹션이 보이면 라이트 테마 유지
+          if (isDarkBackground) {
+            setIsDarkBackground(false);
+          }
+          return; // why2 섹션이 보이면 다른 로직 실행하지 않음
+        }
+      }
+
       // 이전 섹션과 다를 때만 업데이트 (깜빡임 방지)
       if (activeSection !== currentActiveSection) {
         setActiveSection(currentActiveSection);
-        // home 섹션일 때만 다크 배경, 나머지는 라이트 배경 (why2 포함)
+        // home 섹션일 때만 다크 배경, 나머지는 라이트 배경
         setIsDarkBackground(currentActiveSection === 'home');
       }
     };
