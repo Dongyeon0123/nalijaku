@@ -136,6 +136,7 @@
     height: 2.2px;
     background-color: #01C187;
     z-index: 1;
+    box-shadow: 0 0 10px rgba(1, 193, 135, 0.6);
 }
 
 @media (max-width: 768px) {
@@ -143,6 +144,7 @@
         left: 50%;
         width: 20px;
         height: 2.7px;
+        box-shadow: 0 0 15px rgba(1, 193, 135, 0.7);
     }
 }
 
@@ -245,15 +247,29 @@
     }
     
     .title {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
     }
     
     .buttonSection {
         justify-content: center;
+        gap: 20px;
     }
     
     .buttonSection::after {
-        left: 50%;
-        width: 20px;
+        left: 49.7%;
+        width: 14px;
+        height: 2.8px;
+    }
+    
+    .button1,
+    .button2 {
+        padding: 8px 25px;
+        font-size: 14px;
+        border-radius: 25px;
+    }
+    
+    .button1:not(.active),
+    .button2:not(.active) {
+        padding: 8px 22px;
     }
 }

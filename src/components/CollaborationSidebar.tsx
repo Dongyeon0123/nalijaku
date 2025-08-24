@@ -71,7 +71,7 @@ export default function CollaborationSidebar() {
           <HiChatBubbleLeftRight className={styles.icon} />
         </div>
         <div className={styles.divider}></div>
-        <div className={styles.text}>협업 문의</div>
+        <div className={styles.text}>고객 센터</div>
       </div>
     </div>
   );

@@ -120,7 +120,7 @@
   background-color: White;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
 }
 .Step2 {
@@ -131,7 +131,7 @@
   background-color: White;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
 }
 .Step3 {
@@ -142,7 +142,7 @@
   background-color: White;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
 }
 
@@ -173,19 +173,19 @@
 
 .stepText1 {
   color: #34C987;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
   white-space: nowrap;
 }
 .stepText2 {
   color: #04AD74;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
   white-space: nowrap;
 }
 .stepText3 {
   color: #076E6C;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -264,7 +264,7 @@
   }
   
   .howTitle {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin-bottom: 1.5rem;
   }
   
@@ -274,6 +274,7 @@
   }
 
   .arrowIconStyle {
+    margin-top: 40px;
     font-size: 2rem;
   }
 
@@ -293,7 +294,7 @@
 
   .stepContainer1, .stepContainer2, .stepContainer3 {
     position: relative;
-    left: -20px;
+    left: -12px;
     flex-direction: column;
     gap: 1rem;
     text-align: center;
