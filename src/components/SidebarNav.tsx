@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { IoHomeOutline, IoBusinessOutline, IoPeopleOutline, IoCallOutline, IoMenuOutline, IoHelpCircleOutline, IoStarOutline, IoAddCircleOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoBusinessOutline, IoPeopleOutline, IoCallOutline, IoMenuOutline, IoBookOutline ,IoHelpOutline, IoStarOutline, IoNewspaperOutline, IoPersonOutline } from 'react-icons/io5';
 import styles from '@/styles/SidebarNav.module.css';
 
 export default function SidebarNav() {
@@ -14,12 +14,12 @@ export default function SidebarNav() {
     { id: 'home', label: 'Home', icon: IoHomeOutline },
     { id: 'cooperation', label: '협력 업체', icon: IoPeopleOutline },
     { id: 'customer', label: '고객사', icon: IoBusinessOutline },
-    { id: 'why', label: 'WHY?', icon: IoHelpCircleOutline },
-    { id: 'who', label: 'WHO?', icon: IoBusinessOutline },
-    { id: 'how', label: 'HOW?', icon: IoHelpCircleOutline },
+    { id: 'why', label: 'WHY?', icon: IoHelpOutline },
+    { id: 'who', label: 'WHO?', icon: IoPersonOutline },
+    { id: 'how', label: 'HOW?', icon: IoBookOutline },
     { id: 'review', label: '교육 후기', icon: IoStarOutline },
     { id: 'team', label: 'Team 날리자쿠', icon: IoPeopleOutline },
-    { id: 'more', label: 'MORE', icon: IoAddCircleOutline },
+    { id: 'news', label: '날리자쿠 News', icon: IoNewspaperOutline },
     { id: 'contact', label: 'Contact Us', icon: IoCallOutline },
   ], []);
 
