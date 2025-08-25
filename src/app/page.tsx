@@ -12,6 +12,7 @@ import How from '@/components/How';
 import Who from '@/components/Who';
 import Review from '@/components/Review';
 import Team from '@/components/Team';
+import Contact from '@/components/Contact';
 
 export default function Home() {
   React.useEffect(() => {
@@ -77,13 +78,8 @@ export default function Home() {
               </p>
             </div>
           </section>
-          <section id="contact" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa' }}>
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '3rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>Contact Us</h2>
-              <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
-                언제든지 연락주세요. 함께 성장하겠습니다.
-              </p>
-            </div>
+          <section id="contact">
+            <Contact />
           </section>
         </main>
       </div>
