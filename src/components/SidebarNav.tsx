@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { IoHomeOutline, IoBusinessOutline, IoPeopleOutline, IoCallOutline, IoMenuOutline, IoBookOutline ,IoHelpOutline, IoStarOutline, IoNewspaperOutline, IoPersonOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoBusinessOutline, IoPeopleOutline, IoCallOutline, IoMenuOutline, IoBookOutline ,IoHelpOutline, IoHeartOutline, IoNewspaperOutline, IoPersonOutline } from 'react-icons/io5';
 import styles from '@/styles/SidebarNav.module.css';
 
 export default function SidebarNav() {
@@ -17,7 +17,7 @@ export default function SidebarNav() {
     { id: 'why', label: 'WHY?', icon: IoHelpOutline },
     { id: 'who', label: 'WHO?', icon: IoPersonOutline },
     { id: 'how', label: 'HOW?', icon: IoBookOutline },
-    { id: 'review', label: '교육 후기', icon: IoStarOutline },
+    { id: 'review', label: '교육 후기', icon: IoHeartOutline },
     { id: 'team', label: 'Team 날리자쿠', icon: IoPeopleOutline },
     { id: 'news', label: '날리자쿠 News', icon: IoNewspaperOutline },
     { id: 'contact', label: 'Contact Us', icon: IoCallOutline },

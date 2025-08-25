@@ -128,6 +128,9 @@
   height: 56px;
   text-shadow: none;
   width: 190px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .secondaryButton:hover {
@@ -295,7 +298,10 @@
     padding: 11px 20px;
     font-size: 14px;
     height: 43px;
-    width: 145px;
+    width: 155px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* colorSection 배치 개선 - grid 사용 */
@@ -391,7 +397,10 @@
     padding: 9px 16px;
     font-size: 12px;
     height: 36px;
-    width: 118px;
+    width: 125px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* colorSection 더 컴팩트하게 */
