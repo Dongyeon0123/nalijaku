@@ -70,7 +70,7 @@ export default function Home() {
           <section id="team">
             <Team />
           </section>
-          <section id="more" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' }}>
+          <section id="news" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' }}>
             <div style={{ textAlign: 'center', padding: '2rem' }}>
               <h2 style={{ fontSize: '3rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>MORE</h2>
               <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '600px', margin: '0 auto' }}>

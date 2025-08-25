@@ -77,30 +77,24 @@ export default function SidebarNav() {
       const scrollPosition = mainElement.scrollTop;
       const viewportHeight = mainElement.clientHeight;
       
-      // 현재 뷰포트의 상단을 기준으로 활성 섹션 결정 (중앙점 대신)
-      const viewportTop = scrollPosition;
-      const viewportBottom = scrollPosition + viewportHeight;
+      // 현재 뷰포트의 중앙점을 기준으로 활성 섹션 결정
+      const viewportCenter = scrollPosition + viewportHeight / 2;
 
       let currentActiveSection = 'home';
-      let maxVisibleArea = 0;
+      let minDistance = Infinity;
       
       for (const sectionId of sections) {
         const section = document.getElementById(sectionId);
         if (section) {
           const sectionTop = section.offsetTop - mainElement.offsetTop;
-          const sectionBottom = sectionTop + section.offsetHeight;
+          const sectionCenter = sectionTop + section.offsetHeight / 2;
           
-          // 뷰포트와 섹션이 겹치는 영역 계산
-          const visibleTop = Math.max(viewportTop, sectionTop);
-          const visibleBottom = Math.min(viewportBottom, sectionBottom);
-          const visibleArea = Math.max(0, visibleBottom - visibleTop);
+          // 섹션의 중앙과 뷰포트 중앙 사이의 거리 계산
+          const distance = Math.abs(viewportCenter - sectionCenter);
           
-          // 섹션이 뷰포트의 30% 이상 보여야 활성 섹션으로 인정
-          const sectionHeight = sectionBottom - sectionTop;
-          const visibilityRatio = visibleArea / sectionHeight;
-          
-          if (visibilityRatio > 0.3 && visibleArea > maxVisibleArea) {
-            maxVisibleArea = visibleArea;
+          // 가장 가까운 섹션을 찾기
+          if (distance < minDistance) {
+            minDistance = distance;
             currentActiveSection = sectionId;
           }
         }
@@ -113,12 +107,11 @@ export default function SidebarNav() {
         const why2Bottom = why2Top + why2Section.offsetHeight;
         
         // why2 섹션이 뷰포트에 보이는지 확인
-        if (viewportTop < why2Bottom && viewportBottom > why2Top) {
+        if (scrollPosition < why2Bottom && scrollPosition + viewportHeight > why2Top) {
           // why2 섹션이 보이면 라이트 테마 유지
           if (isDarkBackground) {
             setIsDarkBackground(false);
           }
-          return; // why2 섹션이 보이면 다른 로직 실행하지 않음
         }
       }
 
@@ -129,12 +122,11 @@ export default function SidebarNav() {
         const howBottom = howTop + howSection.offsetHeight;
         
         // HOW 섹션이 뷰포트에 보이는지 확인
-        if (viewportTop < howBottom && viewportBottom > howTop) {
+        if (scrollPosition < howBottom && scrollPosition + viewportHeight > howTop) {
           // HOW 섹션이 보이면 라이트 테마 유지
           if (isDarkBackground) {
             setIsDarkBackground(false);
           }
-          return; // HOW 섹션이 보이면 다른 로직 실행하지 않음
         }
       }
 
@@ -145,17 +137,32 @@ export default function SidebarNav() {
         const teamBottom = teamTop + teamSection.offsetHeight;
         
         // Team 섹션이 뷰포트에 보이는지 확인
-        if (viewportTop < teamBottom && viewportBottom > teamTop) {
+        if (scrollPosition < teamBottom && scrollPosition + viewportHeight > teamTop) {
           // Team 섹션이 보이면 라이트 테마 유지
           if (isDarkBackground) {
             setIsDarkBackground(false);
           }
-          return; // Team 섹션이 보이면 다른 로직 실행하지 않음
+        }
+      }
+
+      // News 섹션 체크 - 밝은 배경이므로 라이트 테마 유지
+      const newsSection = document.getElementById('news');
+      if (newsSection) {
+        const newsTop = newsSection.offsetTop - mainElement.offsetTop;
+        const newsBottom = newsTop + newsSection.offsetHeight;
+        
+        // News 섹션이 뷰포트에 보이는지 확인
+        if (scrollPosition < newsBottom && scrollPosition + viewportHeight > newsTop) {
+          // News 섹션이 보이면 라이트 테마 유지
+          if (isDarkBackground) {
+            setIsDarkBackground(false);
+          }
         }
       }
 
       // 이전 섹션과 다를 때만 업데이트 (깜빡임 방지)
       if (activeSection !== currentActiveSection) {
+        console.log('Active section changed:', currentActiveSection, 'Scroll position:', scrollPosition);
         setActiveSection(currentActiveSection);
         // home 섹션일 때만 다크 배경, 나머지는 라이트 배경
         setIsDarkBackground(currentActiveSection === 'home');
@@ -164,21 +171,23 @@ export default function SidebarNav() {
 
     const mainElement = document.querySelector('main');
     if (mainElement) {
-      // 스크롤 이벤트에 debounce 적용하여 성능 개선
-      let timeoutId: NodeJS.Timeout;
-      const debouncedHandleScroll = () => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          handleScroll();
-        }, 50); // 50ms debounce
+      // 스크롤 이벤트에 throttle 적용하여 성능 개선
+      let ticking = false;
+      const throttledHandleScroll = () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            handleScroll();
+            ticking = false;
+          });
+          ticking = true;
+        }
       };
 
-      mainElement.addEventListener('scroll', debouncedHandleScroll);
+      mainElement.addEventListener('scroll', throttledHandleScroll, { passive: true });
       // 초기 섹션 설정
       handleScroll();
       return () => {
-        mainElement.removeEventListener('scroll', debouncedHandleScroll);
-        clearTimeout(timeoutId);
+        mainElement.removeEventListener('scroll', throttledHandleScroll);
       };
     }
   }, [navItems, activeSection, isDarkBackground]);
