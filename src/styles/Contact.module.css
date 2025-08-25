@@ -258,6 +258,152 @@
   color: #00A169;
 }
 
+/* 모바일 반응형 디자인 */
+@media (max-width: 768px) {
+  /* 사진 안 요소들 크기 조정 */
+  .title {
+    font-size: 1.1rem;
+    margin: 0 0 14px 0;
+  }
+  
+  .subtitle {
+    font-size: 0.95rem;
+    margin: 0 0 26px 0;
+  }
+  
+  .serviceButton {
+    width: 310px;
+    padding: 12px 22px;
+    font-size: 15px;
+    height: 48px;
+  }
+  
+  .buttonContainer {
+    gap: 12px;
+  }
+  
+  .primaryButton,
+  .secondaryButton {
+    padding: 12px 22px;
+    font-size: 15px;
+    height: 46px;
+    width: 150px;
+  }
+  
+  /* colorSection 배치 개선 - grid 사용 */
+  .colorSection {
+    height: auto;
+    padding: 28px 18px;
+  }
+  .footerContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'logo logo'
+      'company menu'
+      'company sns';
+    grid-auto-rows: auto;
+    gap: 20px;
+    align-items: start;
+    text-align: left;
+    padding: 20px;
+  }
+  .logoSection { grid-area: logo; justify-self: center; }
+  .companyInfo { grid-area: company; max-width: 100%; }
+  .menuSection { grid-area: menu; }
+  .snsSection { grid-area: sns; justify-self: start; text-align: left; }
+  .snsIcons { flex-wrap: wrap; justify-content: flex-start; }
+  .snsIcon { color: #ffffff; }
+
+  /* colorSection 타이포 감소 */
+  .companyName {
+    font-size: 1rem;
+    margin: 0 0 16px 0;
+  }
+  .infoList p {
+    font-size: 0.78rem;
+    margin: 7px 0;
+  }
+  .menuTitle {
+    font-size: 0.95rem;
+    margin: 0 0 10px 0;
+  }
+  .menuLink {
+    font-size: 0.78rem;
+  }
+  .snsTitle {
+    font-size: 0.95rem;
+    margin: 0 0 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 사진 안 요소들 더 작게 조정 */
+  .title {
+    font-size: 0.95rem;
+    margin: 0 0 10px 0;
+  }
+  
+  .subtitle {
+    font-size: 0.85rem;
+    margin: 0 0 22px 0;
+  }
+  
+  .serviceButton {
+    width: 260px;
+    padding: 10px 18px;
+    font-size: 13px;
+    height: 42px;
+  }
+  
+  .buttonContainer {
+    gap: 10px;
+  }
+  
+  .primaryButton,
+  .secondaryButton {
+    padding: 10px 18px;
+    font-size: 13px;
+    height: 40px;
+    width: 128px;
+  }
+  
+  /* colorSection 더 컴팩트하게 */
+  .colorSection {
+    height: auto;
+    padding: 22px 14px;
+  }
+  
+  .footerContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'logo logo'
+      'company menu'
+      'company sns';
+    grid-auto-rows: auto;
+    gap: 16px;
+    align-items: start;
+    text-align: left;
+    padding: 16px;
+  }
+  .logoSection { grid-area: logo; justify-self: center; }
+  .companyInfo { grid-area: company; }
+  .menuSection { grid-area: menu; }
+  .snsSection { grid-area: sns; justify-self: start; text-align: left; }
+  .legalLink {
+    font-size: 0.72rem;
+  }
+  .menuTitle,
+  .snsTitle {
+    font-size: 0.85rem;
+    margin: 0 0 8px 0;
+  }
+  .menuLink {
+    font-size: 0.72rem;
+  }
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -381,127 +527,4 @@
 .delay3 { transition-delay: 0.6s; }
 .delay4 { transition-delay: 0.8s; }
 
-/* 반응형 디자인 */
-@media (max-width: 1024px) {
-  .contentWrapper {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-  
-  .title {
-    font-size: 2.2rem;
-  }
-  
-  .subtitle {
-    font-size: 1.3rem;
-  }
-  
-  .imageSection {
-    height: 400px;
-  }
-}
 
-@media (max-width: 768px) {
-  .contactWrapper {
-    padding: 60px 0;
-  }
-  
-  .container {
-    padding: 0 15px;
-  }
-  
-  .contentWrapper {
-    gap: 30px;
-  }
-  
-  .textContent {
-    gap: 24px;
-    text-align: center;
-  }
-  
-  .title {
-    font-size: 2rem;
-  }
-  
-  .subtitle {
-    font-size: 1.2rem;
-  }
-  
-  .contactInfo {
-    gap: 20px;
-  }
-  
-  .contactItem {
-    padding: 16px;
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
-  }
-  
-  .contactIcon {
-    width: 50px;
-    height: 50px;
-    font-size: 1.5rem;
-  }
-  
-  .buttonSection {
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .primaryButton,
-  .secondaryButton {
-    width: 100%;
-    max-width: 300px;
-    padding: 14px 24px;
-    font-size: 1rem;
-    background: transparent;
-    border: 2px solid #ffffff;
-    color: #ffffff;
-  }
-  
-  .imageSection {
-    height: 300px;
-  }
-  
-  .contactImage {
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 600px) {
-  .contactWrapper {
-    padding: 40px 0;
-  }
-  
-  .title {
-    font-size: 1.8rem;
-  }
-  
-  .subtitle {
-    font-size: 1.1rem;
-  }
-  
-  .contactItem {
-    padding: 12px;
-  }
-  
-  .contactIcon {
-    width: 45px;
-    height: 45px;
-    font-size: 1.3rem;
-  }
-  
-  .contactDetails h3 {
-    font-size: 1rem;
-  }
-  
-  .contactDetails p {
-    font-size: 0.9rem;
-  }
-  
-  .imageSection {
-    height: 250px;
-  }
-}
