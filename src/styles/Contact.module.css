@@ -132,6 +132,130 @@
   width: 100%;
   height: 40%;
   background-color: #233331;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.footerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 1200px;
+  width: 100%;
+  gap: 40px;
+}
+
+.logoSection {
+  flex-shrink: 0;
+}
+
+.companyInfo {
+  flex: 1;
+  max-width: 300px;
+}
+
+.companyName {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 25px 0;
+}
+
+.infoList p {
+  color: #cccccc;
+  font-size: 0.9rem;
+  margin: 12px 0;
+  line-height: 1.4;
+}
+
+.infoList span {
+  color: #ffffff;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.legalLinks {
+  margin-top: 20px;
+  display: flex;
+  gap: 20px;
+}
+
+.legalLink {
+  color: #00A169;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.legalLink:hover {
+  color: #01C187;
+}
+
+.menuSection {
+  flex-shrink: 0;
+}
+
+.menuTitle {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+}
+
+.menuList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.menuLink {
+  color: #cccccc;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.menuLink:hover {
+  color: #ffffff;
+}
+
+.snsSection {
+  flex-shrink: 0;
+}
+
+.snsTitle {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+}
+
+.snsIcons {
+  display: flex;
+  gap: 20px;
+}
+
+.snsIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: #ffffff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.snsIcon:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  color: #00A169;
 }
 
 .container {
