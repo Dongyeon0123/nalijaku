@@ -421,7 +421,7 @@
     
     .title::after {
         left: 33.3%;
-        width: 61px;
+        width: 52px;
         transform: translateX(-50%);
     }
     
