@@ -72,10 +72,10 @@ export default function Contact() {
           <div className={styles.companyInfo}>
             <h3 className={styles.companyName}>날리자쿠</h3>
             <div className={styles.infoList}>
-              <p><span>대표</span> |  이민상</p>
-              <p><span>사업자 등록번호</span> |  215-65-00727</p>
-              <p><span>연락처</span> |  010.5029.6452</p>
-              <p><span>주소</span> |  충청북도 청주시 서원구 서원서로 30-23<br />SK 하이닉스 창업관</p>
+              <p><span>대표</span>|<span></span>이민상</p>
+              <p><span>사업자 등록번호</span>|<span></span>215-65-00727</p>
+              <p><span>연락처</span>|<span></span>010.5029.6452</p>
+              <p><span>주소</span>|<span></span>충청북도 청주시 서원구 서원서로 30-23<br />SK 하이닉스 창업관</p>
             </div>
             <div className={styles.legalLinks}>
               <a href="#" className={styles.legalLink}>서비스 이용약관</a>

@@ -270,86 +270,8 @@
 @media (max-width: 768px) {
   /* 사진 안 요소들 크기 조정 */
   .title {
-    font-size: 1.1rem;
-    margin: 0 0 14px 0;
-  }
-  
-  .subtitle {
-    font-size: 0.95rem;
-    margin: 0 0 26px 0;
-  }
-  
-  .serviceButton {
-    width: 310px;
-    padding: 12px 22px;
-    font-size: 15px;
-    height: 48px;
-  }
-  
-  .buttonContainer {
-    gap: 12px;
-  }
-  
-  .primaryButton,
-  .secondaryButton {
-    padding: 12px 22px;
-    font-size: 15px;
-    height: 46px;
-    width: 150px;
-  }
-  
-  /* colorSection 배치 개선 - grid 사용 */
-  .colorSection {
-    height: auto;
-    padding: 28px 18px;
-  }
-  .footerContent {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      'logo logo'
-      'company menu'
-      'company sns';
-    grid-auto-rows: auto;
-    gap: 20px;
-    align-items: start;
-    text-align: left;
-    padding: 20px;
-  }
-  .logoSection { grid-area: logo; justify-self: center; }
-  .companyInfo { grid-area: company; max-width: 100%; }
-  .menuSection { grid-area: menu; }
-  .snsSection { grid-area: sns; justify-self: start; text-align: left; }
-  .snsIcons { flex-wrap: wrap; justify-content: flex-start; }
-  .snsIcon { color: #ffffff; }
-
-  /* colorSection 타이포 감소 */
-  .companyName {
     font-size: 1rem;
-    margin: 0 0 16px 0;
-  }
-  .infoList p {
-    font-size: 0.78rem;
-    margin: 7px 0;
-  }
-  .menuTitle {
-    font-size: 0.95rem;
-    margin: 0 0 10px 0;
-  }
-  .menuLink {
-    font-size: 0.78rem;
-  }
-  .snsTitle {
-    font-size: 0.95rem;
-    margin: 0 0 10px 0;
-  }
-}
-
-@media (max-width: 480px) {
-  /* 사진 안 요소들 더 작게 조정 */
-  .title {
-    font-size: 0.95rem;
-    margin: 0 0 10px 0;
+    margin: 0 0 12px 0;
   }
   
   .subtitle {
@@ -358,10 +280,10 @@
   }
   
   .serviceButton {
-    width: 260px;
-    padding: 10px 18px;
-    font-size: 13px;
-    height: 42px;
+    width: 300px;
+    padding: 11px 20px;
+    font-size: 14px;
+    height: 45px;
   }
   
   .buttonContainer {
@@ -370,16 +292,112 @@
   
   .primaryButton,
   .secondaryButton {
-    padding: 10px 18px;
-    font-size: 13px;
-    height: 40px;
-    width: 128px;
+    padding: 11px 20px;
+    font-size: 14px;
+    height: 43px;
+    width: 145px;
+  }
+
+  /* colorSection 배치 개선 - grid 사용 */
+  .colorSection {
+    height: auto;
+    padding: 25px 18px;
+  }
+  .footerContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'logo logo'
+      'company menu'
+      'company sns';
+    grid-auto-rows: auto;
+    gap: 18px;
+    align-items: start;
+    text-align: left;
+    padding: 18px;
+  }
+  .logoSection { 
+    grid-area: logo; 
+    grid-column: 1 / -1;
+    justify-self: center; 
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-right: 60px;
+  }
+  .logoSection img {
+    width: 100px;
+    height: 50px;
+  }
+  .companyInfo { grid-area: company; max-width: 100%; }
+  .menuSection { grid-area: menu; }
+  .snsSection { grid-area: sns; justify-self: start; text-align: left; }
+  .snsIcons { flex-wrap: wrap; justify-content: flex-start; }
+  .snsIcon { color: #ffffff; }
+
+  /* colorSection 타이포 감소 */
+  .companyName {
+    font-size: 0.9rem;
+    margin: 0 0 14px 0;
+  }
+  .infoList p {
+    font-size: 0.72rem;
+    margin: 6px 0;
+  }
+  .legalLink {
+    font-size: 0.72rem;
+  }
+  .menuTitle {
+    font-size: 0.85rem;
+    margin: 0 0 14px 0;
+  }
+  .menuLink {
+    font-size: 0.72rem;
+    margin-bottom: -7px;
+  }
+  .snsTitle {
+    font-size: 0.85rem;
+    margin: 0 0 8px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 사진 안 요소들 더 작게 조정 */
+  .title {
+    font-size: 0.85rem;
+    margin: 0 0 8px 0;
   }
   
+  .subtitle {
+    font-size: 0.75rem;
+    margin: 0 0 18px 0;
+  }
+  
+  .serviceButton {
+    width: 240px;
+    padding: 9px 16px;
+    font-size: 12px;
+    height: 38px;
+  }
+  
+  .buttonContainer {
+    gap: 8px;
+  }
+  
+  .primaryButton,
+  .secondaryButton {
+    padding: 9px 16px;
+    font-size: 12px;
+    height: 36px;
+    width: 118px;
+  }
+
   /* colorSection 더 컴팩트하게 */
   .colorSection {
     height: auto;
-    padding: 22px 14px;
+    padding: 20px 14px;
   }
   
   .footerContent {
@@ -390,25 +408,47 @@
       'company menu'
       'company sns';
     grid-auto-rows: auto;
-    gap: 16px;
+    gap: 14px;
     align-items: start;
     text-align: left;
-    padding: 16px;
+    padding: 14px;
   }
-  .logoSection { grid-area: logo; justify-self: center; }
+  .logoSection { 
+    grid-area: logo; 
+    grid-column: 1 / -1;
+    justify-self: center; 
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  .logoSection img {
+    width: 80px;
+    height: 40px;
+  }
   .companyInfo { grid-area: company; }
   .menuSection { grid-area: menu; }
   .snsSection { grid-area: sns; justify-self: start; text-align: left; }
+
+  .companyName {
+    font-size: 0.8rem;
+    margin: 0 0 10px 0;
+  }
+  .infoList p {
+    font-size: 0.65rem;
+    margin: 4px 0;
+  }
   .legalLink {
-    font-size: 0.72rem;
+    font-size: 0.65rem;
   }
   .menuTitle,
   .snsTitle {
-    font-size: 0.85rem;
-    margin: 0 0 8px 0;
+    font-size: 0.75rem;
+    margin: 0 0 6px 0;
   }
   .menuLink {
-    font-size: 0.72rem;
+    font-size: 0.65rem;
   }
 }
 
