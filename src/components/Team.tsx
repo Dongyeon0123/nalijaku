@@ -46,7 +46,7 @@ export default function Team() {
                         </div>
                         <div className={styles.subText}>
                             <p>날리자KU 팀은 지속가능성 있는 드론 교육 시장을<br></br> 만들어가고 있습니다.
-                            드론이라는 꿈을 꾸는 아이들부터<br></br>드론 선생님을 희망하는 분들까지 모두<br></br><span className={styles.subTextSpan}>드론을 &apos;쉽고
+                            드론이라는 꿈을 꾸는 아이들부터<br></br>드론 선생님을 희망하는 분들까지 모두 <br></br><span className={styles.subTextSpan}>드론을 &apos;쉽고
                             재미있게&apos; 교육하는 시스템</span>을 연구합니다.</p>
                         </div>
                     </div>

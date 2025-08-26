@@ -192,7 +192,7 @@
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
-    margin-left: -3px;
+    margin-left: -5px;
 }
 
 .newsDate {
@@ -286,8 +286,6 @@
     font-size: 1rem;
 }
 
-
-
 /* 데스크톱용 버튼 */
 .desktopButton {
     display: flex;
@@ -341,12 +339,12 @@
 }
 
 .mobileNewsCard .newsTitle {
-    font-size: 1rem;
+    font-size: 0.9rem;
     margin-bottom: 0.8rem;
 }
 
 .mobileNewsCard .newsSummary {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     line-height: 1.5;
     margin-bottom: 1rem;
     max-height: 4em;
@@ -367,15 +365,9 @@
         padding: 0 2rem;
     }
 
-    .title {
-        font-size: 1.2rem;
-    }
-
     .subtitle {
-        font-size: 1.4rem;
+        font-size: 1.4rem;;
     }
-
-
 
     /* 모바일에서 데스크톱 버튼 숨김 */
     .desktopButton {
@@ -409,11 +401,11 @@
     }
 
     .newsContent {
-        padding: 1.5rem;
+        padding: 1.2rem;
     }
 
     .newsLink {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     .newsSummary {
@@ -422,6 +414,6 @@
     }
 
     .footerText {
-        font-size: 14px;
+        font-size: 12px;
     }
 }
