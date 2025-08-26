@@ -191,6 +191,8 @@
   margin-top: 20px;
   display: flex;
   gap: 20px;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .legalLink {
@@ -199,6 +201,8 @@
   font-size: 0.9rem;
   font-weight: 500;
   transition: color 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .legalLink:hover {
@@ -354,6 +358,8 @@
   }
   .legalLink {
     font-size: 0.72rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .menuTitle {
     font-size: 0.85rem;
@@ -376,6 +382,14 @@
   .snsIcon {
     width: 35px;
     height: 35px;
+  }
+  .legalLinks {
+    flex-direction: row;
+    gap: 8px;
+    align-items: flex-start;
+    margin-top: 12px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
   }
 }
 
