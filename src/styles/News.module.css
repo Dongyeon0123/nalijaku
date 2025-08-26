@@ -401,6 +401,10 @@
         width: 14px;
         height: 14px;
     }
+
+    .footerText {
+        font-size: 14px;
+    }
 }
 
 @media (max-width: 480px) {

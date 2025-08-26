@@ -74,7 +74,7 @@ export default function Why() {
       <div className={styles.container}>
         <h2 className={`${styles.title} ${styles.animateUp}`}>WHY?</h2>
         <p className={`${styles.subtitle} ${styles.animateUp} ${styles.delay1}`}>
-          <span style={{color: '#00A169', fontWeight: 'bold'}}>날리자쿠</span> 드론 교육만의 차별성
+          날리자쿠 드론 교육만의 <span style={{color: '#00A169', fontWeight: 'bold'}}>차별성</span>
         </p>
 
         <div className={styles.imageGrid}>

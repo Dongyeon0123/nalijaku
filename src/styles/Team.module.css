@@ -99,7 +99,7 @@
 .title::after {
     content: '';
     position: absolute;
-    bottom: -8px;
+    bottom: -3px;
     left: 2px;
     width: 67px;
     height: 3px;
@@ -426,7 +426,7 @@
     }
     
     .subTitle {
-        font-size: 2rem;
+        font-size: 1.8rem;
         margin-bottom: 2rem;
         line-height: 1.4;
     }
@@ -434,7 +434,7 @@
     .subText {
         font-size: 1rem;
         line-height: 1.7;
-        width: 80%;
+        width: 76%;
         margin: 0 auto;
     }
     

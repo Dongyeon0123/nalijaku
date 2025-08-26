@@ -70,7 +70,7 @@ export default function How() {
       >
         <h2 className={styles.howTitle}>HOW?</h2>
         <p className={styles.howSubtitle}>
-          이론 교육부터 실습까지, 원스탑 교육 솔루션
+          이론 교육부터 실습까지, <span style={{color: '#00A169', fontWeight: 'bold'}}>원스탑</span> 교육 솔루션
         </p>
         <div className={styles.arrowIcon}>
           <HiArrowDown className={styles.arrowIconStyle} />
@@ -126,7 +126,7 @@ export default function How() {
           >
             <h3 className={styles.infoTitle}>퀴즈형 학습으로 재미있게 복습</h3>
             <p className={styles.infoSubtitle}>
-              학생 직접 참여 및 동기 부여 증진과 학습 효과<br />
+              학생 직접 참여 및 동기 부여 증진과<br />학습 효과
               및 역량 개발 향상
             </p>
           </div>

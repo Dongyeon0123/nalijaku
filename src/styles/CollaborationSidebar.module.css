@@ -106,7 +106,7 @@
 }
 
 .divider {
-  width: 50px;
+  width: 75%;
   height: 1px;
   background-color: #e0e0e0;
   margin: 8px 0;
@@ -135,15 +135,17 @@
   }
   
   .icon {
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
+    margin-bottom: -5px;
   }
   
   .text {
     font-size: 10px;
+    margin-top: 2px;
   }
   
   .divider {
-    width: 30px;
+    width: 43px;
   }
 }

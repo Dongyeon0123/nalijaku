@@ -273,12 +273,12 @@
 @media (max-width: 768px) {
   /* 사진 안 요소들 크기 조정 */
   .title {
-    font-size: 1rem;
+    font-size: 1.2rem;
     margin: 0 0 12px 0;
   }
   
   .subtitle {
-    font-size: 0.85rem;
+    font-size: 1.2rem;
     margin: 0 0 22px 0;
   }
   
@@ -365,7 +365,13 @@
   }
   .snsTitle {
     font-size: 0.85rem;
-    margin: 0 0 8px 0;
+    margin: 0 0 14px 0;
+  }
+  .primaryButton {
+    width: 145px;
+  }
+  .secondaryButton {
+    width: 145px;
   }
 }
 
