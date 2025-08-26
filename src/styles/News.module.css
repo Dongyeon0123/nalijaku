@@ -192,6 +192,7 @@
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
+    margin-left: -3px;
 }
 
 .newsDate {
