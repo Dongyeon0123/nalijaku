@@ -16,7 +16,7 @@
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 3rem;
     width: 100%;
@@ -37,7 +37,7 @@
 }
 
 .title {
-    font-size: 2.5rem;
+    font-size: 1.6rem;
     font-weight: bold;
     color: #00A169;
     text-shadow: 0 0 15px rgba(0, 161, 105, 0.3);
@@ -46,10 +46,12 @@
 }
 
 .subtitle {
-    font-size: 1.2rem;
-    color: #666;
+    font-size: 1.9rem;
+    color: #414141;
     line-height: 1.6;
     margin-top: 1.5rem;
+    font-weight: 600;
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .newsSliderContainer {
@@ -198,9 +200,6 @@
     font-weight: 600;
     line-height: 1.4;
     transition: color 0.3s ease;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
@@ -211,12 +210,10 @@
 .newsSummary {
     color: #666;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
-    flex-grow: 1;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
     overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
 }
 
 .readMore {
@@ -389,7 +386,8 @@
     }
 
     .newsSummary {
-        -webkit-line-clamp: 3;
+        max-height: 4.5em;
+        overflow: hidden;
     }
 
     /* 모바일에서 페이지네이션 개선 */
@@ -401,10 +399,6 @@
     .pageDot {
         width: 14px;
         height: 14px;
-    }
-    .footerText {
-        line-height: 1.8;
-        font-size: 0.8rem;
     }
 }
 

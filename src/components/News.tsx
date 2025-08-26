@@ -102,7 +102,7 @@ export default function News() {
         <section ref={newsRef} className={`${styles.newsSection} ${isVisible ? styles.animate : ''}`}>
             <div className={styles.container}>
                 <div className={styles.header}>
-                    <h2 className={styles.title}>외부소식</h2>
+                    <h2 className={styles.title}>날리자쿠 외부소식</h2>
                     <p className={styles.subtitle}>날리자쿠의 다양한 활동과 성과를<br></br>언론을 통해 확인해보세요</p>
                 </div>
                 
