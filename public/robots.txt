@@ -1,0 +1,18 @@
+# robots.txt for nalijaku
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Naver bot (Yeti)
+User-agent: Yeti
+Allow: /
+
+# Google crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-News
+Allow: /
