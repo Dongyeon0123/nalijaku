@@ -141,7 +141,7 @@ export default function News() {
                     </button>
                     
                     <div className={styles.newsGrid}>
-                        {currentNews.map((news, index) => (
+                        {currentNews.map((news) => (
                             <div key={news.id} className={styles.newsCard}>
                                 <a 
                                     href={news.url} 
