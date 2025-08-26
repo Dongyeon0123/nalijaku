@@ -143,43 +143,38 @@ export default function News() {
                     <div className={styles.newsGrid}>
                         {currentNews.map((news, index) => (
                             <div key={news.id} className={styles.newsCard}>
-                                <div className={styles.newsImage}>
-                                    <Image 
-                                        src={news.image} 
-                                        alt={news.title}
-                                        width={400}
-                                        height={250}
-                                        className={styles.image}
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px"
-                                    />
-                                </div>
-                                <div className={styles.newsContent}>
-                                    <div className={styles.newsHeader}>
-                                        <span className={styles.newsSource}>{news.source}</span>
-                                        <span className={styles.newsDate}>{news.date}</span>
+                                <a 
+                                    href={news.url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className={styles.newsCardLink}
+                                >
+                                    <div className={styles.newsImage}>
+                                        <Image 
+                                            src={news.image} 
+                                            alt={news.title}
+                                            width={400}
+                                            height={250}
+                                            className={styles.image}
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px"
+                                        />
                                     </div>
-                                    <h3 className={styles.newsTitle}>
-                                        <a 
-                                            href={news.url} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className={styles.newsLink}
-                                        >
+                                    <div className={styles.newsContent}>
+                                        <div className={styles.newsHeader}>
+                                            <span className={styles.newsSource}>{news.source}</span>
+                                            <span className={styles.newsDate}>{news.date}</span>
+                                        </div>
+                                        <h3 className={styles.newsTitle}>
                                             {news.title}
-                                        </a>
-                                    </h3>
-                                    <p className={styles.newsSummary}>{news.content}</p>
-                                    <div className={styles.readMore}>
-                                        <a 
-                                            href={news.url} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className={styles.readMoreLink}
-                                        >
-                                            기사 읽기 →
-                                        </a>
+                                        </h3>
+                                        <p className={styles.newsSummary}>{news.content}</p>
+                                        <div className={styles.readMore}>
+                                            <span className={styles.readMoreText}>
+                                                기사 읽기 →
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                         ))}
                     </div>
