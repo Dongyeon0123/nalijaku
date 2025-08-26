@@ -54,7 +54,7 @@ export default function HeroSection() {
         // 방법 1: 기본 play() 시도
         await video.play();
         setIsVideoPlaying(true);
-        console.log('✅ 비디오 자동재생 성공!');
+        console.log('비디오 자동재생 성공!');
         return true;
       } catch (error) {
         console.log('기본 재생 실패, 대체 방법 시도...', error);
@@ -63,7 +63,7 @@ export default function HeroSection() {
           // 방법 2: Promise.resolve()로 감싸서 시도
           await Promise.resolve(video.play());
           setIsVideoPlaying(true);
-          console.log('✅ Promise.resolve로 재생 성공!');
+          console.log('Promise.resolve로 재생 성공!');
           return true;
         } catch (error2) {
           console.log('Promise.resolve 재생도 실패:', error2);
@@ -74,7 +74,7 @@ export default function HeroSection() {
               try {
                 await video.play();
                 setIsVideoPlaying(true);
-                console.log('✅ 지연 재생 성공!');
+                console.log('지연 재생 성공!');
               } catch (error3) {
                 console.log('지연 재생도 실패:', error3);
               }
@@ -90,22 +90,22 @@ export default function HeroSection() {
 
     // 비디오 이벤트 리스너들
     const handleLoadedData = () => {
-      console.log('📹 비디오 데이터 로드됨');
+      console.log('비디오 데이터 로드됨');
       tryPlay();
     };
 
     const handleCanPlay = () => {
-      console.log('🎬 비디오 재생 가능');
+      console.log('비디오 재생 가능');
       tryPlay();
     };
 
     const handleCanPlayThrough = () => {
-      console.log('🎭 비디오 완전 재생 가능');
+      console.log('비디오 완전 재생 가능');
       tryPlay();
     };
 
     const handleLoadedMetadata = () => {
-      console.log('📋 비디오 메타데이터 로드됨');
+      console.log('비디오 메타데이터 로드됨');
       tryPlay();
     };
 
@@ -115,7 +115,7 @@ export default function HeroSection() {
       try {
         await video.play();
         setIsVideoPlaying(true);
-        console.log('🎯 사용자 상호작용으로 재생 성공!');
+        console.log('사용자 상호작용으로 재생 성공');
         
         // 성공 후 이벤트 리스너 제거
         document.removeEventListener('click', playOnInteraction);
