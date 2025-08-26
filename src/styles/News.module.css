@@ -286,40 +286,75 @@
     font-size: 1rem;
 }
 
-/* 모바일용 네비게이션 - 위에 한 줄로 정렬 */
-.mobileNavigation {
-    display: none;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 25px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
 
-.pageIndicator {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-    color: #333;
-}
-
-.currentPage {
-    font-size: 1.2rem;
-    color: #00A169;
-}
-
-.totalPages {
-    font-size: 1rem;
-    color: #666;
-}
 
 /* 데스크톱용 버튼 */
 .desktopButton {
     display: flex;
+}
+
+/* 모바일용 스크롤 가능한 뉴스 카드들 */
+.mobileNewsScroll {
+    display: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.mobileNewsScroll::-webkit-scrollbar {
+    display: none;
+}
+
+.mobileNewsCard {
+    display: inline-block;
+    width: 300px;
+    margin-right: 1.5rem;
+    white-space: normal;
+    vertical-align: top;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.mobileNewsCard:last-child {
+    margin-right: 0;
+}
+
+.mobileNewsCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.mobileNewsCard .newsImage {
+    height: 200px;
+}
+
+.mobileNewsCard .newsContent {
+    padding: 1.5rem;
+}
+
+.mobileNewsCard .newsTitle {
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.mobileNewsCard .newsSummary {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    max-height: 4em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
 }
 
 /* 반응형 디자인 */
@@ -340,31 +375,25 @@
         font-size: 1.4rem;
     }
 
-    /* 모바일에서 모바일 네비게이션 표시 */
-    .mobileNavigation {
-        display: flex;
-    }
+
 
     /* 모바일에서 데스크톱 버튼 숨김 */
     .desktopButton {
         display: none;
     }
 
+    /* 모바일에서 기존 뉴스 그리드 숨김 */
     .newsSliderContainer {
-        flex-direction: column;
-        gap: 1rem;
+        display: none;
     }
 
-    .newsGrid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        width: 100%;
-        max-width: 500px;
-        margin: 0 auto;
+    /* 모바일에서 스크롤 가능한 뉴스 카드들 표시 */
+    .mobileNewsScroll {
+        display: block;
     }
 
-    /* 모바일에서 카드 1개만 보이도록 */
-    .newsCard:nth-child(n+2) {
+    /* 모바일에서 페이지네이션 숨김 */
+    .pagination {
         display: none;
     }
 
@@ -390,17 +419,6 @@
     .newsSummary {
         max-height: 4.5em;
         overflow: hidden;
-    }
-
-    /* 모바일에서 페이지네이션 개선 */
-    .pagination {
-        gap: 0.8rem;
-        margin-bottom: 2rem;
-    }
-
-    .pageDot {
-        width: 14px;
-        height: 14px;
     }
 
     .footerText {

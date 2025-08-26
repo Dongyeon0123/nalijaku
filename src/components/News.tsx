@@ -106,29 +106,7 @@ export default function News() {
                     <p className={styles.subtitle}>날리자쿠의 다양한 활동과 성과를<br></br>언론을 통해 확인해보세요</p>
                 </div>
                 
-                {/* 모바일용 네비게이션 버튼 - 위에 한 줄로 정렬 */}
-                <div className={styles.mobileNavigation}>
-                    <button 
-                        className={styles.sliderButton} 
-                        onClick={prevPage}
-                        aria-label="이전 기사"
-                    >
-                        <IoChevronBackOutline size={24} />
-                    </button>
-                    
-                    <div className={styles.pageIndicator}>
-                        <span className={styles.currentPage}>{currentPage + 1}</span>
-                        <span className={styles.totalPages}>/ {totalItems}</span>
-                    </div>
-                    
-                    <button 
-                        className={styles.sliderButton} 
-                        onClick={nextPage}
-                        aria-label="다음 기사"
-                    >
-                        <IoChevronForwardOutline size={24} />
-                    </button>
-                </div>
+
                 
                 <div className={styles.newsSliderContainer}>
                     {/* 데스크톱용 좌우 버튼 */}
@@ -156,7 +134,7 @@ export default function News() {
                                             width={400}
                                             height={250}
                                             className={styles.image}
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px"
+                                            sizes="(max-width: 768px) 300px, (max-width: 1024px) 50vw, 400px"
                                         />
                                     </div>
                                     <div className={styles.newsContent}>
@@ -186,6 +164,46 @@ export default function News() {
                     >
                         <IoChevronForwardOutline size={24} />
                     </button>
+                </div>
+
+                {/* 모바일용 스크롤 가능한 뉴스 카드들 */}
+                <div className={styles.mobileNewsScroll}>
+                    {newsData.map((news) => (
+                        <div key={news.id} className={styles.mobileNewsCard}>
+                            <a 
+                                href={news.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className={styles.newsCardLink}
+                            >
+                                <div className={styles.newsImage}>
+                                    <Image 
+                                        src={news.image} 
+                                        alt={news.title}
+                                        width={300}
+                                        height={200}
+                                        className={styles.image}
+                                        sizes="300px"
+                                    />
+                                </div>
+                                <div className={styles.newsContent}>
+                                    <div className={styles.newsHeader}>
+                                        <span className={styles.newsSource}>{news.source}</span>
+                                        <span className={styles.newsDate}>{news.date}</span>
+                                    </div>
+                                    <h3 className={styles.newsTitle}>
+                                        {news.title}
+                                    </h3>
+                                    <p className={styles.newsSummary}>{news.content}</p>
+                                    <div className={styles.readMore}>
+                                        <span className={styles.readMoreText}>
+                                            기사 읽기 →
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    ))}
                 </div>
 
                 <div className={styles.pagination}>

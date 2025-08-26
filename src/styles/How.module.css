@@ -271,6 +271,7 @@
   .howSubtitle {
     font-size: 1.2rem;
     line-height: 1.4;
+    margin-right: 15px;
   }
 
   .arrowIconStyle {
@@ -388,37 +389,6 @@
   
   .infoBox3.animate {
     animation: fadeInUp 0.6s ease-out 0.9s forwards;
-  }
-}
-
-@media (max-width: 480px) {
-  .howTitle {
-    font-size: 2rem;
-  }
-  
-  .howSubtitle {
-    font-size: 1rem;
-  }
-
-  .howImage1, .howImage2, .howImage3 {
-    height: 200px;
-  }
-
-  .Step1, .Step2, .Step3 {
-    font-size: 14px;
-    padding: 8px 16px;
-  }
-
-  .stepText1, .stepText2, .stepText3 {
-    font-size: 18px;
-  }
-
-  .infoTitle {
-    font-size: 20px;
-  }
-
-  .infoSubtitle {
-    font-size: 14px;
   }
 }
 
