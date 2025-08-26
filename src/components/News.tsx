@@ -106,9 +106,34 @@ export default function News() {
                     <p className={styles.subtitle}>날리자쿠의 다양한 활동과 성과를<br></br>언론을 통해 확인해보세요</p>
                 </div>
                 
-                <div className={styles.newsSliderContainer}>
+                {/* 모바일용 네비게이션 버튼 - 위에 한 줄로 정렬 */}
+                <div className={styles.mobileNavigation}>
                     <button 
                         className={styles.sliderButton} 
+                        onClick={prevPage}
+                        aria-label="이전 기사"
+                    >
+                        <IoChevronBackOutline size={24} />
+                    </button>
+                    
+                    <div className={styles.pageIndicator}>
+                        <span className={styles.currentPage}>{currentPage + 1}</span>
+                        <span className={styles.totalPages}>/ {totalItems}</span>
+                    </div>
+                    
+                    <button 
+                        className={styles.sliderButton} 
+                        onClick={nextPage}
+                        aria-label="다음 기사"
+                    >
+                        <IoChevronForwardOutline size={24} />
+                    </button>
+                </div>
+                
+                <div className={styles.newsSliderContainer}>
+                    {/* 데스크톱용 좌우 버튼 */}
+                    <button 
+                        className={`${styles.sliderButton} ${styles.desktopButton}`}
                         onClick={prevPage}
                         aria-label="이전 기사"
                     >
@@ -160,7 +185,7 @@ export default function News() {
                     </div>
 
                     <button 
-                        className={styles.sliderButton} 
+                        className={`${styles.sliderButton} ${styles.desktopButton}`}
                         onClick={nextPage}
                         aria-label="다음 기사"
                     >

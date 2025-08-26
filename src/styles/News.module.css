@@ -45,18 +45,6 @@
     position: relative;
 }
 
-.title::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, #00A169, #00D4AA);
-    border-radius: 2px;
-}
-
 .subtitle {
     font-size: 1.2rem;
     color: #666;
@@ -299,6 +287,42 @@
     font-size: 1rem;
 }
 
+/* 모바일용 네비게이션 - 위에 한 줄로 정렬 */
+.mobileNavigation {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.pageIndicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.currentPage {
+    font-size: 1.2rem;
+    color: #00A169;
+}
+
+.totalPages {
+    font-size: 1rem;
+    color: #666;
+}
+
+/* 데스크톱용 버튼 */
+.desktopButton {
+    display: flex;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .newsSection {
@@ -317,6 +341,16 @@
         font-size: 1.1rem;
     }
 
+    /* 모바일에서 모바일 네비게이션 표시 */
+    .mobileNavigation {
+        display: flex;
+    }
+
+    /* 모바일에서 데스크톱 버튼 숨김 */
+    .desktopButton {
+        display: none;
+    }
+
     .newsSliderContainer {
         flex-direction: column;
         gap: 1rem;
@@ -326,6 +360,13 @@
         grid-template-columns: 1fr;
         gap: 1.5rem;
         width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    /* 모바일에서 카드 1개만 보이도록 */
+    .newsCard:nth-child(n+2) {
+        display: none;
     }
 
     .sliderButton {
@@ -350,6 +391,21 @@
     .newsSummary {
         -webkit-line-clamp: 3;
     }
+
+    /* 모바일에서 페이지네이션 개선 */
+    .pagination {
+        gap: 0.8rem;
+        margin-bottom: 2rem;
+    }
+
+    .pageDot {
+        width: 14px;
+        height: 14px;
+    }
+    .footerText {
+        line-height: 1.8;
+        font-size: 0.8rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -359,6 +415,24 @@
 
     .title {
         font-size: 1.8rem;
+    }
+
+    .mobileNavigation {
+        gap: 1.5rem;
+        padding: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .pageIndicator {
+        gap: 0.3rem;
+    }
+
+    .currentPage {
+        font-size: 1.1rem;
+    }
+
+    .totalPages {
+        font-size: 0.9rem;
     }
 
     .newsImage {
@@ -387,5 +461,14 @@
     .sliderButton {
         width: 35px;
         height: 35px;
+    }
+
+    .pagination {
+        gap: 0.6rem;
+    }
+
+    .pageDot {
+        width: 12px;
+        height: 12px;
     }
 }
