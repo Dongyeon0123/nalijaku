@@ -13,6 +13,7 @@ import Who from '@/components/Who';
 import Review from '@/components/Review';
 import Team from '@/components/Team';
 import Contact from '@/components/Contact';
+import News from '@/components/News';
 
 export default function Home() {
   React.useEffect(() => {
@@ -70,13 +71,8 @@ export default function Home() {
           <section id="team">
             <Team />
           </section>
-          <section id="news" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' }}>
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '3rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>MORE</h2>
-              <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
-                더 많은 정보와 서비스를 확인하세요.
-              </p>
-            </div>
+          <section id="news">
+            <News />
           </section>
           <section id="contact">
             <Contact />
