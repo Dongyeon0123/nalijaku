@@ -233,13 +233,20 @@ export default function HeroSection() {
           </span>
         </p>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <button
-            className={`${styles.serviceButton} ${styles.enterFromBottom}`}
-            style={{ animationDelay: '650ms' }}
+          <a
+            href="https://featpaper.com/l/NqZlfuZ7"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none' }}
           >
-            서비스 소개서 보기
-            <IoChevronForward size={20} />
-          </button>
+            <button
+              className={`${styles.serviceButton} ${styles.enterFromBottom}`}
+              style={{ animationDelay: '650ms' }}
+            >
+              서비스 소개서 보기
+              <IoChevronForward size={20} />
+            </button>
+          </a>
         </div>
         <div className={styles.buttonContainer}>
           <button

@@ -45,10 +45,17 @@ export default function Contact() {
             드론을 배우고 싶은 학생과 선생님을 연결합니다
           </p>
           <div className={`${styles.serviceButtonContainer} ${styles.animateUp} ${styles.delay2}`}>
-            <button className={styles.serviceButton}>
-              서비스 소개서 보기
-              <IoChevronForward size={20} />
-            </button>
+            <a
+              href="https://featpaper.com/l/NqZlfuZ7"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none' }}
+            >
+              <button className={styles.serviceButton}>
+                서비스 소개서 보기
+                <IoChevronForward size={20} />
+              </button>
+            </a>
           </div>
           <div className={`${styles.buttonContainer} ${styles.animateUp} ${styles.delay3}`}>
             <button className={styles.primaryButton}>교육 도입하기</button>
