@@ -76,6 +76,22 @@
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
+/* a 태그로 감싸진 서비스 버튼의 너비 유지 */
+.serviceButtonContainer a {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.serviceButtonContainer a .serviceButton {
+  width: 396px;
+}
+
+/* a 태그가 감싸고 있을 때도 버튼 너비 유지 */
+a .serviceButton {
+  width: 396px;
+}
+
 .serviceButton:hover {
   background: #ffffff;
   color: #1a1a1a;
@@ -291,6 +307,16 @@
     padding: 11px 20px;
     font-size: 14px;
     height: 45px;
+  }
+  
+  /* a 태그로 감싸진 서비스 버튼도 모바일에서 작게 */
+  a .serviceButton {
+    width: 300px;
+  }
+  
+  /* serviceButtonContainer a도 모바일에서 작게 */
+  .serviceButtonContainer a .serviceButton {
+    width: 300px;
   }
   
   .buttonContainer {
