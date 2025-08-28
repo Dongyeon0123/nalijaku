@@ -73,7 +73,7 @@ export default function EducationIntroPage() {
                 <div className={styles.formText}>
                     <span style={{fontWeight: 'bold', color: '#04AD74', textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'}}>교육 도입하기</span>
                     <span style={{fontSize: '24px', fontWeight: 'bold', color: '#383838', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'}}>어디든지 날라갑니다.</span>
-                    <span style={{fontSize: '13px', fontWeight: '500', color: '#606060', textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'}}>개인/단체/내부자교육</span>
+                    <span style={{fontSize: '14px', fontWeight: '500', color: '#606060', textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'}}>개인/단체/내부자교육</span>
                     <p style={{marginTop: '15px', marginBottom: '120px', fontWeight: '500', color: '#383838', textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'}}>Please fill out and submit to<br></br>receive a call from us.</p>
 
                     <a href="http://pf.kakao.com/_Wxmdxen" target="_blank" rel="noopener noreferrer" className={styles.kakaoButton}>
