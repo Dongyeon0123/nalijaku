@@ -64,7 +64,7 @@ export default function EducationIntroPage() {
             단체 강연, 행사 및 협업 문의
           </p>
           <p className={styles.subtitle2}>
-            "드론으로 여는 미래 교육, 날리자KU가 첫걸음을 함께합니다."
+            &quot;드론으로 여는 미래 교육, 날리자쿠가 첫걸음을 함께합니다.&quot;
           </p>
           
           <div className={styles.formContainer}>
