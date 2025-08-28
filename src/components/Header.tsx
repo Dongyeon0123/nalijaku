@@ -4,7 +4,11 @@ import React from 'react';
 import Image from 'next/image';
 import styles from '@/styles/Header.module.css';
 
-export default function Header() {
+interface HeaderProps {
+  forceLightMode?: boolean;
+}
+
+export default function Header({ forceLightMode = false }: HeaderProps) {
   const [progress, setProgress] = React.useState(0);
   const [isScrolled, setIsScrolled] = React.useState(false);
   const headerRef = React.useRef<HTMLElement | null>(null);
@@ -76,7 +80,7 @@ export default function Header() {
   };
 
   return (
-    <header ref={headerRef} className={`${styles.header} ${isScrolled ? styles.scrolled : styles.transparent}`}>
+    <header ref={headerRef} className={`${styles.header} ${forceLightMode ? styles.scrolled : (isScrolled ? styles.scrolled : styles.transparent)}`}>
       <div className={styles.container}>
         <div className={styles.logoSection} onClick={handleScrollToHome}>
           <Image 

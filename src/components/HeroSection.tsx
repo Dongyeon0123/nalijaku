@@ -249,18 +249,28 @@ export default function HeroSection() {
           </a>
         </div>
         <div className={styles.buttonContainer}>
-          <button
-            className={`${styles.primaryButton} ${styles.enterFromBottom}`}
-            style={{ animationDelay: '800ms' }}
+          <a
+            href="/education-intro"
+            style={{ textDecoration: 'none' }}
           >
-            교육 도입하기
-          </button>
-          <button
-            className={`${styles.secondaryButton} ${styles.enterFromBottom}`}
-            style={{ animationDelay: '950ms' }}
+            <button
+              className={`${styles.primaryButton} ${styles.enterFromBottom}`}
+              style={{ animationDelay: '800ms' }}
+            >
+              교육 도입하기
+            </button>
+          </a>
+          <a
+            href="/partner-recruitment"
+            style={{ textDecoration: 'none' }}
           >
-            교육 파트너 모집
-          </button>
+            <button
+              className={`${styles.secondaryButton} ${styles.enterFromBottom}`}
+              style={{ animationDelay: '950ms' }}
+            >
+              교육 파트너 모집
+            </button>
+          </a>
         </div>
       </div>
       
