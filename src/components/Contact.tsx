@@ -58,8 +58,12 @@ export default function Contact() {
             </a>
           </div>
           <div className={`${styles.buttonContainer} ${styles.animateUp} ${styles.delay3}`}>
-            <button className={styles.primaryButton}>교육 도입하기</button>
-            <button className={styles.secondaryButton}>교육 파트너 모집</button>
+            <a href="/education-intro" style={{ textDecoration: 'none' }}>
+              <button className={styles.primaryButton}>교육 도입하기</button>
+            </a>
+            <a href="/partner-recruitment" style={{ textDecoration: 'none' }}>
+              <button className={styles.secondaryButton}>교육 파트너 모집</button>
+            </a>
           </div>
         </div>
       </div>

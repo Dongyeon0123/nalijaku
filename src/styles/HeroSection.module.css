@@ -181,9 +181,11 @@
 
 @media (max-width: 768px) {
   .buttonContainer {
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
     align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
   }
 }
 
@@ -266,11 +268,11 @@ a .serviceButton {
 
 @media (max-width: 768px) {
   .primaryButton {
-    padding: 14px 24px;
+    padding: 12px 20px;
     font-size: 16px;
     height: 48px;
-    width: 90%;
-    max-width: 300px;
+    width: auto;
+    max-width: none;
   }
 }
 
@@ -295,11 +297,11 @@ a .serviceButton {
 
 @media (max-width: 768px) {
   .secondaryButton {
-    padding: 14px 24px;
+    padding: 12px 20px;
     font-size: 16px;
     height: 48px;
-    width: 90%;
-    max-width: 300px;
+    width: auto;
+    max-width: none;
   }
 }
 
