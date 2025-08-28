@@ -66,13 +66,15 @@ export default function CollaborationSidebar() {
 
   return (
     <div className={styles.sidebar}>
-      <div className={`${styles.button} ${isDarkBackground ? styles.darkTheme : styles.lightTheme}`}>
-        <div className={styles.iconContainer}>
-          <HiChatBubbleLeftRight className={styles.icon} />
+      <a href="http://pf.kakao.com/_Wxmdxen" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+        <div className={`${styles.button} ${isDarkBackground ? styles.darkTheme : styles.lightTheme}`}>
+          <div className={styles.iconContainer}>
+            <HiChatBubbleLeftRight className={styles.icon} />
+          </div>
+          <div className={styles.divider}></div>
+          <div className={styles.text}>고객 센터</div>
         </div>
-        <div className={styles.divider}></div>
-        <div className={styles.text}>고객 센터</div>
-      </div>
+      </a>
     </div>
   );
 }
