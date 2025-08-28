@@ -105,7 +105,10 @@
 .primaryButton.enterFromBottom:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(0, 193, 135, 0.4);
-  background-color: #00A876;
+  background-color: #FFFFFF;
+  color: #00A876;
+  text-shadow: none;
+  border: 2px solid #00A876;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
