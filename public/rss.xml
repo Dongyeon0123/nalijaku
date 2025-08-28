@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>날리자쿠 외부소식</title>
+    <description>날리자쿠의 다양한 활동과 성과를 언론을 통해 확인해보세요</description>
+    <link>https://nalijaku.com</link>
+    <language>ko-KR</language>
+    <lastBuildDate>Mon, 26 Aug 2025 12:00:00 +0900</lastBuildDate>
+    <atom:link href="https://nalijaku.com/rss.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>건국대 글로컬캠 드론 원데이 클래스 개최</title>
+      <description>건국대 글로컬캠은 직원 노동조합이 주최하고 날리자KU(창업문화활성화센터 드론 창업동아리)가 주관해 뉴라이프(중앙동아리) 드론봉사단이 함께한 드론 원데이 클래스가 18일 성공적으로 개최됐다고 23일 밝혔다.</description>
+      <link>https://www.veritas-a.com/news/articleView.html?idxno=505587</link>
+      <guid>https://www.veritas-a.com/news/articleView.html?idxno=505587</guid>
+      <pubDate>Thu, 23 May 2024 12:00:00 +0900</pubDate>
+      <category>드론교육</category>
+      <category>건국대</category>
+    </item>
+    
+    <item>
+      <title>날리자쿠, 드론 교육으로 미래 인재 양성</title>
+      <description>창업동아리 날리자 KU는 드론 비행 및 무인 멀티콥터를 전문으로 교육하는 창업 동아리로 드론의 진입장벽을 낮추고, 독자적인 드론 교육시스템을 연구하고자 2024년에 신설됐다.</description>
+      <link>https://www.hankyung.com/article/202507162520i</link>
+      <guid>https://www.hankyung.com/article/202507162520i</guid>
+      <pubDate>Tue, 16 Jul 2025 12:00:00 +0900</pubDate>
+      <category>드론교육</category>
+      <category>창업동아리</category>
+    </item>
+    
+    <item>
+      <title>충주지역 드론 교육의 새로운 패러다임</title>
+      <description>날리자쿠는 충주와 충청북도의 교육생들에게 드론 교육의 기회를 제공하고자 하며, 추후에는 드론 플랫폼을 설립해 더 많은 교육생들에게 높은 수준의 교육을 제공하기 위해서 노력할 것이라고 전했다.</description>
+      <link>http://www.snakorea.com/news/articleView.html?idxno=944383</link>
+      <guid>http://www.snakorea.com/news/articleView.html?idxno=944383</guid>
+      <pubDate>Sat, 15 Jun 2024 12:00:00 +0900</pubDate>
+      <category>드론교육</category>
+      <category>충주</category>
+    </item>
+    
+    <item>
+      <title>드론 축구 체험으로 아이들의 꿈 키워</title>
+      <description>드론 비행 실습에서는 뉴라이프의 드론 봉사단 학생이 아동 2명당 1명의 교관으로 함께해 아동들이 직접 드론 볼을 날리며 골대에 넣어보는 드론 축구와 드론 기초 비행을 체험하는 등 안전한 환경 속에서 교육을 진행했다.</description>
+      <link>https://www.goodmorningcc.com/news/articleView.html?idxno=418984</link>
+      <guid>https://www.goodmorningcc.com/news/articleView.html?idxno=418984</guid>
+      <pubDate>Tue, 20 Aug 2024 12:00:00 +0900</pubDate>
+      <category>드론교육</category>
+      <category>아동교육</category>
+    </item>
+    
+    <item>
+      <title>4차 산업혁명 시대의 드론 교육</title>
+      <description>드론이 단순한 취미를 넘어 활용 범위가 점점 확대되고 4차 산업시대에 핵심 분야로 주목받음에 따라 아동들의 드론에 대한 관심도가 높아지는 것을 반영해 마련된 교육 프로그램이다.</description>
+      <link>https://www.nbnnews.co.kr/news/articleView.html?idxno=866342</link>
+      <guid>https://www.nbnnews.co.kr/news/articleView.html?idxno=866342</guid>
+      <pubDate>Tue, 10 Sep 2024 12:00:00 +0900</pubDate>
+      <category>드론교육</category>
+      <category>4차산업혁명</category>
+    </item>
+  </channel>
+</rss>

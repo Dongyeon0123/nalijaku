@@ -19,3 +19,6 @@ Allow: /
 
 # Sitemap
 Sitemap: https://nalijaku.com/sitemap.xml
+
+# RSS Feed
+RSS: https://nalijaku.com/rss.xml
