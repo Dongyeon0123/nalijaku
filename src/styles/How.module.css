@@ -232,10 +232,10 @@
   margin: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .howSection {
     background-image: none;
-    background-color: #f8f9fa;
+    background-color: #FFFFFF;
     min-height: 100vh;
     padding: 20px;
   }
