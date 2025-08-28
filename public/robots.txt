@@ -16,3 +16,6 @@ Allow: /
 
 User-agent: Googlebot-News
 Allow: /
+
+# Sitemap
+Sitemap: https://nalijaku.com/sitemap.xml
