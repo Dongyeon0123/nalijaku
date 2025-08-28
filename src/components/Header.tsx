@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import styles from '@/styles/Header.module.css';
+import Link from 'next/link';
 
 interface HeaderProps {
   forceLightMode?: boolean;
@@ -90,9 +91,9 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
             height={40}
             className={styles.logoImage}
           />
-          <span className={styles.logoText}>
+          <Link href="/" className={styles.logoText}>
             날리자쿠
-          </span>
+          </Link>
         </div>
 
         <nav className={styles.navigation}>

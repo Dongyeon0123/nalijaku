@@ -102,6 +102,7 @@
   letter-spacing: -0.5px;
   cursor: pointer;
   transition: color 0.3s ease;
+  text-decoration: none;
 }
 
 .header.transparent .logoText {
