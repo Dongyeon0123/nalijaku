@@ -315,6 +315,63 @@
   transition: width 0.3s ease-out;
 }
 
+.progressStep.completed .stepNumber {
+  color: #ffffff;
+}
+
+.progressStep {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid #C7C7C7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.progressStep.active {
+  border-color: #01C187;
+  background: #ffffff;
+}
+
+.progressStep.completed {
+  border-color: #01C187;
+  background: #01C187;
+}
+
+.stepNumber {
+  font-size: 16px;
+  font-weight: 600;
+  color: #C7C7C7;
+  transition: color 0.3s ease;
+}
+
+.progressStep.active .stepNumber {
+  color: #01C187;
+}
+
+.progressIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0;
+  padding: 0 20px;
+}
+
+.progressLine {
+  width: 40px;
+  height: 3px;
+  background: #C7C7C7;
+  transition: background 0.3s ease;
+}
+
+.progressLine.active {
+  background: #01C187;
+}
+
 /* Modal */
 .modalOverlay {
   position: fixed;

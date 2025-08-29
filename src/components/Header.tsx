@@ -182,6 +182,19 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                 <h3 id="signup-modal-title" className={styles.modalTitle}>회원가입</h3>
                 <button className={styles.modalClose} onClick={() => { setIsLoginOpen(false); setSignupStep(0); }} aria-label="닫기">×</button>
               </div>
+              <div className={styles.progressIndicator}>
+                <div className={`${styles.progressStep} ${signupStep === 0 ? styles.active : signupStep > 0 ? styles.completed : ''}`}>
+                  <span className={styles.stepNumber}>1</span>
+                </div>
+                <div className={`${styles.progressLine} ${signupStep >= 1 ? styles.active : ''}`}></div>
+                <div className={`${styles.progressStep} ${signupStep === 1 ? styles.active : signupStep > 1 ? styles.completed : ''}`}>
+                  <span className={styles.stepNumber}>2</span>
+                </div>
+                <div className={`${styles.progressLine} ${signupStep >= 2 ? styles.active : ''}`}></div>
+                <div className={`${styles.progressStep} ${signupStep === 2 ? styles.active : ''}`}>
+                  <span className={styles.stepNumber}>3</span>
+                </div>
+              </div>
               <div className={styles.modalBody}>
                 {signupStep === 0 && (
                   <>
