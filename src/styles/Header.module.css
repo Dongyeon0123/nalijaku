@@ -314,3 +314,241 @@
   width: 0%;
   transition: width 0.3s ease-out;
 }
+
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  width: 90%;
+  max-width: 360px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: modalPop 0.18s ease-out;
+  border: 1px solid #ececec;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  position: relative;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 24px;
+  margin-top: 35px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.modalBack {
+  position: absolute;
+  left: 12px;
+  top: 15px;
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease;
+}
+
+.modalBack:hover {
+  background: rgba(0,0,0,0.06);
+  color: #222;
+}
+
+.modalBack:active {
+  transform: scale(0.96);
+}
+
+.modalClose {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #565656;
+  position: absolute;
+  right: 15px;
+  top: 12px;
+  transition: color 0.2s ease, transform 0.1s ease;
+  border-radius: 8px;
+}
+
+.modalClose:hover {
+  background: rgba(0,0,0,0.06);
+  color: #222222;
+}
+
+.modalClose:active {
+  transform: scale(0.95);
+}
+
+.modalBody {
+  padding: 12px 20px 20px 20px;
+  font-size: 14px;
+  color: #383838;
+  font-weight: 600;
+  margin-top: -20px;
+}
+
+.signupRow {
+  width: 80%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.signupLink {
+  font-size: 13px;
+  font-weight: 500;
+  color: #383838;
+  text-decoration: none;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.signupLink:hover {
+  text-decoration: underline;
+  color: #2e2e2e;
+}
+
+.modalBody input {
+  margin: 0 auto;
+  width: 90%;
+  padding: 14px;
+  border: 1px solid #868686;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  margin-top: -5px;
+  background: #f9f9f9;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.modalBody input::placeholder {
+  color: #9a9a9a;
+}
+
+.modalBody input:hover {
+  background: #ffffff;
+}
+
+.modalBody input:focus {
+  border-color: #00C187;
+  box-shadow: 0 0 0 4px rgba(0, 193, 135, 0.15);
+  background: #ffffff;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 20px 20px;
+}
+
+.primaryAction {
+  width: 100%;
+  padding: 14px 14px;
+  border-radius: 8px;
+  border: 1px solid #000;
+  background: #000;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  margin-bottom: 20px;
+}
+.primaryAction:hover {
+  background: #00C187;
+  color: #FFFFFF;
+  border: 1px solid #00C187;
+  transition: all 0.5s;
+}
+.primaryAction:active {
+  background: #008d63;
+  color: #FFFFFF;
+  border: 1px solid #008d63;
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.98); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.checkboxGroup {
+  width: 90%;
+  margin: 8px auto;
+  display: flex;
+  flex-direction: column;
+  margin-top: 50px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #383838;
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+}
+
+.exampleText {
+  font-size: 12px;
+  color: #8F8F8F;
+  margin: -6px 0 12px 0;
+  font-weight: 400;
+  text-align: left;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.toggleGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.toggleButton {
+  flex: 1;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 2px solid #8F8F8F;
+  color: #7D7D7D;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleButtonSelected {
+  border-color: #00C187;
+  color: #00C187;
+  background: rgba(0, 193, 135, 0.05);
+}
