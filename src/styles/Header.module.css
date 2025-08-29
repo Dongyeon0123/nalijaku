@@ -315,41 +315,50 @@
   transition: width 0.3s ease-out;
 }
 
-.progressStep.completed .stepNumber {
-  color: #ffffff;
-}
-
 .progressStep {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 3px solid #C7C7C7;
+  border: 2px solid #C7C7C7;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #ffffff;
   transition: all 0.3s ease;
+  transform: scale(1);
+  animation: stepPulse 0.6s ease-out;
 }
 
 .progressStep.active {
   border-color: #01C187;
   background: #ffffff;
+  animation: stepActive 0.5s ease-out;
+  box-shadow: 0 0 0 4px rgba(1, 193, 135, 0.2);
 }
 
 .progressStep.completed {
   border-color: #01C187;
   background: #01C187;
+  animation: stepCompleted 0.5s ease-out;
+  transform: scale(1.1);
 }
 
 .stepNumber {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #C7C7C7;
   transition: color 0.3s ease;
+  animation: numberFadeIn 0.4s ease-out;
 }
 
 .progressStep.active .stepNumber {
   color: #01C187;
+  animation: numberActive 0.4s ease-out;
+}
+
+.progressStep.completed .stepNumber {
+  color: #ffffff;
+  animation: numberCompleted 0.4s ease-out;
 }
 
 .progressIndicator {
@@ -359,17 +368,20 @@
   gap: 8px;
   margin: 20px 0;
   padding: 0 20px;
+  animation: progressSlideIn 0.6s ease-out;
 }
 
 .progressLine {
   width: 40px;
-  height: 3px;
+  height: 2px;
   background: #C7C7C7;
   transition: background 0.3s ease;
+  animation: lineGrow 0.8s ease-out;
 }
 
 .progressLine.active {
   background: #01C187;
+  animation: lineActive 0.6s ease-out;
 }
 
 /* Modal */
@@ -608,4 +620,56 @@
   border-color: #00C187;
   color: #00C187;
   background: rgba(0, 193, 135, 0.05);
+}
+
+/* 애니메이션 키프레임 */
+@keyframes stepPulse {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes stepActive {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes stepCompleted {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1.1); }
+}
+
+@keyframes numberFadeIn {
+  0% { opacity: 0; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes numberActive {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes numberCompleted {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes progressSlideIn {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lineGrow {
+  0% { width: 0; opacity: 0; }
+  100% { width: 40px; opacity: 1; }
+}
+
+@keyframes lineActive {
+  0% { background: #C7C7C7; }
+  50% { background: #01C187; transform: scaleX(1.1); }
+  100% { background: #01C187; transform: scaleX(1); }
 }
