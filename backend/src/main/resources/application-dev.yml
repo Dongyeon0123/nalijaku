@@ -1,0 +1,56 @@
+# 개발 서버 환경 설정 (팀 공용 개발 서버)
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api
+
+spring:
+  # 개발 서버 데이터베이스 설정
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DEV_DATABASE_URL:jdbc:mysql://dev-db-server:3306/nallijaku_dev_db?useSSL=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${DEV_DATABASE_USERNAME:nallijaku_dev_user}
+    password: ${DEV_DATABASE_PASSWORD:dev_password123}
+    
+  jpa:
+    hibernate:
+      ddl-auto: update   # 개발 서버에서는 스키마 업데이트 허용
+    show-sql: true       # 개발 중에는 SQL 로그 확인
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+
+# JWT 설정 (개발용)
+jwt:
+  secret: ${JWT_SECRET:nallijaku-development-secret-key-change-before-production}
+
+# 로깅 설정 (개발용)
+logging:
+  level:
+    com.nallijaku.backend: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+    root: INFO
+    
+# CORS 설정 (개발용)
+cors:
+  allowed-origins: 
+    - http://localhost:3000
+    - http://localhost:3001
+    - https://dev.nallijaku.com
+    - https://dev-frontend.vercel.app
+  allowed-methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - PATCH
+    - OPTIONS
+  allowed-headers:
+    - "*"
+  allow-credentials: true
+
+# 파일 저장 경로 (개발 서버)
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:/app/uploads/dev}
