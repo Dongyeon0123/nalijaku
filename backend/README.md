@@ -4,7 +4,6 @@
 
 ## 🚀 배포 정보
 
-- **서버 주소**: http://13.124.1.128:8080/api
 - **환경**: AWS EC2 (Ubuntu 22.04 LTS)
 - **Java**: OpenJDK 17
 - **데이터베이스**: MySQL 8.0
@@ -56,7 +55,7 @@ GET    /api/users/count                # DB 연결 테스트
 로컬 개발 시 MySQL 8.0이 필요합니다:
 ```sql
 CREATE DATABASE nallijaku_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'nallijaku_user'@'localhost' IDENTIFIED BY 'password123';
+CREATE USER 'nallijaku_user'@'localhost' IDENTIFIED BY 'your_password';
 GRANT ALL PRIVILEGES ON nallijaku_db.* TO 'nallijaku_user'@'localhost';
 ```
 
@@ -69,7 +68,7 @@ GRANT ALL PRIVILEGES ON nallijaku_db.* TO 'nallijaku_user'@'localhost';
 
 ### 2. AWS EC2 업로드
 ```bash
-scp -i nallijaku-key.pem target/backend-0.0.1-SNAPSHOT.jar ubuntu@13.124.1.128:/tmp/
+scp -i your-key.pem target/backend-0.0.1-SNAPSHOT.jar ubuntu@your-server-ip:/tmp/
 ```
 
 ### 3. 서버에서 배포
@@ -163,10 +162,10 @@ backend/
 ### 환경 변수 (운영 서버)
 ```bash
 SPRING_PROFILES_ACTIVE=local
-SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/nallijaku_prod_db
-SPRING_DATASOURCE_USERNAME=nallijaku_prod_user
-SPRING_DATASOURCE_PASSWORD=nallijaku-db-password-123!
-JWT_SECRET=nallijaku-jwt-secret-key-2025-production-environment
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/your_database
+SPRING_DATASOURCE_USERNAME=your_username
+SPRING_DATASOURCE_PASSWORD=your_password
+JWT_SECRET=your_jwt_secret_key
 ```
 
 ## 📞 문의
