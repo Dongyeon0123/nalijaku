@@ -2,7 +2,11 @@
 export interface ApiResponse {
   success: boolean;
   message?: string;
-  data?: any;
+  data?: {
+    userId?: string;
+    token?: string;
+    [key: string]: unknown;
+  };
 }
 
 // 회원가입 데이터 타입

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { IoChevronBack } from 'react-icons/io5';
 import styles from '@/styles/Header.module.css';
 import Link from 'next/link';
-import { SignupData, LoginData, ApiResponse } from '@/types/auth';
+import { SignupData, LoginData } from '@/types/auth';
 import { signup, login, checkServerHealth, getUserCount } from '@/services/authService';
 import { validateSignupStep1, validateSignupStep2, validateSignupStep3 } from '@/utils/validation';
 
@@ -58,7 +58,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
 
   // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [userInfo, setUserInfo] = React.useState<any>(null);
+  const [userInfo, setUserInfo] = React.useState<{username: string; token?: string} | null>(null);
 
 
 
@@ -107,8 +107,9 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
           setSuccessMessage('');
         }, 2000);
       }
-    } catch (error: any) {
-      setErrorMessage(error.message || '회원가입 중 오류가 발생했습니다.');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '회원가입 중 오류가 발생했습니다.';
+      setErrorMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -146,8 +147,9 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
           setSuccessMessage('');
         }, 2000);
       }
-    } catch (error: any) {
-      setErrorMessage(error.message || '로그인 중 오류가 발생했습니다.');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '로그인 중 오류가 발생했습니다.';
+      setErrorMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }

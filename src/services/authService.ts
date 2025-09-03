@@ -2,7 +2,7 @@ import { ApiResponse, SignupData, LoginData } from '@/types/auth';
 import { API_BASE_URL, API_ENDPOINTS, getDefaultHeaders } from '@/config/api';
 
 // 서버 상태 확인 함수
-export const checkServerHealth = async (): Promise<any> => {
+export const checkServerHealth = async (): Promise<{status: string; message?: string}> => {
   try {
     const response = await fetch(`${API_BASE_URL}/health`);
     console.log('🏥 서버 응답 상태:', response.status, response.statusText);
@@ -27,7 +27,7 @@ export const checkServerHealth = async (): Promise<any> => {
 };
 
 // 사용자 수 확인 함수
-export const getUserCount = async (): Promise<any> => {
+export const getUserCount = async (): Promise<{count: string | number}> => {
   try {
     const response = await fetch(`${API_BASE_URL}/users/count`);
     console.log('👥 사용자 수 응답 상태:', response.status, response.statusText);
