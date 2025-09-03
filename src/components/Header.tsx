@@ -56,6 +56,10 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
   const [errorMessage, setErrorMessage] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
 
+  // 로그인 상태 관리
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [userInfo, setUserInfo] = React.useState<any>(null);
+
 
 
   // 회원가입 처리
@@ -124,6 +128,17 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       const result = await login(loginForm);
       
       if (result.success) {
+        // 로그인 상태 업데이트
+        const userData = {
+          username: loginForm.username,
+          token: result.data?.token
+        };
+        setIsLoggedIn(true);
+        setUserInfo(userData);
+        
+        // localStorage에 사용자 정보 저장
+        localStorage.setItem('userInfo', JSON.stringify(userData));
+        
         setSuccessMessage('로그인되었습니다!');
         setTimeout(() => {
           setIsLoginOpen(false);
@@ -135,6 +150,29 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       setErrorMessage(error.message || '로그인 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // 로그아웃 처리
+  const handleLogout = async () => {
+    try {
+      // 로그아웃 API 호출 (선택사항)
+      // await logout();
+      
+      // 로그인 상태 초기화
+      setIsLoggedIn(false);
+      setUserInfo(null);
+      
+      // localStorage에서 사용자 정보 삭제
+      localStorage.removeItem('userInfo');
+      
+      setSuccessMessage('로그아웃되었습니다!');
+      
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 2000);
+    } catch (error) {
+      console.error('로그아웃 중 오류:', error);
     }
   };
 
@@ -267,6 +305,19 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
 
   React.useEffect(() => {
     setIsMounted(true);
+    
+    // 페이지 로드 시 로그인 상태 확인
+    const savedUserInfo = localStorage.getItem('userInfo');
+    if (savedUserInfo) {
+      try {
+        const userData = JSON.parse(savedUserInfo);
+        setIsLoggedIn(true);
+        setUserInfo(userData);
+      } catch (error) {
+        console.error('저장된 사용자 정보 파싱 오류:', error);
+        localStorage.removeItem('userInfo');
+      }
+    }
   }, []);
 
   React.useEffect(() => {
@@ -330,9 +381,18 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
           <button className={styles.curriculumButton}>
             전체 커리큘럼
           </button>
-          <button className={styles.loginButton} onClick={() => { setModalType('login'); setSignupStep(0); setIsLoginOpen(true); }}>
-            로그인
-          </button>
+          {isLoggedIn ? (
+            <div className={styles.userMenu}>
+              <span className={styles.userName}>{userInfo?.username}님</span>
+              <button className={styles.logoutButton} onClick={handleLogout}>
+                로그아웃
+              </button>
+            </div>
+          ) : (
+            <button className={styles.loginButton} onClick={() => { setModalType('login'); setSignupStep(0); setIsLoginOpen(true); }}>
+              로그인
+            </button>
+          )}
         </div>
       </div>
       <div className={styles.progressContainer}>
