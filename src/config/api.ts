@@ -1,5 +1,5 @@
 // API 기본 URL - 환경변수로 관리
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://54.180.120.101:8080/api';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://54.180.120.101:8080/api';
 
 // API 설정 로그 출력
 console.log('🔧 API 설정 정보:');
