@@ -6,10 +6,15 @@ import Image from 'next/image';
 import { IoChevronBack } from 'react-icons/io5';
 import styles from '@/styles/Header.module.css';
 import Link from 'next/link';
+import { SignupData, LoginData, ApiResponse } from '@/types/auth';
+import { signup, login, checkServerHealth, getUserCount } from '@/services/authService';
+import { validateSignupStep1, validateSignupStep2, validateSignupStep3 } from '@/utils/validation';
 
 interface HeaderProps {
   forceLightMode?: boolean;
 }
+
+
 
 export default function Header({ forceLightMode = false }: HeaderProps) {
   const [progress, setProgress] = React.useState(0);
@@ -22,6 +27,194 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
   const [role, setRole] = React.useState('');
   const [isMounted, setIsMounted] = React.useState(false);
   const headerRef = React.useRef<HTMLElement | null>(null);
+
+  // 폼 데이터 상태
+  const [signupForm, setSignupForm] = React.useState<SignupData>({
+    username: '',
+    password: '',
+    confirmPassword: '',
+    email: '',
+    organization: '',
+    role: '',
+    phone: '',
+    droneExperience: false,
+    termsAgreed: false
+  });
+
+  // 체크박스 개별 상태
+  const [ageCheck, setAgeCheck] = React.useState(false);
+  const [termsCheck, setTermsCheck] = React.useState(false);
+
+  const [loginForm, setLoginForm] = React.useState<LoginData>({
+    username: '',
+    password: '',
+    rememberMe: false
+  });
+
+  // 로딩 및 에러 상태
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const [successMessage, setSuccessMessage] = React.useState('');
+
+
+
+  // 회원가입 처리
+  const handleSignup = async () => {
+    // 최종 유효성 검사
+    const errors = validateSignupStep3(signupForm.phone, ageCheck, termsCheck);
+    if (errors.length > 0) {
+      setErrorMessage(errors[0]);
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      // 먼저 서버 상태 확인
+      console.log('🔍 서버 상태 확인 중...');
+      await checkServerHealth();
+      await getUserCount();
+
+      // role 매핑 (프론트엔드 값 → 백엔드 enum 값)
+      const roleMapping: { [key: string]: string } = {
+        '1': 'GENERAL',
+        '2': 'STUDENT', 
+        '3': 'TEACHER',
+        '4': 'INSTRUCTOR',
+        '5': 'ADMIN'
+      };
+      
+      const signupData = {
+        ...signupForm,
+        organization: affiliation,
+        role: roleMapping[role] || 'GENERAL', // 매핑된 role 사용, 없으면 GENERAL
+        termsAgreed: ageCheck && termsCheck // 두 체크박스 모두 체크되어야 true
+      };
+
+      const result = await signup(signupData);
+      
+      if (result.success) {
+        setSuccessMessage('회원가입이 완료되었습니다!');
+        setTimeout(() => {
+          setIsLoginOpen(false);
+          setSignupStep(0);
+          resetSignupForm();
+          setSuccessMessage('');
+        }, 2000);
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message || '회원가입 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 로그인 처리
+  const handleLogin = async () => {
+    if (!loginForm.username || !loginForm.password) {
+      setErrorMessage('아이디와 비밀번호를 입력해주세요.');
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      const result = await login(loginForm);
+      
+      if (result.success) {
+        setSuccessMessage('로그인되었습니다!');
+        setTimeout(() => {
+          setIsLoginOpen(false);
+          resetLoginForm();
+          setSuccessMessage('');
+        }, 2000);
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message || '로그인 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 폼 초기화 함수들
+  const resetSignupForm = () => {
+    setSignupForm({
+      username: '',
+      password: '',
+      confirmPassword: '',
+      email: '',
+      organization: '',
+      role: '',
+      phone: '',
+      droneExperience: false,
+      termsAgreed: false
+    });
+    setHasDroneExp(null);
+    setAffiliation('');
+    setRole('');
+    setAgeCheck(false);
+    setTermsCheck(false);
+  };
+
+  const resetLoginForm = () => {
+    setLoginForm({
+      username: '',
+      password: '',
+      rememberMe: false
+    });
+  };
+
+  // 모달 닫기 시 폼 초기화
+  const handleCloseModal = () => {
+    setIsLoginOpen(false);
+    setSignupStep(0);
+    resetSignupForm();
+    resetLoginForm();
+    setErrorMessage('');
+    setSuccessMessage('');
+  };
+
+  // 회원가입 단계별 데이터 저장 및 유효성 검사
+  const handleSignupStepChange = (step: number) => {
+    if (step === 1) {
+      // 1단계 유효성 검사
+      const errors = validateSignupStep1(
+        signupForm.username, 
+        signupForm.password, 
+        signupForm.confirmPassword, 
+        signupForm.email
+      );
+      
+      if (errors.length > 0) {
+        setErrorMessage(errors[0]);
+        return;
+      }
+      
+      setErrorMessage(''); // 에러 메시지 초기화
+    } else if (step === 2) {
+      // 2단계 유효성 검사
+      const errors = validateSignupStep2(affiliation, role, hasDroneExp);
+      
+      if (errors.length > 0) {
+        setErrorMessage(errors[0]);
+        return;
+      }
+      
+      setErrorMessage(''); // 에러 메시지 초기화
+      
+      // 2단계 데이터 저장
+      setSignupForm(prev => ({
+        ...prev,
+        organization: affiliation,
+        role: role,
+        droneExperience: hasDroneExp === '있음'
+      }));
+    }
+    
+    setSignupStep(step as 0 | 1 | 2);
+  };
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -147,24 +340,52 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       </div>
 
       {isMounted && isLoginOpen && createPortal(
-        <div className={styles.modalOverlay} onClick={() => { setIsLoginOpen(false); setSignupStep(0); }}>
+        <div className={styles.modalOverlay} onClick={handleCloseModal}>
           {modalType === 'login' ? (
             <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
               <div className={styles.modalHeader}>
                 <h3 id="login-modal-title" className={styles.modalTitle}>로그인</h3>
-                <button className={styles.modalClose} onClick={() => { setIsLoginOpen(false); setSignupStep(0); }} aria-label="닫기">×</button>
+                <button className={styles.modalClose} onClick={handleCloseModal} aria-label="닫기">×</button>
               </div>
               <div className={styles.modalBody}>
+                {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
+                {successMessage && <div className={styles.successMessage}>{successMessage}</div>}
                 <p>아이디</p>
-                <input type="text" placeholder="아이디" />
+                <input 
+                  type="text" 
+                  placeholder="아이디" 
+                  value={loginForm.username}
+                  onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
+                />
                 <p>비밀번호</p>
-                <input type="password" placeholder="비밀번호" />
+                <input 
+                  type="password" 
+                  placeholder="비밀번호" 
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                />
+                <div className={styles.rememberMeRow}>
+                  <label className={styles.checkboxLabel}>
+                    <input 
+                      type="checkbox" 
+                      checked={loginForm.rememberMe}
+                      onChange={(e) => setLoginForm(prev => ({ ...prev, rememberMe: e.target.checked }))}
+                    />
+                    <span>로그인 상태 유지</span>
+                  </label>
+                </div>
                 <div className={styles.signupRow}>
                   <a href="#" className={styles.signupLink} onClick={(e) => { e.preventDefault(); setModalType('signup'); setSignupStep(0); }}>회원가입</a>
                 </div>
               </div>
               <div className={styles.modalFooter}>
-                <button className={styles.primaryAction} onClick={() => setIsLoginOpen(false)}>로그인</button>
+                <button 
+                  className={styles.primaryAction} 
+                  onClick={handleLogin}
+                  disabled={isLoading}
+                >
+                  {isLoading ? '로그인 중...' : '로그인'}
+                </button>
               </div>
             </div>
           ) : (
@@ -180,7 +401,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                   </button>
                 )}
                 <h3 id="signup-modal-title" className={styles.modalTitle}>회원가입</h3>
-                <button className={styles.modalClose} onClick={() => { setIsLoginOpen(false); setSignupStep(0); }} aria-label="닫기">×</button>
+                <button className={styles.modalClose} onClick={handleCloseModal} aria-label="닫기">×</button>
               </div>
               <div className={styles.progressIndicator}>
                 <div className={`${styles.progressStep} ${signupStep === 0 ? styles.active : signupStep > 0 ? styles.completed : ''}`}>
@@ -196,16 +417,38 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                 </div>
               </div>
               <div className={styles.modalBody}>
+                {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
+                {successMessage && <div className={styles.successMessage}>{successMessage}</div>}
                 {signupStep === 0 && (
                   <>
                     <p>아이디 <span style={{ color: 'red' }}>*</span></p>
-                    <input type="text" placeholder="사용할 아이디를 입력하세요." />
+                    <input 
+                      type="text" 
+                      placeholder="사용할 아이디를 입력하세요." 
+                      value={signupForm.username}
+                      onChange={(e) => setSignupForm(prev => ({ ...prev, username: e.target.value }))}
+                    />
                     <p>비밀번호 <span style={{ color: 'red' }}>*</span></p>
-                    <input type="password" placeholder="비밀번호를 입력하세요." />
+                    <input 
+                      type="password" 
+                      placeholder="비밀번호를 입력하세요." 
+                      value={signupForm.password}
+                      onChange={(e) => setSignupForm(prev => ({ ...prev, password: e.target.value }))}
+                    />
                     <p>비밀번호 확인 <span style={{ color: 'red' }}>*</span></p>
-                    <input type="password" placeholder="비밀번호를 다시 입력하세요." />
+                    <input 
+                      type="password" 
+                      placeholder="비밀번호를 다시 입력하세요." 
+                      value={signupForm.confirmPassword}
+                      onChange={(e) => setSignupForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    />
                     <p>이메일 <span style={{ color: 'red' }}>*</span></p>
-                    <input type="text" placeholder="학습 자료를 받을 이메일 주소를 입력하세요." />
+                    <input 
+                      type="text" 
+                      placeholder="학습 자료를 받을 이메일 주소를 입력하세요." 
+                      value={signupForm.email}
+                      onChange={(e) => setSignupForm(prev => ({ ...prev, email: e.target.value }))}
+                    />
                   </>
                 )}
                 {signupStep === 1 && (
@@ -229,26 +472,49 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                         </button>
                       </div>
                     </div>
-                    <p>소속</p>
-                    <input type="text" placeholder="소속을 입력하세요." value={affiliation} onChange={(e) => setAffiliation(e.target.value)} />
+                    <p>소속 <span style={{ color: 'red' }}>*</span></p>
+                    <input 
+                      type="text" 
+                      placeholder="소속을 입력하세요." 
+                      value={affiliation} 
+                      onChange={(e) => setAffiliation(e.target.value)} 
+                    />
                     <p className={styles.exampleText}>ex) ㅇㅇ중학교, 충주시 ㅇㅇ센터 등</p>
-                    <p>직무/역할</p>
-                    <input type="text" placeholder="현재 직무/역할을 입력하세요." value={role} onChange={(e) => setRole(e.target.value)} />
+                    <p>직무/역할 <span style={{ color: 'red' }}>*</span></p>
+                    <input 
+                      type="text" 
+                      placeholder="현재 직무/역할을 입력하세요." 
+                      value={role} 
+                      onChange={(e) => setRole(e.target.value)} 
+                    />
                     <p className={styles.exampleText}>ex) 교사, 과장, 교육담당자, 학생 등</p>
                   </>
                 )}
                 {signupStep === 2 && (
                   <>
-                    <p>연락처</p>
-                    <input type="tel" placeholder="연락처를 입력하세요." />
+                    <p>연락처 <span style={{ color: 'red' }}>*</span></p>
+                    <input 
+                      type="tel" 
+                      placeholder="연락처를 입력하세요." 
+                      value={signupForm.phone}
+                      onChange={(e) => setSignupForm(prev => ({ ...prev, phone: e.target.value }))}
+                    />
                     <p className={styles.exampleText}>숫자만 입력해 주세요. ex) 01012345678</p>
                     <div className={styles.checkboxGroup}>
                       <label className={styles.checkboxLabel}>
-                        <input type="checkbox" />
+                        <input 
+                          type="checkbox" 
+                          checked={ageCheck}
+                          onChange={(e) => setAgeCheck(e.target.checked)}
+                        />
                         <span>만 14세 이상입니다.</span>
                       </label>
                       <label className={styles.checkboxLabel}>
-                        <input type="checkbox" />
+                        <input 
+                          type="checkbox" 
+                          checked={termsCheck}
+                          onChange={(e) => setTermsCheck(e.target.checked)}
+                        />
                         <span>이용약관 및 개인정보처리방침 동의 <span style={{ color: 'red' }}>(필수)</span></span>
                       </label>
                     </div>
@@ -260,9 +526,20 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
               </div>
               <div className={styles.modalFooter}>
                 {signupStep < 2 ? (
-                  <button className={styles.primaryAction} onClick={() => setSignupStep((s) => (s + 1) as 0 | 1 | 2)}>다음</button>
+                  <button 
+                    className={styles.primaryAction} 
+                    onClick={() => handleSignupStepChange(signupStep + 1)}
+                  >
+                    다음
+                  </button>
                 ) : (
-                  <button className={styles.primaryAction} onClick={() => { setIsLoginOpen(false); setSignupStep(0); setHasDroneExp(null); setAffiliation(''); setRole(''); }}>회원가입 완료</button>
+                  <button 
+                    className={styles.primaryAction} 
+                    onClick={handleSignup}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? '회원가입 중...' : '회원가입 완료'}
+                  </button>
                 )}
               </div>
             </div>
