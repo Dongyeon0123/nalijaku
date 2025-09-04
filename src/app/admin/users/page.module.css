@@ -1,0 +1,68 @@
+.pageHeader {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+.pageHeader h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 500;
+}
+.pageHeader p {
+    margin: 5px 0 0;
+    color: #7f8c8d;
+}
+.tableContainer {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+.userTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+.userTable th, .userTable td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+.userTable th {
+    background-color: #f7f9fa;
+    font-weight: 600;
+}
+.userTable tbody tr:last-child td {
+    border-bottom: none;
+}
+.userTable tbody tr:hover {
+    background-color: #fcfcfc;
+}
+.role {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: white;
+}
+.admin {
+    background-color: #e74c3c;
+}
+.editor {
+    background-color: #3498db;
+}
+.user {
+    background-color: #2ecc71;
+}
+.manageButton {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.manageButton:hover {
+    background-color: #7f8c8d;
+}

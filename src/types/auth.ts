@@ -5,6 +5,7 @@ export interface ApiResponse {
   data?: {
     userId?: string;
     token?: string;
+    role?: string;
     [key: string]: unknown;
   };
 }

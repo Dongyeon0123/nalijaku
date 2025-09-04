@@ -118,13 +118,9 @@ export const signup = async (data: SignupData): Promise<ApiResponse> => {
 
         return result;
       } catch (fetchError) {
-        // API 서버가 없을 때 모킹 응답
-        console.log('❌ API 서버 연결 실패, 모킹 응답 사용:', fetchError);
-        return {
-          success: true,
-          message: '회원가입이 완료되었습니다. (모킹)',
-          data: { userId: 'mock_' + Date.now() }
-        };
+        // API 서버 연결 실패 시 에러 반환
+        console.log('❌ API 서버 연결 실패:', fetchError);
+        throw new Error('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
       }
     } else {
       // 프로덕션 환경에서는 실제 API 호출
@@ -172,22 +168,58 @@ export const login = async (data: LoginData): Promise<ApiResponse> => {
         });
 
         console.log('📡 응답 상태:', response.status, response.statusText);
-        const result = await response.json();
-        console.log('📥 응답 데이터:', result);
+        
+        // 응답이 JSON인지 확인
+        const contentType = response.headers.get('content-type');
+        let result;
+        
+        if (contentType && contentType.includes('application/json')) {
+          result = await response.json();
+          console.log('📥 응답 데이터 (JSON):', result);
+        } else {
+          const textResult = await response.text();
+          console.log('📥 응답 데이터 (텍스트):', textResult);
+          result = { message: textResult };
+        }
         
         if (!response.ok) {
-          throw new Error(result.message || '로그인에 실패했습니다.');
+          // HTTP 상태 코드에 따라 다른 에러 메시지 제공
+          if (response.status === 401) {
+            throw new Error('아이디 또는 비밀번호가 잘못되었습니다.');
+          } else if (response.status === 404) {
+            throw new Error('아이디 또는 비밀번호가 잘못되었습니다.');
+          } else {
+            // 서버에서 보낸 메시지가 있으면 사용, 없으면 기본 메시지
+            const errorMessage = result.message || result.error || '로그인에 실패했습니다.';
+            throw new Error(errorMessage);
+          }
         }
 
         return result;
       } catch (fetchError) {
-        // API 서버가 없을 때 모킹 응답
-        console.log('❌ API 서버 연결 실패, 모킹 응답 사용:', fetchError);
-        return {
-          success: true,
-          message: '로그인되었습니다. (모킹)',
-          data: { token: 'mock_token_' + Date.now() }
-        };
+        // API 서버 연결 실패 시 에러 반환
+        console.log('❌ API 서버 연결 실패:', fetchError);
+        
+        // fetchError가 Error 객체인지 확인하고 타입에 따라 다른 메시지 제공
+        if (fetchError instanceof Error) {
+          // 이미 우리가 던진 에러인 경우 (서버 응답 처리 중 발생한 에러) 그대로 전달
+          if (fetchError.message.includes('아이디 또는 비밀번호가 잘못되었습니다') || 
+              fetchError.message.includes('로그인에 실패했습니다') ||
+              fetchError.message.includes('비밀번호가 일치하지 않습니다')) {
+            throw fetchError;
+          }
+          
+          // 네트워크 에러인 경우
+          if (fetchError.message.includes('fetch') || fetchError.message.includes('network') || fetchError.message.includes('Failed to fetch')) {
+            throw new Error('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
+          }
+          // JSON 파싱 에러인 경우 (서버가 응답했지만 JSON이 아닌 경우)
+          if (fetchError.message.includes('JSON') || fetchError.message.includes('parse')) {
+            throw new Error('서버 응답을 처리할 수 없습니다. 잠시 후 다시 시도해주세요.');
+          }
+        }
+        
+        throw new Error('아이디 또는 비밀번호가 잘못되었습니다.');
       }
     } else {
       // 프로덕션 환경에서는 실제 API 호출
@@ -198,11 +230,31 @@ export const login = async (data: LoginData): Promise<ApiResponse> => {
       });
 
       console.log('📡 응답 상태:', response.status, response.statusText);
-      const result = await response.json();
-      console.log('📥 응답 데이터:', result);
+      
+      // 응답이 JSON인지 확인
+      const contentType = response.headers.get('content-type');
+      let result;
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+        console.log('📥 응답 데이터 (JSON):', result);
+      } else {
+        const textResult = await response.text();
+        console.log('📥 응답 데이터 (텍스트):', textResult);
+        result = { message: textResult };
+      }
       
       if (!response.ok) {
-        throw new Error(result.message || '로그인에 실패했습니다.');
+        // HTTP 상태 코드에 따라 다른 에러 메시지 제공
+        if (response.status === 401) {
+          throw new Error('아이디 또는 비밀번호가 잘못되었습니다.');
+        } else if (response.status === 404) {
+          throw new Error('아이디 또는 비밀번호가 잘못되었습니다.');
+        } else {
+          // 서버에서 보낸 메시지가 있으면 사용, 없으면 기본 메시지
+          const errorMessage = result.message || result.error || '로그인에 실패했습니다.';
+          throw new Error(errorMessage);
+        }
       }
 
       return result;

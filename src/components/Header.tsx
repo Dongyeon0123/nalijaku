@@ -58,7 +58,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
 
   // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [userInfo, setUserInfo] = React.useState<{username: string; token?: string} | null>(null);
+  const [userInfo, setUserInfo] = React.useState<{username: string; token?: string; role?: string} | null>(null);
 
 
 
@@ -130,10 +130,16 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       
       if (result.success) {
         // 로그인 상태 업데이트
-        const userData = {
+        console.log('🔍 로그인 응답 데이터:', result.data);
+        console.log('🔍 사용자 role:', result.data?.role);
+        
+        const userData: {username: string; token?: string; role?: string} = {
           username: loginForm.username,
-          token: result.data?.token
+          token: result.data?.token,
+          role: result.data?.role || 'GENERAL' // 백엔드에서 role 정보 받기
         };
+        
+        console.log('🔍 저장할 userData:', userData);
         setIsLoggedIn(true);
         setUserInfo(userData);
         
@@ -386,6 +392,16 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
           {isLoggedIn ? (
             <div className={styles.userMenu}>
               <span className={styles.userName}>{userInfo?.username}님</span>
+              {(() => {
+                console.log('🔍 현재 userInfo:', userInfo);
+                console.log('🔍 userInfo?.role:', userInfo?.role);
+                console.log('🔍 role === ADMIN?', userInfo?.role === 'ADMIN');
+                return userInfo?.role === 'ADMIN';
+              })() && (
+                <button className={styles.adminButton} onClick={() => window.open('/admin', '_blank')}>
+                  관리자
+                </button>
+              )}
               <button className={styles.logoutButton} onClick={handleLogout}>
                 로그아웃
               </button>
