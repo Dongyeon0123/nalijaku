@@ -47,7 +47,7 @@ logging:
   level:
     com.nallijaku.backend: INFO
     org.springframework.security: WARN
-    org.hibernate.SQL: WARN
+    org.hibernatL: WARN
     org.springframework.web: WARN
     root: INFO
   # 로그 파일 설정

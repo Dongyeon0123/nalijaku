@@ -48,13 +48,27 @@ public class AuthController {
                     .body(createErrorResponse("비밀번호와 비밀번호 확인이 일치하지 않습니다."));
             }
 
+            // Role 자동 변환 (숫자나 잘못된 값이 오면 GENERAL로 기본 설정)
+            Role userRole = Role.GENERAL; // 기본값
+            try {
+                String roleStr = signUpRequest.getRole().toUpperCase();
+                // 숫자나 잘못된 값이면 GENERAL로 설정
+                if (roleStr.matches("\\d+")) {
+                    userRole = Role.GENERAL;
+                } else {
+                    userRole = Role.valueOf(roleStr);
+                }
+            } catch (IllegalArgumentException e) {
+                userRole = Role.GENERAL; // 잘못된 role 값이면 기본값 사용
+            }
+
             // 새 사용자 생성
             User newUser = new User(
                 signUpRequest.getUsername(),
                 "{noop}" + signUpRequest.getPassword(), // 임시로 {noop} 접두사 사용 (개발용)
                 signUpRequest.getEmail(),
                 signUpRequest.getOrganization(),
-                Role.valueOf(signUpRequest.getRole().toUpperCase()),
+                userRole,
                 signUpRequest.getPhone(),
                 signUpRequest.getDroneExperience(),
                 signUpRequest.getTermsAgreed()
