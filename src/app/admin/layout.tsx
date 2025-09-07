@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './layout.module.css';
-import { FaTachometerAlt, FaUsers } from 'react-icons/fa';
+import { FaTachometerAlt, FaUsers, FaCog, FaChartBar, FaFileAlt } from 'react-icons/fa';
 
 export default function AdminLayout({
   children,
@@ -23,6 +23,15 @@ export default function AdminLayout({
           <ul>
             <li className={pathname === '/admin' ? styles.active : ''}>
               <Link href="/admin"><FaTachometerAlt /> 대시보드</Link>
+            </li>
+            <li className={pathname === '/admin/content' ? styles.active : ''}>
+              <Link href="/admin/content"><FaFileAlt /> 콘텐츠 관리</Link>
+            </li>
+            <li className={pathname === '/admin/settings' ? styles.active : ''}>
+              <Link href="/admin/settings"><FaCog /> 설정</Link>
+            </li>
+            <li className={pathname === '/admin/statistics' ? styles.active : ''}>
+              <Link href="/admin/statistics"><FaChartBar /> 통계</Link>
             </li>
             <li className={pathname === '/admin/users' ? styles.active : ''}>
               <Link href="/admin/users"><FaUsers /> 사용자 관리</Link>

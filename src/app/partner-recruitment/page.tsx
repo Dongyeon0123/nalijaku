@@ -46,11 +46,33 @@ export default function EducationIntroPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 여기에 폼 제출 로직을 추가할 수 있습니다
-    console.log('교육 도입 신청:', formData);
-    alert('교육 도입 신청이 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
+    
+    try {
+      // 실제로는 API 호출을 하여 데이터를 서버로 전송
+      const response = await fetch('/api/partner-applications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          submittedAt: new Date().toISOString(),
+          status: 'pending'
+        }),
+      });
+
+      if (response.ok) {
+        console.log('파트너 모집 신청 데이터:', formData);
+        alert('파트너 모집 신청이 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
+      } else {
+        throw new Error('신청 처리 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      alert('신청 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
   };
 
   return (
