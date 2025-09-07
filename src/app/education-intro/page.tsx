@@ -19,6 +19,7 @@ export default function EducationIntroPage() {
     phone: '',
     email: '',
     studentCount: '',
+    budget: '',
     grade: '',
     preferredDate: '',
     message: '',
@@ -131,6 +132,39 @@ export default function EducationIntroPage() {
                             required
                             placeholder="example@school.edu"
                         />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label htmlFor="studentCount">예상 학생 수 <span style={{color: 'red'}}>*</span></label>
+                        <input
+                            type="number"
+                            id="studentCount"
+                            name="studentCount"
+                            value={formData.studentCount}
+                            onChange={handleInputChange}
+                            required
+                            placeholder="예: 30"
+                            min="1"
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label htmlFor="budget">대략적인 예산 (선택사항)</label>
+                        <select
+                            id="budget"
+                            name="budget"
+                            value={formData.budget}
+                            onChange={handleInputChange}
+                        >
+                            <option value="">예산 범위를 선택해주세요</option>
+                            <option value="under-500">50만원 미만</option>
+                            <option value="500-1000">50만원 ~ 100만원</option>
+                            <option value="1000-2000">100만원 ~ 200만원</option>
+                            <option value="2000-3000">200만원 ~ 300만원</option>
+                            <option value="3000-5000">300만원 ~ 500만원</option>
+                            <option value="over-5000">500만원 이상</option>
+                            <option value="discuss">상담 후 결정</option>
+                        </select>
                     </div>
                 </div>
 
