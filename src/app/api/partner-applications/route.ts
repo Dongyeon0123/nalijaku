@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // 임시 데이터 저장소 (실제로는 데이터베이스 사용)
-let partnerApplications: any[] = [
+const partnerApplications: Array<{
+  id: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  location: string;
+  experience: string;
+  status: string;
+  createdAt: string;
+  specialties: string[];
+}> = [
   {
     id: '1',
     contactPerson: '박강사',

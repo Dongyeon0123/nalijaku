@@ -11,15 +11,6 @@ interface StatCard {
   icon: string;
 }
 
-interface ChartData {
-  labels: string[];
-  datasets: {
-    label: string;
-    data: number[];
-    backgroundColor: string;
-    borderColor: string;
-  }[];
-}
 
 export default function StatisticsPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'applications' | 'users' | 'revenue'>('overview');
@@ -47,8 +38,8 @@ export default function StatisticsPage() {
         const partnerApps = partnerData.applications || [];
         
         // 완료된 신청 계산
-        const completedEducation = educationApps.filter((app: any) => app.status === 'completed').length;
-        const completedPartner = partnerApps.filter((app: any) => app.status === 'completed').length;
+        const completedEducation = educationApps.filter((app: { status: string }) => app.status === 'completed').length;
+        const completedPartner = partnerApps.filter((app: { status: string }) => app.status === 'completed').length;
         const totalCompleted = completedEducation + completedPartner;
         
         // 통계 카드 업데이트
@@ -202,7 +193,7 @@ export default function StatisticsPage() {
           <select
             id="dateRange"
             value={dateRange}
-            onChange={(e) => setDateRange(e.target.value as any)}
+            onChange={(e) => setDateRange(e.target.value as '7d' | '30d' | '90d' | '1y')}
             className={styles.dateRangeSelect}
           >
             <option value="7d">최근 7일</option>

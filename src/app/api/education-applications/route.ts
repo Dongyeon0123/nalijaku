@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // 임시 데이터 저장소 (실제로는 데이터베이스 사용)
-let educationApplications: any[] = [
+const educationApplications: Array<{
+  id: string;
+  schoolName: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  studentCount: number;
+  grade: string;
+  preferredDate: string;
+  budget: string;
+  additionalInfo: string;
+  status: string;
+  submittedAt: string;
+}> = [
   {
     id: '1',
     schoolName: '서울초등학교',

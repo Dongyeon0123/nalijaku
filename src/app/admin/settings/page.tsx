@@ -92,7 +92,7 @@ export default function SettingsPage() {
       // 실제로는 API 호출로 설정 저장
       await new Promise(resolve => setTimeout(resolve, 1000));
       setSaveMessage('설정이 성공적으로 저장되었습니다.');
-    } catch (error) {
+    } catch {
       setSaveMessage('설정 저장 중 오류가 발생했습니다.');
     } finally {
       setIsSaving(false);
