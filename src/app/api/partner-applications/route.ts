@@ -8,9 +8,9 @@ const partnerApplications: Array<{
   phone: string;
   location: string;
   experience: string;
+  certificates: string[];
   status: string;
-  createdAt: string;
-  specialties: string[];
+  submittedAt: string;
 }> = [
   {
     id: '1',
