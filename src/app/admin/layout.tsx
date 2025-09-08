@@ -13,6 +13,11 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
 
+  React.useEffect(() => {
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+  }, []);
+
   return (
     <div className={styles.adminContainer}>
       <aside className={styles.sidebar}>
