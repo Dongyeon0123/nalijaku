@@ -374,9 +374,9 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
         </div>
 
         <nav className={styles.navigation}>
-          <a href="#" className={styles.navLink}>
+          <Link href="/resources" className={styles.navLink}>
             학습 자료
-          </a>
+          </Link>
           <a href="#" className={styles.navLink}>
             날리자쿠 소개
           </a>
