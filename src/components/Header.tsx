@@ -172,6 +172,9 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       // 로그아웃 API 호출 (선택사항)
       // await logout();
       
+      // 현재 페이지가 resources인지 확인
+      const isOnResourcesPage = window.location.pathname === '/resources';
+      
       // 로그인 상태 초기화
       setIsLoggedIn(false);
       setUserInfo(null);
@@ -184,6 +187,10 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       
       setTimeout(() => {
         setShowLogoutSuccessModal(false);
+        // resources 페이지에서 로그아웃한 경우 메인 페이지로 이동
+        if (isOnResourcesPage) {
+          window.location.href = '/';
+        }
       }, 2000);
     } catch (error) {
       console.error('로그아웃 중 오류:', error);

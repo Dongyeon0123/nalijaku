@@ -6,13 +6,22 @@ import Image from 'next/image';
 import baseStyles from '../education-intro/page.module.css';
 import styles from './page.module.css';
 import { FiSearch } from 'react-icons/fi';
+import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
 
 export default function ResourcesPage() {
   const [selectedCategory, setSelectedCategory] = React.useState('전체');
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
+    
+    // 로딩 시뮬레이션 (실제로는 데이터 로딩 시간에 맞춰 조정)
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // 로그인 상태 확인
@@ -144,6 +153,21 @@ export default function ResourcesPage() {
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
   };
+
+  // 로딩 중일 때 표시할 컴포넌트
+  if (isLoading) {
+    return (
+      <div className={baseStyles.container}>
+        <Header forceLightMode={true} />
+        <main className={baseStyles.main} style={{ background: '#ffffff', minHeight: '60vh' }}>
+          <div className={styles.loadingContainer}>
+            <div className={styles.loadingSpinner}></div>
+            <div className={styles.loadingText}>학습 자료를 불러오는 중...</div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={baseStyles.container}>
@@ -290,9 +314,15 @@ export default function ResourcesPage() {
           <div className={baseStyles.snsSection}>
             <h4 className={baseStyles.snsTitle}>날리자쿠 SNS</h4>
             <div className={baseStyles.snsIcons}>
-              <a href="#" className={baseStyles.snsIcon}>IG</a>
-              <a href="#" className={baseStyles.snsIcon}>YT</a>
-              <a href="#" className={baseStyles.snsIcon}>BR</a>
+              <a href="https://instagram.com/nalijaku" target="_blank" rel="noopener noreferrer" className={baseStyles.snsIcon}>
+                <FaInstagram size={24} />
+              </a>
+              <a href="https://youtube.com/@nalijaku" target="_blank" rel="noopener noreferrer" className={baseStyles.snsIcon}>
+                <FaYoutube size={24} />
+              </a>
+              <a href="https://blog.naver.com/nalijaku" target="_blank" rel="noopener noreferrer" className={baseStyles.snsIcon}>
+                <FaBloggerB size={24} />
+              </a>
             </div>
           </div>
         </div>
