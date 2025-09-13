@@ -9,12 +9,8 @@ import { FiSearch } from 'react-icons/fi';
 
 export default function ResourcesPage() {
   const [selectedCategory, setSelectedCategory] = React.useState('전체');
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [userInfo, setUserInfo] = React.useState<{username: string; token?: string; role?: string} | null>(null);
-  const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setIsMounted(true);
     document.body.style.margin = '0';
     document.body.style.padding = '0';
   }, []);
@@ -22,16 +18,7 @@ export default function ResourcesPage() {
   // 로그인 상태 확인
   React.useEffect(() => {
     const savedUserInfo = localStorage.getItem('userInfo');
-    if (savedUserInfo) {
-      try {
-        const userData = JSON.parse(savedUserInfo);
-        setIsLoggedIn(true);
-        setUserInfo(userData);
-      } catch (error) {
-        console.error('저장된 사용자 정보 파싱 오류:', error);
-        localStorage.removeItem('userInfo');
-      }
-    } else {
+    if (!savedUserInfo) {
       // 로그인하지 않은 사용자는 홈페이지로 리다이렉트
       window.location.href = '/';
     }
