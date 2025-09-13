@@ -98,3 +98,97 @@
   color: #ffffff;
   border-color: #00A169;
 }
+
+.materialsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  margin-top: 40px;
+  padding: 20px 0;
+}
+
+.materialItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 25px;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  gap: 0;
+  overflow: hidden;
+}
+
+.materialItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+}
+
+.materialImage {
+  width: 100%;
+  height: 250px;
+  border-radius: 12px 12px 0 0;
+  object-fit: cover;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.categoryTag {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background: #01C187;
+  color: #ffffff;
+  padding: 8px 32px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  z-index: 1;
+}
+
+.materialItem:hover .materialImage {
+  transform: scale(1.05);
+}
+
+.materialContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  padding: 20px;
+  background: #ffffff;
+}
+
+.materialTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #383838;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.instructorInfo {
+  font-size: 14px;
+  font-weight: 600;
+  color: #04AD74;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+}
+
+.subtitle {
+  font-size: 15px;
+  font-weight: 400;
+  color: #5E5E5E;
+  margin: 0;
+  line-height: 1.8;
+}
