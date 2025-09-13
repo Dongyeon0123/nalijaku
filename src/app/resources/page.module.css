@@ -144,11 +144,11 @@
 
 .categoryTag {
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 10px;
+  right: 10px;
   background: #01C187;
   color: #ffffff;
-  padding: 8px 32px;
+  padding: 9px 32px;
   border-radius: 20px;
   font-size: 16px;
   font-weight: 500;
