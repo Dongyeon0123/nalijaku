@@ -99,6 +99,12 @@
   border-color: #00A169;
 }
 
+.topicItem.selected {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
 .materialsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -146,7 +152,7 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #01C187;
+  background: rgba(1, 193, 135, 0.8);
   color: #ffffff;
   padding: 9px 32px;
   border-radius: 20px;
@@ -173,7 +179,7 @@
   font-size: 20px;
   font-weight: 600;
   color: #383838;
-  margin: 0 0 8px 0;
+  margin: 0 0 15px 0;
   line-height: 1.4;
 }
 
@@ -190,5 +196,5 @@
   font-weight: 400;
   color: #5E5E5E;
   margin: 0;
-  line-height: 1.8;
+  line-height: 0.9;
 }

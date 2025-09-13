@@ -839,3 +839,90 @@
   50% { background: #01C187; transform: scaleX(1.1); }
   100% { background: #01C187; transform: scaleX(1); }
 }
+
+/* 로그아웃 성공 모달 스타일 */
+.logoutSuccessModal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  max-width: 380px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease-out;
+  border: 1px solid #f0f0f0;
+}
+
+.logoutSuccessModal .modalContent {
+  padding: 40px 32px;
+  text-align: center;
+}
+
+.successIcon {
+  margin-bottom: 24px;
+  animation: iconBounce 0.6s ease-out;
+}
+
+.logoutSuccessModal .modalTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+  animation: titleSlideIn 0.4s ease-out 0.2s both;
+}
+
+.logoutSuccessModal .modalMessage {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+  animation: messageSlideIn 0.4s ease-out 0.3s both;
+}
+
+/* 애니메이션 키프레임 */
+@keyframes modalSlideIn {
+  0% { 
+    transform: translateY(-20px) scale(0.95); 
+    opacity: 0; 
+  }
+  100% { 
+    transform: translateY(0) scale(1); 
+    opacity: 1; 
+  }
+}
+
+@keyframes iconBounce {
+  0% { 
+    transform: scale(0.3); 
+    opacity: 0; 
+  }
+  50% { 
+    transform: scale(1.1); 
+  }
+  100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+}
+
+@keyframes titleSlideIn {
+  0% { 
+    transform: translateY(10px); 
+    opacity: 0; 
+  }
+  100% { 
+    transform: translateY(0); 
+    opacity: 1; 
+  }
+}
+
+@keyframes messageSlideIn {
+  0% { 
+    transform: translateY(10px); 
+    opacity: 0; 
+  }
+  100% { 
+    transform: translateY(0); 
+    opacity: 1; 
+  }
+}

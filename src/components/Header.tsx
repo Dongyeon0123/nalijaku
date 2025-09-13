@@ -22,6 +22,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const [modalType, setModalType] = React.useState<'login' | 'signup'>('login');
   const [signupStep, setSignupStep] = React.useState<0 | 1 | 2>(0);
+  const [showLogoutSuccessModal, setShowLogoutSuccessModal] = React.useState(false);
   const [hasDroneExp, setHasDroneExp] = React.useState<'있음' | '없음' | null>(null);
   const [affiliation, setAffiliation] = React.useState('');
   const [role, setRole] = React.useState('');
@@ -147,6 +148,10 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
         localStorage.setItem('userInfo', JSON.stringify(userData));
         
         setSuccessMessage('로그인되었습니다!');
+        
+        // 로그인 성공 이벤트 발생
+        window.dispatchEvent(new CustomEvent('loginSuccess'));
+        
         setTimeout(() => {
           setIsLoginOpen(false);
           resetLoginForm();
@@ -174,10 +179,11 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       // localStorage에서 사용자 정보 삭제
       localStorage.removeItem('userInfo');
       
-      setSuccessMessage('로그아웃되었습니다!');
+      // 로그아웃 성공 모달 표시
+      setShowLogoutSuccessModal(true);
       
       setTimeout(() => {
-        setSuccessMessage('');
+        setShowLogoutSuccessModal(false);
       }, 2000);
     } catch (error) {
       console.error('로그아웃 중 오류:', error);
@@ -340,6 +346,20 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isLoginOpen]);
 
+  // 다른 컴포넌트에서 로그인 모달을 열기 위한 커스텀 이벤트 처리
+  React.useEffect(() => {
+    const handleOpenLoginModal = () => {
+      setModalType('login');
+      setSignupStep(0);
+      setIsLoginOpen(true);
+    };
+
+    window.addEventListener('openLoginModal', handleOpenLoginModal);
+    return () => {
+      window.removeEventListener('openLoginModal', handleOpenLoginModal);
+    };
+  }, []);
+
   const handleScrollToHome = () => {
     const homeSection = document.getElementById('home');
     const mainElement = document.querySelector('main');
@@ -374,9 +394,21 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
         </div>
 
         <nav className={styles.navigation}>
-          <Link href="/resources" className={styles.navLink}>
+          <button 
+            className={styles.navLink}
+            onClick={() => {
+              if (isLoggedIn) {
+                window.location.href = '/resources';
+              } else {
+                setModalType('login');
+                setSignupStep(0);
+                setIsLoginOpen(true);
+              }
+            }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+          >
             학습 자료
-          </Link>
+          </button>
           <a href="#" className={styles.navLink}>
             날리자쿠 소개
           </a>
@@ -622,6 +654,27 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
               </div>
             </div>
           )}
+        </div>,
+        document.body
+      )}
+
+      {/* 로그아웃 성공 모달 */}
+      {isMounted && showLogoutSuccessModal && createPortal(
+        <div className={styles.modalOverlay}>
+          <div className={styles.logoutSuccessModal}>
+            <div className={styles.modalContent}>
+              <div className={styles.successIcon}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#04AD74"/>
+                  <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h3 className={styles.modalTitle}>로그아웃 완료</h3>
+              <p className={styles.modalMessage}>
+                안전하게 로그아웃되었습니다.
+              </p>
+            </div>
+          </div>
         </div>,
         document.body
       )}
