@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './page.module.css';
+import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
 
 interface EducationApplication {
   id: string;
@@ -18,6 +19,22 @@ interface EducationApplication {
   submittedAt: string;
 }
 
+interface EducationInquiry {
+  id: string;
+  schoolName: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  studentCount: number;
+  budget: string;
+  grade: string;
+  preferredDate: string;
+  additionalInfo: string;
+  status: 'completed' | 'in_progress' | 'pending';
+  submittedAt: string;
+  services: string[];
+}
+
 interface PartnerApplication {
   id: string;
   contactPerson: string;
@@ -31,12 +48,13 @@ interface PartnerApplication {
 }
 
 export default function ContentManagementPage() {
-  const [activeTab, setActiveTab] = useState<'education' | 'partner'>('education');
-  const [selectedApplication, setSelectedApplication] = useState<EducationApplication | PartnerApplication | null>(null);
+  const [activeTab, setActiveTab] = useState<'education' | 'inquiries' | 'partner'>('education');
+  const [selectedApplication, setSelectedApplication] = useState<EducationApplication | EducationInquiry | PartnerApplication | null>(null);
   const [loading, setLoading] = useState(true);
 
   // 실제 데이터
   const [educationApplications, setEducationApplications] = useState<EducationApplication[]>([]);
+  const [educationInquiries, setEducationInquiries] = useState<EducationInquiry[]>([]);
   const [partnerApplications, setPartnerApplications] = useState<PartnerApplication[]>([]);
 
   // 데이터 로드
@@ -45,15 +63,22 @@ export default function ContentManagementPage() {
       try {
         setLoading(true);
         
-        // 교육 도입 신청 데이터 로드
-        const educationResponse = await fetch('/api/education-applications');
+        // 교육 도입 신청 데이터 로드 (실제 백엔드 API)
+        const educationResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.EDUCATION.APPLICATION}`);
         if (educationResponse.ok) {
           const educationData = await educationResponse.json();
-          setEducationApplications(educationData.applications || []);
+          setEducationApplications(educationData.data || []);
         }
-
-        // 파트너 모집 신청 데이터 로드
-        const partnerResponse = await fetch('/api/partner-applications');
+        
+        // 교육 문의 데이터 로드 (실제 백엔드 API)
+        const inquiriesResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.EDUCATION.INQUIRY}`);
+        if (inquiriesResponse.ok) {
+          const inquiriesData = await inquiriesResponse.json();
+          setEducationInquiries(inquiriesData.data?.inquiries || []);
+        }
+        
+        // 파트너 모집 신청 데이터 로드 (실제 백엔드 API)
+        const partnerResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PARTNER.APPLICATION}`);
         if (partnerResponse.ok) {
           const partnerData = await partnerResponse.json();
           setPartnerApplications(partnerData.applications || []);
@@ -112,7 +137,7 @@ export default function ContentManagementPage() {
     <div className={styles.container}>
         <div className={styles.header}>
           <h1>콘텐츠 관리</h1>
-        <p>교육 도입 신청 및 파트너 모집 신청을 관리합니다.</p>
+        <p>교육 도입 신청, 교육 문의 및 파트너 모집 신청을 관리합니다.</p>
         </div>
         
       <div className={styles.tabContainer}>
@@ -121,6 +146,12 @@ export default function ContentManagementPage() {
             onClick={() => setActiveTab('education')}
         >
           교육 도입 신청 ({educationApplications.length})
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'inquiries' ? styles.active : ''}`}
+            onClick={() => setActiveTab('inquiries')}
+          >
+            교육 문의 ({educationInquiries.length})
           </button>
           <button
           className={`${styles.tab} ${activeTab === 'partner' ? styles.active : ''}`}
@@ -138,6 +169,51 @@ export default function ContentManagementPage() {
           </div>
         ) : (
           <>
+        {activeTab === 'inquiries' && (
+              <div className={styles.tableContainer}>
+                {educationInquiries.length === 0 ? (
+                  <div className={styles.emptyState}>
+                    <p>교육 문의가 없습니다.</p>
+                  </div>
+                ) : (
+                  <table className={styles.table}>
+                <thead>
+                      <tr>
+                        <th>학교명</th>
+                        <th>담당자</th>
+                        <th>연락처</th>
+                        <th>학생 수</th>
+                        <th>예산</th>
+                        <th>상태</th>
+                        <th>신청일</th>
+                        <th>액션</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {educationInquiries.map((inquiry) => (
+                        <tr key={inquiry.id}>
+                          <td>{inquiry.schoolName}</td>
+                          <td>{inquiry.contactPerson}</td>
+                          <td>{inquiry.phone}</td>
+                          <td>{inquiry.studentCount}명</td>
+                          <td>{inquiry.budget}</td>
+                          <td>{getStatusBadge(inquiry.status)}</td>
+                          <td>{new Date(inquiry.submittedAt).toLocaleDateString()}</td>
+                          <td>
+                            <button
+                              className={styles.viewButton}
+                              onClick={() => setSelectedApplication(inquiry)}
+                            >
+                          상세보기
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+                )}
+              </div>
+            )}
         {activeTab === 'education' && (
               <div className={styles.tableContainer}>
                 {educationApplications.length === 0 ? (

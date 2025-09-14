@@ -51,6 +51,25 @@ export const getUserCount = async (): Promise<{count: string | number}> => {
   }
 };
 
+// 관리자 권한 확인 함수
+export const checkAdminStatus = async (username: string): Promise<{success: boolean; data: {isAdmin: boolean; username: string}}> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/check-admin/${username}`);
+    console.log('🔐 관리자 권한 확인 응답 상태:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      throw new Error('관리자 권한 확인에 실패했습니다.');
+    }
+    
+    const result = await response.json();
+    console.log('🔐 관리자 권한 확인 결과:', result);
+    return result;
+  } catch (error) {
+    console.log('❌ 관리자 권한 확인 실패:', error);
+    throw error;
+  }
+};
+
 // API 호출 함수들
 export const signup = async (data: SignupData): Promise<ApiResponse> => {
   try {

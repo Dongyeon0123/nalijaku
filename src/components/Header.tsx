@@ -7,7 +7,7 @@ import { IoChevronBack } from 'react-icons/io5';
 import styles from '@/styles/Header.module.css';
 import Link from 'next/link';
 import { SignupData, LoginData } from '@/types/auth';
-import { signup, login, checkServerHealth, getUserCount } from '@/services/authService';
+import { signup, login, checkServerHealth, getUserCount, checkAdminStatus } from '@/services/authService';
 import { validateSignupStep1, validateSignupStep2, validateSignupStep3 } from '@/utils/validation';
 
 interface HeaderProps {
@@ -60,6 +60,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
   // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [userInfo, setUserInfo] = React.useState<{username: string; token?: string; role?: string} | null>(null);
+  const [isAdmin, setIsAdmin] = React.useState(false);
 
 
 
@@ -147,6 +148,16 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
         // localStorage에 사용자 정보 저장
         localStorage.setItem('userInfo', JSON.stringify(userData));
         
+        // 관리자 권한 확인
+        try {
+          const adminResult = await checkAdminStatus(loginForm.username);
+          setIsAdmin(adminResult.data.isAdmin);
+          console.log('🔐 관리자 권한 확인 결과:', adminResult.data.isAdmin);
+        } catch (error) {
+          console.log('❌ 관리자 권한 확인 실패:', error);
+          setIsAdmin(false);
+        }
+        
         setSuccessMessage('로그인되었습니다!');
         
         // 로그인 성공 이벤트 발생
@@ -178,6 +189,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       // 로그인 상태 초기화
       setIsLoggedIn(false);
       setUserInfo(null);
+      setIsAdmin(false);
       
       // localStorage에서 사용자 정보 삭제
       localStorage.removeItem('userInfo');
@@ -334,6 +346,18 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
         const userData = JSON.parse(savedUserInfo);
         setIsLoggedIn(true);
         setUserInfo(userData);
+        
+        // 저장된 사용자의 관리자 권한 확인
+        if (userData.username) {
+          try {
+            const adminResult = await checkAdminStatus(userData.username);
+            setIsAdmin(adminResult.data.isAdmin);
+            console.log('🔐 저장된 사용자 관리자 권한 확인 결과:', adminResult.data.isAdmin);
+          } catch (error) {
+            console.log('❌ 저장된 사용자 관리자 권한 확인 실패:', error);
+            setIsAdmin(false);
+          }
+        }
       } catch (error) {
         console.error('저장된 사용자 정보 파싱 오류:', error);
         localStorage.removeItem('userInfo');
@@ -431,12 +455,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
           {isLoggedIn ? (
             <div className={styles.userMenu}>
               <span className={styles.userName}>{userInfo?.username}님</span>
-              {(() => {
-                console.log('🔍 현재 userInfo:', userInfo);
-                console.log('🔍 userInfo?.role:', userInfo?.role);
-                console.log('🔍 role === ADMIN?', userInfo?.role === 'ADMIN');
-                return userInfo?.role === 'ADMIN';
-              })() && (
+              {isAdmin && (
                 <button className={styles.adminButton} onClick={() => window.open('/admin', '_blank')}>
                   관리자
                 </button>

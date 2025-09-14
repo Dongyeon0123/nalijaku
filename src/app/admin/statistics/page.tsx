@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
+import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
 
 interface StatCard {
   title: string;
@@ -22,78 +23,98 @@ export default function StatisticsPage() {
 
   // 실제 데이터 로드
   useEffect(() => {
+    console.log('loadStatistics useEffect 실행됨');
     const loadStatistics = async () => {
       try {
+        console.log('loadStatistics 함수 시작');
         setLoading(true);
         
-        // 교육 도입 신청 데이터
-        const educationResponse = await fetch('/api/education-applications');
-        const educationData = educationResponse.ok ? await educationResponse.json() : { applications: [] };
+          // 교육 도입 신청 데이터 (실제 백엔드 API)
+          console.log('교육 도입 신청 API 호출:', `${API_BASE_URL}${API_ENDPOINTS.EDUCATION.APPLICATION}`);
+          const educationResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.EDUCATION.APPLICATION}`);
+          console.log('교육 도입 신청 API 응답 상태:', educationResponse.status);
+          const educationData = educationResponse.ok ? await educationResponse.json() : { data: [] };
+          console.log('교육 도입 신청 API 응답 데이터:', educationData);
         
-        // 파트너 모집 신청 데이터
-        const partnerResponse = await fetch('/api/partner-applications');
+        // 교육 문의 데이터 (실제 백엔드 API)
+        console.log('교육 문의 API 호출:', `${API_BASE_URL}${API_ENDPOINTS.EDUCATION.INQUIRY}`);
+        const educationInquiriesResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.EDUCATION.INQUIRY}`);
+        console.log('교육 문의 API 응답 상태:', educationInquiriesResponse.status);
+        const educationInquiriesData = educationInquiriesResponse.ok ? await educationInquiriesResponse.json() : { data: { inquiries: [] } };
+        console.log('교육 문의 API 응답 데이터:', educationInquiriesData);
+        
+        // 파트너 모집 신청 데이터 (실제 백엔드 API)
+        console.log('파트너 지원 API 호출:', `${API_BASE_URL}${API_ENDPOINTS.PARTNER.APPLICATION}`);
+        const partnerResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PARTNER.APPLICATION}`);
+        console.log('파트너 지원 API 응답 상태:', partnerResponse.status);
         const partnerData = partnerResponse.ok ? await partnerResponse.json() : { applications: [] };
+        console.log('파트너 지원 API 응답 데이터:', partnerData);
         
-        const educationApps = educationData.applications || [];
+        // 사용자 수 데이터 (실제 백엔드 API)
+        console.log('사용자 수 API 호출:', `${API_BASE_URL}${API_ENDPOINTS.SYSTEM.USER_COUNT}`);
+        const usersResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SYSTEM.USER_COUNT}`);
+        console.log('사용자 수 API 응답 상태:', usersResponse.status);
+        const usersData = usersResponse.ok ? await usersResponse.json() : { data: { count: 0 } };
+        console.log('사용자 수 API 응답:', usersData);
+        
+          const educationApps = educationData.data || [];
+        const educationInquiries = educationInquiriesData.data?.inquiries || [];
         const partnerApps = partnerData.applications || [];
+        const totalUsers = usersData.data?.count || 0;
+        console.log('👥 추출된 사용자 수:', totalUsers);
         
         // 완료된 신청 계산
         const completedEducation = educationApps.filter((app: { status: string }) => app.status === 'completed').length;
         const completedPartner = partnerApps.filter((app: { status: string }) => app.status === 'completed').length;
-        const totalCompleted = completedEducation + completedPartner;
+        const completedInquiries = educationInquiries.filter((inquiry: { status: string }) => inquiry.status === 'completed').length;
+        const totalCompleted = completedEducation + completedPartner + completedInquiries;
         
         // 통계 카드 업데이트
         setStatCards([
           {
             title: '총 신청 건수',
-            value: educationApps.length + partnerApps.length,
+            value: educationApps.length + partnerApps.length + educationInquiries.length,
             change: 12.5,
             changeType: 'increase',
             icon: '📝'
           },
           {
-            title: '교육 도입 신청',
-            value: educationApps.length,
-            change: 8.2,
-            changeType: 'increase',
-            icon: '🎓'
-          },
-          {
-            title: '파트너 모집 신청',
-            value: partnerApps.length,
-            change: -3.1,
-            changeType: 'decrease',
-            icon: '🤝'
-          },
-          {
-            title: '완료된 신청',
-            value: totalCompleted,
-            change: 15.3,
-            changeType: 'increase',
-            icon: '✅'
-          },
-          {
-            title: '총 사용자',
-            value: 1234,
-            change: 22.1,
+            title: '총 사용자 수',
+            value: totalUsers,
+            change: 5.7,
             changeType: 'increase',
             icon: '👥'
           },
           {
-            title: '활성 사용자',
-            value: 456,
-            change: 5.7,
+            title: '완료된 신청',
+            value: totalCompleted,
+            change: 8.2,
             changeType: 'increase',
-            icon: '🟢'
+            icon: '✅'
+          },
+          {
+            title: '진행 중인 신청',
+            value: (educationApps.length + partnerApps.length + educationInquiries.length) - totalCompleted,
+            change: -3.1,
+            changeType: 'decrease',
+            icon: '⏳'
           }
         ]);
       } catch (error) {
         console.error('Error loading statistics:', error);
+        if (error instanceof Error) {
+          console.error('Error details:', error.message);
+          console.error('Error stack:', error.stack);
+        } else {
+          console.error('Unknown error:', error);
+        }
       } finally {
+        console.log('loadStatistics 함수 완료');
         setLoading(false);
       }
     };
 
+    console.log('loadStatistics 함수 호출');
     loadStatistics();
   }, []);
 

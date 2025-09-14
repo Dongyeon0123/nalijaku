@@ -20,6 +20,7 @@ export const API_ENDPOINTS = {
   // 교육 문의
   EDUCATION: {
     INQUIRY: '/education-inquiries',
+    APPLICATION: '/education-applications',
   },
   
   // 파트너 지원
@@ -31,6 +32,7 @@ export const API_ENDPOINTS = {
   SYSTEM: {
     HEALTH: '/health',
     USER_COUNT: '/users/count',
+    USERS: '/users',
   },
 } as const;
 
