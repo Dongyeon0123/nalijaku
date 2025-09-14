@@ -349,14 +349,15 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
         
         // 저장된 사용자의 관리자 권한 확인
         if (userData.username) {
-          try {
-            const adminResult = await checkAdminStatus(userData.username);
-            setIsAdmin(adminResult.data.isAdmin);
-            console.log('🔐 저장된 사용자 관리자 권한 확인 결과:', adminResult.data.isAdmin);
-          } catch (error) {
-            console.log('❌ 저장된 사용자 관리자 권한 확인 실패:', error);
-            setIsAdmin(false);
-          }
+          checkAdminStatus(userData.username)
+            .then(adminResult => {
+              setIsAdmin(adminResult.data.isAdmin);
+              console.log('🔐 저장된 사용자 관리자 권한 확인 결과:', adminResult.data.isAdmin);
+            })
+            .catch(error => {
+              console.log('❌ 저장된 사용자 관리자 권한 확인 실패:', error);
+              setIsAdmin(false);
+            });
         }
       } catch (error) {
         console.error('저장된 사용자 정보 파싱 오류:', error);
