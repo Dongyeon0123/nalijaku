@@ -15,6 +15,7 @@ export default function ResourcesPage() {
   React.useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
+    (document.body.style as any).webkitOverflowScrolling = 'touch';
     
     // 로딩 시뮬레이션 (실제로는 데이터 로딩 시간에 맞춰 조정)
     const timer = setTimeout(() => {

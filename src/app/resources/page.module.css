@@ -456,10 +456,6 @@
     -webkit-overflow-scrolling: touch;
   }
   
-  /* iOS Safari에서 스크롤 개선 */
-  :global(body) {
-    -webkit-overflow-scrolling: touch;
-  }
   
   /* 터치 영역 확대 */
   .searchButton,
