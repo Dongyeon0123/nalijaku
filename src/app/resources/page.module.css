@@ -457,7 +457,7 @@
   }
   
   /* iOS Safari에서 스크롤 개선 */
-  body {
+  :global(body) {
     -webkit-overflow-scrolling: touch;
   }
   
