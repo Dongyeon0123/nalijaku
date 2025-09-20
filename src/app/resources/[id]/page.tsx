@@ -16,23 +16,15 @@ interface MaterialDetailProps {
 }
 
 export default function MaterialDetailPage({ params }: MaterialDetailProps) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = React.useState(true);
   const [notionContent, setNotionContent] = React.useState<NotionPage | null>(null);
-  const [selectedLesson, setSelectedLesson] = React.useState<number | null>(null);
+  const [selectedLesson, setSelectedLesson] = React.useState<number | null>(1);
+  const [isNotionLoading, setIsNotionLoading] = React.useState(false);
   const resolvedParams = React.use(params);
 
   React.useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     (document.body.style as CSSStyleDeclaration & { webkitOverflowScrolling?: string }).webkitOverflowScrolling = 'touch';
-    
-    // 로딩 시뮬레이션
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
   }, []);
 
   // 로그인 상태 확인
@@ -225,32 +217,49 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
   // 노션 콘텐츠 가져오기
   React.useEffect(() => {
     const loadNotionContent = async () => {
-      if (!currentMaterial?.notionId) return;
+      if (!currentMaterial) return;
       
       try {
-        setIsLoading(true);
-        const response = await fetch(`/api/notion/page?pageId=${currentMaterial.notionId}`);
+        setIsNotionLoading(true);
         
-        if (!response.ok) {
-          throw new Error('API 요청 실패');
+        // 차시가 있는 경우 첫 번째 차시의 노션 콘텐츠 로드
+        if (currentMaterial.hasLessons && currentMaterial.lessons && currentMaterial.lessons.length > 0) {
+          const firstLesson = currentMaterial.lessons[0];
+          const response = await fetch(`/api/notion/page?pageId=${firstLesson.notionId}`);
+          
+          if (!response.ok) {
+            throw new Error('API 요청 실패');
+          }
+          
+          const content = await response.json();
+          setNotionContent(content);
+        } else if (currentMaterial.notionId) {
+          // 차시가 없는 경우 기본 노션 콘텐츠 로드
+          const response = await fetch(`/api/notion/page?pageId=${currentMaterial.notionId}`);
+          
+          if (!response.ok) {
+            throw new Error('API 요청 실패');
+          }
+          
+          const content = await response.json();
+          setNotionContent(content);
         }
-        
-        const content = await response.json();
-        setNotionContent(content);
       } catch (error) {
         console.error('노션 콘텐츠 로드 실패:', error);
       } finally {
-        setIsLoading(false);
+        setIsNotionLoading(false);
       }
     };
 
-    loadNotionContent();
-  }, [currentMaterial?.notionId]);
+    if (currentMaterial) {
+      loadNotionContent();
+    }
+  }, [currentMaterial?.id]);
 
   // 차시별 콘텐츠 로드
   const loadLessonContent = async (lessonId: string) => {
     try {
-      setIsLoading(true);
+      setIsNotionLoading(true);
       const response = await fetch(`/api/notion/page?pageId=${lessonId}`);
       
       if (!response.ok) {
@@ -262,30 +271,16 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
     } catch (error) {
       console.error('차시 콘텐츠 로드 실패:', error);
     } finally {
-      setIsLoading(false);
+      setIsNotionLoading(false);
     }
   };
 
   // 차시 버튼 클릭 핸들러
-  const handleLessonClick = (lesson: any) => {
+  const handleLessonClick = (lesson: { id: number; notionId: string }) => {
     setSelectedLesson(lesson.id);
     loadLessonContent(lesson.notionId);
   };
 
-  // 로딩 중일 때 표시할 컴포넌트
-  if (isLoading) {
-    return (
-      <div className={baseStyles.container}>
-        <Header forceLightMode={true} />
-        <main className={baseStyles.main} style={{ background: '#ffffff', minHeight: '60vh' }}>
-          <div className={styles.loadingContainer}>
-            <div className={styles.loadingSpinner}></div>
-            <div className={styles.loadingText}>학습 자료를 불러오는 중...</div>
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className={baseStyles.container}>
@@ -337,12 +332,15 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                 
                 <div className={styles.rightSection}>
                   <div className={styles.notionContainer}>
-                    {isLoading ? (
-                    <div className={styles.loadingContainer}>
-                      <div className={styles.loadingSpinner}></div>
-                      <div className={styles.loadingText}>노션 콘텐츠를 불러오는 중...</div>
-                    </div>
-                  ) : notionContent ? (
+                    {isNotionLoading ? (
+                      <div className={styles.loadingContainer} style={{ minHeight: '400px', margin: '0', padding: '40px' }}>
+                        <div className={styles.loadingSpinner}>
+                          <div className={styles.dot}></div>
+                        </div>
+                        <div className={styles.loadingText}>노션 콘텐츠를 불러오는 중...</div>
+                        <div className={styles.loadingProgress}></div>
+                      </div>
+                    ) : notionContent ? (
                     <div className={styles.notionContent}>
                       <h2 className={styles.notionTitle}>{notionContent.title}</h2>
                       <div 

@@ -4,6 +4,167 @@
   padding: 62px 24px;
 }
 
+/* 로딩 컨테이너 */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 30px;
+  animation: fadeIn 0.8s ease-in-out;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 20px;
+  padding: 60px 40px;
+  margin: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.loadingContainer::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(4, 173, 116, 0.1), transparent);
+  animation: shimmer 2s infinite;
+}
+
+.loadingSpinner {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  z-index: 2;
+}
+
+.loadingSpinner::before,
+.loadingSpinner::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+}
+
+.loadingSpinner::before {
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-top: 3px solid #04AD74;
+  border-right: 3px solid #04AD74;
+}
+
+.loadingSpinner::after {
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+  border: 2px solid transparent;
+  border-bottom: 2px solid #00C187;
+  border-left: 2px solid #00C187;
+  animation-direction: reverse;
+  animation-duration: 1.5s;
+}
+
+.loadingSpinner .dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #04AD74;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.loadingText {
+  font-size: 18px;
+  color: #04AD74;
+  font-weight: 600;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  animation: typewriter 3s steps(20) infinite;
+}
+
+.loadingText::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 20px;
+  background: #04AD74;
+  margin-left: 4px;
+  animation: blink 1s infinite;
+}
+
+.loadingProgress {
+  width: 200px;
+  height: 4px;
+  background: #e9ecef;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.loadingProgress::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #04AD74, #00C187, #04AD74);
+  animation: progress 2s ease-in-out infinite;
+}
+
+/* 애니메이션 키프레임 */
+@keyframes fadeIn {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.9);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.5; }
+}
+
+@keyframes typewriter {
+  0%, 90%, 100% { width: 0; }
+  10%, 80% { width: 100%; }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes progress {
+  0% { left: -100%; }
+  50% { left: 0%; }
+  100% { left: 100%; }
+}
+
 /* 모바일 반응형 */
 @media (max-width: 768px) {
   .content {

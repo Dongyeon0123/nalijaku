@@ -12,19 +12,11 @@ import { useRouter } from 'next/navigation';
 export default function ResourcesPage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = React.useState('전체');
-  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     (document.body.style as CSSStyleDeclaration & { webkitOverflowScrolling?: string }).webkitOverflowScrolling = 'touch';
-    
-    // 로딩 시뮬레이션 (실제로는 데이터 로딩 시간에 맞춰 조정)
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
   }, []);
 
   // 로그인 상태 확인
@@ -161,20 +153,6 @@ export default function ResourcesPage() {
     router.push(`/resources/${materialId}`);
   };
 
-  // 로딩 중일 때 표시할 컴포넌트
-  if (isLoading) {
-    return (
-      <div className={baseStyles.container}>
-        <Header forceLightMode={true} />
-        <main className={baseStyles.main} style={{ background: '#ffffff', minHeight: '60vh' }}>
-          <div className={styles.loadingContainer}>
-            <div className={styles.loadingSpinner}></div>
-            <div className={styles.loadingText}>학습 자료를 불러오는 중...</div>
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className={baseStyles.container}>

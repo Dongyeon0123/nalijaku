@@ -2,7 +2,6 @@
 import { Client } from '@notionhq/client';
 
 const NOTION_API_KEY = process.env.NOTION_API_KEY;
-const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
 // Notion 클라이언트 초기화
 const notion = new Client({
@@ -12,6 +11,7 @@ const notion = new Client({
 export interface NotionPage {
   id: string;
   title: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   content: any[];
   last_edited_time: string;
 }
@@ -19,6 +19,7 @@ export interface NotionPage {
 export interface NotionBlock {
   id: string;
   type: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -50,6 +51,7 @@ export async function getNotionPageContent(pageId: string): Promise<NotionPage |
 }
 
 // 페이지 제목 추출
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractTitle(page: any): string {
   const properties = page.properties;
   
@@ -106,6 +108,7 @@ export function convertBlockToHTML(block: NotionBlock): string {
 }
 
 // 리치 텍스트에서 텍스트 추출
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractText(richText: any[]): string {
   return richText.map(text => text.plain_text).join('');
 }

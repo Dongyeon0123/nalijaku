@@ -1,20 +1,142 @@
-/* 로딩 컨테이너 */
+/* 로딩 컨테이너 - 글로벌 스타일과 호환 */
 .loadingContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 60vh;
-  gap: 20px;
+  gap: 30px;
+  animation: fadeIn 0.8s ease-in-out;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 20px;
+  padding: 60px 40px;
+  margin: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.loadingContainer::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(4, 173, 116, 0.1), transparent);
+  animation: shimmer 2s infinite;
 }
 
 .loadingSpinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #04AD74;
+  width: 60px;
+  height: 60px;
+  position: relative;
+  z-index: 2;
+}
+
+.loadingSpinner::before,
+.loadingSpinner::after {
+  content: '';
+  position: absolute;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+.loadingSpinner::before {
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-top: 3px solid #04AD74;
+  border-right: 3px solid #04AD74;
+}
+
+.loadingSpinner::after {
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+  border: 2px solid transparent;
+  border-bottom: 2px solid #00C187;
+  border-left: 2px solid #00C187;
+  animation-direction: reverse;
+  animation-duration: 1.5s;
+}
+
+.loadingSpinner .dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #04AD74;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.loadingText {
+  font-size: 18px;
+  color: #04AD74;
+  font-weight: 600;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  animation: typewriter 3s steps(20) infinite;
+}
+
+.loadingText::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 20px;
+  background: #04AD74;
+  margin-left: 4px;
+  animation: blink 1s infinite;
+}
+
+.loadingProgress {
+  width: 200px;
+  height: 4px;
+  background: #e9ecef;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.loadingProgress::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #04AD74, #00C187, #04AD74);
+  animation: progress 2s ease-in-out infinite;
+}
+
+/* 노션 로딩 특별 스타일 */
+.notion-loading {
+  margin: 0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 애니메이션 키프레임 */
+@keyframes fadeIn {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.9);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
 
 @keyframes spin {
@@ -22,10 +144,26 @@
   100% { transform: rotate(360deg); }
 }
 
-.loadingText {
-  font-size: 16px;
-  color: #666;
-  font-weight: 500;
+@keyframes pulse {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.5; }
+}
+
+@keyframes typewriter {
+  0%, 90%, 100% { width: 0; }
+  10%, 80% { width: 100%; }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes progress {
+  0% { left: -100%; }
+  50% { left: 0%; }
+  100% { left: 100%; }
 }
 
 /* 에러 컨테이너 */
@@ -400,6 +538,18 @@
   padding: 40px;
   max-height: 80vh;
   overflow-y: auto;
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
 }
 
 .notionTitle {
@@ -409,11 +559,35 @@
   margin-bottom: 30px;
   padding-bottom: 15px;
   border-bottom: 2px solid #e5e7eb;
+  animation: fadeInLeft 0.8s ease-out 0.2s both;
+}
+
+@keyframes fadeInLeft {
+  0% { 
+    opacity: 0; 
+    transform: translateX(-30px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
 }
 
 .notionBody {
   line-height: 1.8;
   color: #333;
+  animation: fadeInRight 0.8s ease-out 0.4s both;
+}
+
+@keyframes fadeInRight {
+  0% { 
+    opacity: 0; 
+    transform: translateX(30px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
 }
 
 .notionBody h1,
@@ -802,6 +976,25 @@
   margin-top: 20px;
   padding: 0 20px;
   justify-content: center;
+  animation: bounceIn 0.8s ease-out 0.6s both;
+}
+
+@keyframes bounceIn {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.3) translateY(50px);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.05) translateY(0);
+  }
+  70% { 
+    transform: scale(0.95);
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
 }
 
 .lectureButton,
@@ -826,8 +1019,9 @@
 
 .lectureButton:hover {
   background: #00a070;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 193, 135, 0.3);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 193, 135, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .quizButton,
@@ -838,6 +1032,7 @@
 .quizButton:hover,
 .practiceButton:hover {
   background: #333333;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(67, 67, 67, 0.3);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(67, 67, 67, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
