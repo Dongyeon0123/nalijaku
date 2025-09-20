@@ -1,0 +1,843 @@
+/* 로딩 컨테이너 */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #04AD74;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingText {
+  font-size: 16px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* 에러 컨테이너 */
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+  text-align: center;
+}
+
+.errorContainer h1 {
+  font-size: 24px;
+  color: #333;
+  margin: 0;
+}
+
+.errorContainer p {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
+/* 뒤로가기 버튼 */
+.backButton {
+  background: #04AD74;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.backButton:hover {
+  background: #038a5e;
+  transform: translateY(-2px);
+}
+
+/* 자료 상세 컨테이너 */
+.materialDetail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.materialHeader {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 40px;
+  align-items: flex-start;
+}
+
+.imageContainer {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.materialImage {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.materialInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.materialTitle {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.3;
+}
+
+.instructorInfo {
+  font-size: 18px;
+  color: #04AD74;
+  font-weight: 600;
+}
+
+.materialSubtitle {
+  font-size: 18px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+}
+
+.materialDescription {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+  border-radius: 8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.syllabusButton {
+  background: #01c187;
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+  width: fit-content;
+}
+
+.syllabusButton:hover {
+  background: #00a070;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(1, 193, 135, 0.3);
+}
+
+/* 상세 내용 */
+.materialContent {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e9ecef;
+}
+
+.contentBody {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #333;
+}
+
+.contentBody h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #04AD74;
+  margin: 32px 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.contentBody h3:first-child {
+  margin-top: 0;
+}
+
+.contentBody p {
+  margin: 0 0 16px 0;
+  color: #555;
+}
+
+.contentBody ul {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.contentBody li {
+  margin: 8px 0;
+  color: #555;
+}
+
+.contentBody strong {
+  color: #333;
+  font-weight: 600;
+}
+
+/* 로고 섹션 */
+.logoSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .materialHeader {
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .materialImage {
+    width: 250px;
+    height: 250px;
+  }
+
+  .materialTitle {
+    font-size: 28px;
+  }
+
+  .materialContent {
+    padding: 24px;
+  }
+
+  .contentBody h3 {
+    font-size: 20px;
+  }
+
+  .backButton {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .materialDetail {
+    padding: 0 16px;
+  }
+
+  .materialImage {
+    width: 200px;
+    height: 200px;
+  }
+
+  .materialTitle {
+    font-size: 24px;
+  }
+
+  .materialContent {
+    padding: 20px;
+  }
+
+  .contentBody {
+    font-size: 14px;
+  }
+
+  .contentBody h3 {
+    font-size: 18px;
+  }
+}
+
+.materialContainer {
+  width: 80%;
+  margin: 50px auto;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.materialContent {
+  display: flex;
+  flex: 1;
+  gap: 30px;
+  padding: 20px;
+}
+
+.leftSection {
+  flex: 0 0 30%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rightSection {
+  flex: 0 0 70%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.courseInfoContainer {
+  background: transparent;
+  border-radius: 12px;
+  padding: 20px;
+  border: none;
+  box-shadow: none;
+}
+
+.courseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lessonsContainer {
+  flex: 1;
+  padding: 20px;
+  background: transparent;
+  border-radius: 12px;
+}
+
+.notionContainer {
+  flex: 1;
+  width: 100%;
+  max-width: 95%;
+  height: 80vh;
+  min-height: 600px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  overflow-y: auto;
+  border: 3px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.materialHeader {
+  position: relative;
+  padding: 40px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8f9fa;
+}
+
+.materialInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.categoryTag {
+  color: #04AD74;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+
+.instructorInfo {
+  font-size: 16px;
+  color: #000000;
+  font-weight: 600;
+}
+
+.materialTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.3;
+}
+
+.materialDescription {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+.notionContainer {
+  width: 100%;
+  height: 80vh;
+  min-height: 600px;
+  border: none;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.notionIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0 0 20px 20px;
+  background: #ffffff;
+}
+
+.notionContent {
+  padding: 40px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.notionTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.notionBody {
+  line-height: 1.8;
+  color: #333;
+}
+
+.notionBody h1,
+.notionBody h2,
+.notionBody h3 {
+  color: #04AD74;
+  margin: 30px 0 15px 0;
+  font-weight: 600;
+}
+
+.notionBody h1 {
+  font-size: 1.8rem;
+}
+
+.notionBody h2 {
+  font-size: 1.5rem;
+}
+
+.notionBody h3 {
+  font-size: 1.3rem;
+}
+
+.notionBody p {
+  margin: 15px 0;
+  color: #555;
+}
+
+.notionBody ul,
+.notionBody ol {
+  margin: 15px 0;
+  padding-left: 30px;
+}
+
+.notionBody li {
+  margin: 8px 0;
+  color: #555;
+}
+
+.notionBody blockquote {
+  border-left: 4px solid #04AD74;
+  padding-left: 20px;
+  margin: 20px 0;
+  font-style: italic;
+  color: #666;
+}
+
+.notionBody pre {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.notionBody code {
+  background: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.notionBody img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.notionBody hr {
+  border: none;
+  height: 2px;
+  background: #e5e7eb;
+  margin: 30px 0;
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 40px;
+}
+
+.errorContainer h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.errorContainer p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.notionButton {
+  display: inline-block;
+  background: #04AD74;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.notionButton:hover {
+  background: #038a5e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(4, 173, 116, 0.3);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  color: #6b7280;
+  padding: 60px 40px;
+}
+
+.emptyState h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+.emptyState p {
+  font-size: 1.2rem;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .materialContainer {
+    width: 90%;
+    margin: 100px auto;
+  }
+  
+  .materialHeader {
+    padding: 30px;
+  }
+  
+  .materialTitle {
+    font-size: 24px;
+  }
+  
+  .materialDescription {
+    font-size: 15px;
+  }
+  
+  .materialContent {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .leftSection {
+    flex: none;
+    width: 100%;
+    gap: 15px;
+  }
+  
+  .rightSection {
+    flex: none;
+    width: 100%;
+  }
+  
+  .courseInfoContainer {
+    padding: 15px;
+  }
+  
+  .lessonsContainer {
+    padding: 15px;
+  }
+  
+  .notionContainer {
+    height: 70vh;
+    min-height: 500px;
+  }
+  
+  .learningButtons {
+    gap: 10px;
+    margin-top: 15px;
+    padding: 0 15px;
+    flex-wrap: wrap;
+  }
+  
+  .lectureButton,
+  .quizButton,
+  .practiceButton {
+    padding: 10px 22px;
+    font-size: 14px;
+  }
+  
+  .emptyState {
+    padding: 40px 30px;
+  }
+  
+  .emptyState h2 {
+    font-size: 1.5rem;
+  }
+  
+  .emptyState p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .materialContainer {
+    width: 95%;
+    margin: 80px auto;
+  }
+  
+  .materialHeader {
+    padding: 20px;
+  }
+  
+  .materialTitle {
+    font-size: 20px;
+  }
+  
+  .materialDescription {
+    font-size: 14px;
+  }
+  
+  .materialContent {
+    padding: 15px;
+  }
+  
+  .leftSection {
+    flex: none;
+    width: 100%;
+    gap: 10px;
+  }
+  
+  .rightSection {
+    flex: none;
+    width: 100%;
+  }
+  
+  .courseInfoContainer {
+    padding: 12px;
+  }
+  
+  .lessonsContainer {
+    padding: 12px;
+  }
+  
+  .notionContainer {
+    height: 60vh;
+    min-height: 400px;
+    padding: 15px;
+  }
+  
+  .learningButtons {
+    gap: 8px;
+    margin-top: 12px;
+    padding: 0 12px;
+    flex-wrap: wrap;
+  }
+  
+  .lectureButton,
+  .quizButton,
+  .practiceButton {
+    padding: 8px 18px;
+    font-size: 13px;
+  }
+  
+  .emptyState {
+    padding: 30px 20px;
+  }
+  
+  .emptyState h2 {
+    font-size: 1.3rem;
+  }
+  
+  .emptyState p {
+    font-size: 0.9rem;
+  }
+}
+
+/* 일차별 학습 스타일 */
+
+.lessonsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 100%;
+}
+
+.lessonItem {
+  background: #ffffff;
+  padding: 12px 16px;
+  border-left: 4px solid #e9ecef;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lessonItem:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  border-color: #01c187;
+}
+
+.lessonItem.selected {
+  border-left: 4px solid #01c187;
+  background: #ECF7F3;
+}
+
+.lessonTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #01c187;
+  margin: 0 0 6px 0;
+  display: inline-block;
+  padding: 4px 1px;
+  border-radius: 20px;
+  border: 2px solid #01c187;
+  background: #ffffff;
+  text-align: center;
+  min-width: 50px;
+}
+
+.lessonItem.selected .lessonTitle {
+  background: #01c187;
+  color: #ffffff;
+  border-color: #01c187;
+}
+
+.lessonLeft {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-top: 0;
+  margin-top: 0;
+  transform: translateY(-25px);
+}
+
+.lessonRight {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.lessonSubtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 8px 0 12px 0;
+}
+
+.lessonMaterials {
+  font-size: 12px;
+  color: #666;
+  padding: 6px 0;
+  border-radius: 4px;
+  line-height: 1.4;
+}
+
+.lessonItem.selected .lessonMaterials {
+  background: #ECF7F3;
+}
+
+.lessonShortDescription {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* 학습 버튼들 */
+.learningButtons {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  padding: 0 20px;
+  justify-content: center;
+}
+
+.lectureButton,
+.quizButton,
+.practiceButton {
+  flex: none;
+  padding: 14px 50px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.lectureButton {
+  background: #00C187;
+}
+
+.lectureButton:hover {
+  background: #00a070;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 193, 135, 0.3);
+}
+
+.quizButton,
+.practiceButton {
+  background: #434343;
+}
+
+.quizButton:hover,
+.practiceButton:hover {
+  background: #333333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(67, 67, 67, 0.3);
+}

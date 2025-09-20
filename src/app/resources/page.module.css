@@ -247,12 +247,24 @@
 .materialItem:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #04AD74;
+}
+
+.materialItem:active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 768px) {
   .materialItem:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    border-color: #04AD74;
+  }
+  
+  .materialItem:active {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -260,12 +272,20 @@
   .materialItem:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-color: #04AD74;
+  }
+  
+  .materialItem:active {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   }
 }
 
 .imageContainer {
   position: relative;
   width: 100%;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
 }
 
 .materialImage {
@@ -291,15 +311,20 @@
 
 .categoryTag {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(1, 193, 135, 0.8);
+  top: 8px;
+  right: 8px;
+  background: #01c187;
   color: #ffffff;
-  padding: 9px 32px;
-  border-radius: 20px;
-  font-size: 16px;
-  font-weight: 500;
-  z-index: 1;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  max-width: calc(100% - 16px);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 768px) {

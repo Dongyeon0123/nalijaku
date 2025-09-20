@@ -7,8 +7,10 @@ import baseStyles from '../education-intro/page.module.css';
 import styles from './page.module.css';
 import { FiSearch } from 'react-icons/fi';
 import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
 
 export default function ResourcesPage() {
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = React.useState('전체');
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -155,6 +157,10 @@ export default function ResourcesPage() {
     setSelectedCategory(category);
   };
 
+  const handleMaterialClick = (materialId: number) => {
+    router.push(`/resources/${materialId}`);
+  };
+
   // 로딩 중일 때 표시할 컴포넌트
   if (isLoading) {
     return (
@@ -250,7 +256,12 @@ export default function ResourcesPage() {
 
             <div className={styles.materialsGrid}>
               {filteredMaterials.map((material) => (
-                <div key={material.id} className={styles.materialItem}>
+                <div 
+                  key={material.id} 
+                  className={styles.materialItem}
+                  onClick={() => handleMaterialClick(material.id)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className={styles.imageContainer}>
                     <Image 
                       src={material.image} 
