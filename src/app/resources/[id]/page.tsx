@@ -6,7 +6,6 @@ import Image from 'next/image';
 import baseStyles from '../../education-intro/page.module.css';
 import styles from './page.module.css';
 import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
-import { useRouter } from 'next/navigation';
 import { convertBlocksToHTML, NotionPage } from '@/services/notionService';
 
 interface MaterialDetailProps {
@@ -254,7 +253,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
     if (currentMaterial) {
       loadNotionContent();
     }
-  }, [currentMaterial?.id]);
+  }, [currentMaterial]);
 
   // 차시별 콘텐츠 로드
   const loadLessonContent = async (lessonId: string) => {

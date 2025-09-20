@@ -42,7 +42,7 @@ export async function getNotionPageContent(pageId: string): Promise<NotionPage |
       id: page.id,
       title: extractTitle(page),
       content: blocksData.results,
-      last_edited_time: (page as any).last_edited_time || new Date().toISOString(),
+      last_edited_time: (page as { last_edited_time?: string }).last_edited_time || new Date().toISOString(),
     };
   } catch (error) {
     console.error('노션 API 오류:', error);
