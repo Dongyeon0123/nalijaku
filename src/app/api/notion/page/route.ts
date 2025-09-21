@@ -13,9 +13,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    console.log('Notion API 요청 - pageId:', pageId);
     const content = await getNotionPageContent(pageId);
+    console.log('Notion API 응답 데이터:', content);
 
     if (!content) {
+      console.log('Notion API 응답이 null입니다.');
       return NextResponse.json(
         { error: '페이지를 찾을 수 없습니다.' },
         { status: 404 }

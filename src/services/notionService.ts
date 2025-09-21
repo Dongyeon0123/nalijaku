@@ -26,24 +26,33 @@ export interface NotionBlock {
 // 노션 페이지 내용 가져오기
 export async function getNotionPageContent(pageId: string): Promise<NotionPage | null> {
   try {
+    console.log('Notion API 키 확인:', NOTION_API_KEY ? '설정됨' : '설정되지 않음');
+    
     if (!NOTION_API_KEY) {
       throw new Error('NOTION_API_KEY가 설정되지 않았습니다.');
     }
 
+    console.log('Notion 페이지 정보 요청 중...', pageId);
     // 페이지 정보 가져오기
     const page = await notion.pages.retrieve({ page_id: pageId });
+    console.log('Notion 페이지 정보:', page);
 
+    console.log('Notion 블록 정보 요청 중...', pageId);
     // 페이지 블록들 가져오기
     const blocksData = await notion.blocks.children.list({
       block_id: pageId,
     });
+    console.log('Notion 블록 데이터:', blocksData);
 
-    return {
+    const result = {
       id: page.id,
       title: extractTitle(page),
       content: blocksData.results,
       last_edited_time: (page as { last_edited_time?: string }).last_edited_time || new Date().toISOString(),
     };
+    
+    console.log('최종 Notion 데이터:', result);
+    return result;
   } catch (error) {
     console.error('노션 API 오류:', error);
     return null;

@@ -216,7 +216,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
   // 노션 콘텐츠 가져오기
   React.useEffect(() => {
     const loadNotionContent = async () => {
-      if (!currentMaterial) return;
+      if (!currentMaterial || isNotionLoading) return;
       
       try {
         setIsNotionLoading(true);
@@ -231,6 +231,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
           }
           
           const content = await response.json();
+          console.log('Notion API 응답 (차시):', content);
           setNotionContent(content);
         } else if (currentMaterial.notionId) {
           // 차시가 없는 경우 기본 노션 콘텐츠 로드
@@ -241,6 +242,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
           }
           
           const content = await response.json();
+          console.log('Notion API 응답 (기본):', content);
           setNotionContent(content);
         }
       } catch (error) {
@@ -253,10 +255,12 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
     if (currentMaterial) {
       loadNotionContent();
     }
-  }, [currentMaterial]);
+  }, [resolvedParams.id]); // currentMaterial 대신 resolvedParams.id 사용
 
   // 차시별 콘텐츠 로드
-  const loadLessonContent = async (lessonId: string) => {
+  const loadLessonContent = React.useCallback(async (lessonId: string) => {
+    if (isNotionLoading) return; // 이미 로딩 중이면 중복 호출 방지
+    
     try {
       setIsNotionLoading(true);
       const response = await fetch(`/api/notion/page?pageId=${lessonId}`);
@@ -266,19 +270,20 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
       }
       
       const content = await response.json();
+      console.log('Notion API 응답 (차시 클릭):', content);
       setNotionContent(content);
     } catch (error) {
       console.error('차시 콘텐츠 로드 실패:', error);
     } finally {
       setIsNotionLoading(false);
     }
-  };
+  }, [isNotionLoading]);
 
   // 차시 버튼 클릭 핸들러
-  const handleLessonClick = (lesson: { id: number; notionId: string }) => {
+  const handleLessonClick = React.useCallback((lesson: { id: number; notionId: string }) => {
     setSelectedLesson(lesson.id);
     loadLessonContent(lesson.notionId);
-  };
+  }, [loadLessonContent]);
 
 
   return (
