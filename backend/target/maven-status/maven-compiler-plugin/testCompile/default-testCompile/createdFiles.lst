@@ -1,0 +1,8 @@
+com\nallijaku\backend\service\EducationInquiryServiceTest.class
+com\nallijaku\backend\controller\EducationInquiryControllerTest.class
+com\nallijaku\backend\controller\PartnerApplicationControllerTest.class
+com\nallijaku\backend\controller\AuthControllerTest.class
+com\nallijaku\backend\service\PartnerApplicationServiceTest.class
+com\nallijaku\backend\service\TestServiceTest.class
+com\nallijaku\backend\controller\TestControllerTest.class
+com\nallijaku\backend\service\AuthServiceTest.class

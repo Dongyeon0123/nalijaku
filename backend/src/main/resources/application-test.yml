@@ -1,0 +1,62 @@
+# 테스트 환경 설정 (H2 인메모리 데이터베이스 사용)
+server:
+  port: 9090
+  servlet:
+    context-path: /api
+
+spring:
+  # H2 인메모리 데이터베이스 설정
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+    
+  jpa:
+    hibernate:
+      ddl-auto: create-drop   # 테스트용 - 시작시 생성, 종료시 삭제
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+# JWT 설정 (테스트용)
+jwt:
+  secret: test-jwt-secret-key-for-development-only
+
+# 로깅 설정 (디버그 모드)
+logging:
+  level:
+    com.nallijaku.backend: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.web: DEBUG
+    root: INFO
+    
+# CORS 설정 (테스트용)
+cors:
+  allowed-origins: 
+    - http://localhost:3000
+    - http://localhost:3001
+    - http://127.0.0.1:3000
+    - http://127.0.0.1:3001
+  allowed-methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - PATCH
+    - OPTIONS
+  allowed-headers:
+    - "*"
+  allow-credentials: true
+
+# 파일 저장 경로 (테스트)
+file:
+  upload-dir: ./uploads/test
