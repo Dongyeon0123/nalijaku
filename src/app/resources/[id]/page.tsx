@@ -18,6 +18,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
   const [notionContent, setNotionContent] = React.useState<NotionPage | null>(null);
   const [selectedLesson, setSelectedLesson] = React.useState<number | null>(1);
   const [isNotionLoading, setIsNotionLoading] = React.useState(false);
+  const [notionError, setNotionError] = React.useState<string | null>(null);
   const resolvedParams = React.use(params);
 
   React.useEffect(() => {
@@ -220,6 +221,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
       
       try {
         setIsNotionLoading(true);
+        setNotionError(null);
         
         // 차시가 있는 경우 첫 번째 차시의 노션 콘텐츠 로드
         if (currentMaterial.hasLessons && currentMaterial.lessons && currentMaterial.lessons.length > 0) {
@@ -227,7 +229,8 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
           const response = await fetch(`/api/notion/page?pageId=${firstLesson.notionId}`);
           
           if (!response.ok) {
-            throw new Error('API 요청 실패');
+            const errorText = await response.text();
+            throw new Error(`API 요청 실패: ${response.status} ${response.statusText} - ${errorText}`);
           }
           
           const content = await response.json();
@@ -238,7 +241,8 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
           const response = await fetch(`/api/notion/page?pageId=${currentMaterial.notionId}`);
           
           if (!response.ok) {
-            throw new Error('API 요청 실패');
+            const errorText = await response.text();
+            throw new Error(`API 요청 실패: ${response.status} ${response.statusText} - ${errorText}`);
           }
           
           const content = await response.json();
@@ -247,6 +251,9 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
         }
       } catch (error) {
         console.error('노션 콘텐츠 로드 실패:', error);
+        console.error('Error details:', error instanceof Error ? error.message : 'Unknown error');
+        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+        setNotionError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.');
       } finally {
         setIsNotionLoading(false);
       }
@@ -263,10 +270,12 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
     
     try {
       setIsNotionLoading(true);
+      setNotionError(null);
       const response = await fetch(`/api/notion/page?pageId=${lessonId}`);
       
       if (!response.ok) {
-        throw new Error('API 요청 실패');
+        const errorText = await response.text();
+        throw new Error(`API 요청 실패: ${response.status} ${response.statusText} - ${errorText}`);
       }
       
       const content = await response.json();
@@ -274,6 +283,9 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
       setNotionContent(content);
     } catch (error) {
       console.error('차시 콘텐츠 로드 실패:', error);
+      console.error('Error details:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      setNotionError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.');
     } finally {
       setIsNotionLoading(false);
     }
@@ -353,6 +365,20 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                           __html: convertBlocksToHTML(notionContent.content) 
                         }}
                       />
+                    </div>
+                  ) : notionError ? (
+                    <div className={styles.errorContainer}>
+                      <h3>콘텐츠를 불러올 수 없습니다</h3>
+                      <p>오류: {notionError}</p>
+                      <p>배포 환경에서 API 라우트가 제대로 작동하지 않을 수 있습니다.</p>
+                      <a 
+                        href={`https://www.notion.so/${currentMaterial.notionId}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={styles.notionButton}
+                      >
+                        노션에서 보기
+                      </a>
                     </div>
                   ) : (
                     <div className={styles.errorContainer}>
