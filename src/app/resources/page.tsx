@@ -7,6 +7,7 @@ import baseStyles from '../education-intro/page.module.css';
 import styles from './page.module.css';
 import { FiSearch } from 'react-icons/fi';
 import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
+import { IoCartOutline } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
 
 export default function ResourcesPage() {
@@ -37,7 +38,7 @@ export default function ResourcesPage() {
       alt: '진로-배송',
       instructor: '유한상 강사',
       title: '진로-배송',
-      subtitle: '24년 2학기 디지털 새싹 데이터 분석가 전용<br></br>커리큘럼'
+      subtitle: '24년 2학기 디지털 새싹 데이터 분석가 전용 커리큘럼'
     },
     {
       id: 2,
@@ -55,7 +56,7 @@ export default function ResourcesPage() {
       alt: '군 드론',
       instructor: '하가연 강사',
       title: '군드론',
-      subtitle: '최초 드론은 세계1차대전부터 이용되었습니다.<br></br>생각보다 오래전에 쓰인 기술, 과거에는 어떤<br></br>모습이었을까요?'
+      subtitle: '최초 드론은 세계1차대전부터 이용되었습니다. 생각보다 오래전에 쓰인 기술, 과거에는 어떤 모습이었을까요?'
     },
     {
       id: 4,
@@ -91,7 +92,7 @@ export default function ResourcesPage() {
       alt: '항공역학',
       instructor: '유한상 강사',
       title: '양력의 원리를 쉽게 배우는 교육자료',
-      subtitle: '드론의 기초 작동 원리와 관련 개념을 이해하고<br></br>직접 드론을 제작하여 비행하는 실습으로<br></br>구성된 커리큘럼입니다.'
+      subtitle: '드론의 기초 작동 원리와 관련 개념을 이해하고 직접 드론을 제작하여 비행하는 실습으로 구성된 커리큘럼입니다.'
     },
     {
       id: 8,
@@ -100,7 +101,7 @@ export default function ResourcesPage() {
       alt: '드론 조종',
       instructor: '유한상 강사',
       title: '드론 조종법 고급편',
-      subtitle: '드론 조종법은 알지만 아직 조종이 미숙한<br></br>사람들을 위한 교육'
+      subtitle: '드론 조종법은 알지만 아직 조종이 미숙한 사람들을 위한 교육'
     },
     {
       id: 9,
@@ -136,13 +137,13 @@ export default function ResourcesPage() {
       alt: '항공촬영',
       instructor: '유한상 강사',
       title: '항공 촬영 기법',
-      subtitle: '패닝샷, 트레킹, 버드아이뷰 등 다양한<br></br>촬영기법 활용'
+      subtitle: '패닝샷, 트레킹, 버드아이뷰 등 다양한 촬영기법 활용'
     }
   ];
 
   // 필터링된 카드 데이터
-  const filteredMaterials = selectedCategory === '전체' 
-    ? materialsData 
+  const filteredMaterials = selectedCategory === '전체'
+    ? materialsData
     : materialsData.filter(material => material.category === selectedCategory);
 
   const handleCategoryClick = (category: string) => {
@@ -153,125 +154,140 @@ export default function ResourcesPage() {
     router.push(`/resources/${materialId}`);
   };
 
+  const handleAddToCart = (e: React.MouseEvent, materialId: number) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    // 장바구니 담기 로직 구현
+    console.log(`장바구니에 추가: ${materialId}`);
+    // 여기에 실제 장바구니 담기 로직을 구현하세요
+  };
+
 
   return (
     <div className={baseStyles.container}>
       <Header forceLightMode={true} />
       <main className={baseStyles.main} style={{ background: '#ffffff', minHeight: '60vh' }}>
         <div className={styles.content}>
-            <h1 className={styles.title}>학습자료실</h1>
-            <p className={styles.subtitle}>필터 또는 검색 기능으로 원하는 주제의 커리큘럼을 찾아보세요.</p>
+          <h1 className={styles.title}>학습자료실</h1>
+          <p className={styles.subtitle}>필터 또는 검색 기능으로 원하는 주제의 커리큘럼을 찾아보세요.</p>
 
-            <div className={styles.actionsRow}>
-              <div className={styles.searchBox}>
-                <input 
-                  type="text" 
-                  className={styles.searchInput} 
-                  placeholder="키워드를 입력하세요"
-                />
-                <button className={styles.searchButton} aria-label="검색">
-                  <FiSearch size={18} />
-                </button>
-              </div>
+          <div className={styles.actionsRow}>
+            <div className={styles.searchBox}>
+              <input
+                type="text"
+                className={styles.searchInput}
+                placeholder="키워드를 입력하세요"
+              />
+              <button className={styles.searchButton} aria-label="검색">
+                <FiSearch size={18} />
+              </button>
             </div>
-            <div className={styles.grayLine}></div>
+          </div>
+          <div className={styles.grayLine}></div>
 
-            <div className={styles.topicList}>
-                <p 
-                  className={`${styles.topicItem} ${selectedCategory === '전체' ? styles.selected : ''}`}
-                  onClick={() => handleCategoryClick('전체')}
-                >
-                  전체
-                </p>
-                <p 
-                  className={`${styles.topicItem} ${selectedCategory === '진로' ? styles.selected : ''}`}
-                  onClick={() => handleCategoryClick('진로')}
-                >
-                  진로
-                </p>
-                <p 
-                  className={`${styles.topicItem} ${selectedCategory === '항공법' ? styles.selected : ''}`}
-                  onClick={() => handleCategoryClick('항공법')}
-                >
-                  항공법
-                </p>
-                <p 
-                  className={`${styles.topicItem} ${selectedCategory === '항공 역학' ? styles.selected : ''}`}
-                  onClick={() => handleCategoryClick('항공 역학')}
-                >
-                  항공 역학
-                </p>
-                <p 
-                  className={`${styles.topicItem} ${selectedCategory === '항공촬영기법' ? styles.selected : ''}`}
-                  onClick={() => handleCategoryClick('항공촬영기법')}
-                >
-                  항공촬영기법
-                </p>
-                <p 
-                  className={`${styles.topicItem} ${selectedCategory === '드론 기초' ? styles.selected : ''}`}
-                  onClick={() => handleCategoryClick('드론 기초')}
-                >
-                  드론 기초
-                </p>
-                <p 
-                  className={`${styles.topicItem} ${selectedCategory === '군 드론' ? styles.selected : ''}`}
-                  onClick={() => handleCategoryClick('군 드론')}
-                >
-                  군 드론
-                </p>
-                <p 
-                  className={`${styles.topicItem} ${selectedCategory === '드론 조종' ? styles.selected : ''}`}
-                  onClick={() => handleCategoryClick('드론 조종')}
-                >
-                  드론 조종
-                </p>
-                <p className={styles.topicItem}>과학교과연계</p>
-                <p className={styles.topicItem}>전보교과연계</p>
-                <p className={styles.topicItem}>메이커톤</p>
-                <p className={styles.topicItem}>더아이엠씨</p>
-                <p className={styles.topicItem}>젯슨나노</p>
-            </div>
+          <div className={styles.topicList}>
+            <p
+              className={`${styles.topicItem} ${selectedCategory === '전체' ? styles.selected : ''}`}
+              onClick={() => handleCategoryClick('전체')}
+            >
+              전체
+            </p>
+            <p
+              className={`${styles.topicItem} ${selectedCategory === '진로' ? styles.selected : ''}`}
+              onClick={() => handleCategoryClick('진로')}
+            >
+              진로
+            </p>
+            <p
+              className={`${styles.topicItem} ${selectedCategory === '항공법' ? styles.selected : ''}`}
+              onClick={() => handleCategoryClick('항공법')}
+            >
+              항공법
+            </p>
+            <p
+              className={`${styles.topicItem} ${selectedCategory === '항공 역학' ? styles.selected : ''}`}
+              onClick={() => handleCategoryClick('항공 역학')}
+            >
+              항공 역학
+            </p>
+            <p
+              className={`${styles.topicItem} ${selectedCategory === '항공촬영기법' ? styles.selected : ''}`}
+              onClick={() => handleCategoryClick('항공촬영기법')}
+            >
+              항공촬영기법
+            </p>
+            <p
+              className={`${styles.topicItem} ${selectedCategory === '드론 기초' ? styles.selected : ''}`}
+              onClick={() => handleCategoryClick('드론 기초')}
+            >
+              드론 기초
+            </p>
+            <p
+              className={`${styles.topicItem} ${selectedCategory === '군 드론' ? styles.selected : ''}`}
+              onClick={() => handleCategoryClick('군 드론')}
+            >
+              군 드론
+            </p>
+            <p
+              className={`${styles.topicItem} ${selectedCategory === '드론 조종' ? styles.selected : ''}`}
+              onClick={() => handleCategoryClick('드론 조종')}
+            >
+              드론 조종
+            </p>
+            <p className={styles.topicItem}>과학교과연계</p>
+            <p className={styles.topicItem}>전보교과연계</p>
+            <p className={styles.topicItem}>메이커톤</p>
+            <p className={styles.topicItem}>더아이엠씨</p>
+            <p className={styles.topicItem}>젯슨나노</p>
+          </div>
 
-            <div className={styles.materialsGrid}>
-              {filteredMaterials.map((material) => (
-                <div 
-                  key={material.id} 
-                  className={styles.materialItem}
-                  onClick={() => handleMaterialClick(material.id)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className={styles.imageContainer}>
-                    <Image 
-                      src={material.image} 
-                      alt={material.alt} 
-                      width={200} 
-                      height={200}
-                      className={styles.materialImage}
-                    />
-                    <div className={styles.categoryTag}>{material.category}</div>
-                  </div>
-                  <div className={styles.materialContent}>
-                    <p className={styles.instructorInfo}>{material.instructor}</p>
-                    <p className={styles.materialTitle}>{material.title}</p>
-                    <p 
-                      className={styles.subtitle}
-                      dangerouslySetInnerHTML={{ __html: material.subtitle }}
-                    />
-                  </div>
+          <div className={styles.materialsGrid}>
+            {filteredMaterials.map((material) => (
+              <div
+                key={material.id}
+                className={styles.materialItem}
+                onClick={() => handleMaterialClick(material.id)}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className={styles.imageContainer}>
+                  <Image
+                    src={material.image}
+                    alt={material.alt}
+                    width={200}
+                    height={200}
+                    className={styles.materialImage}
+                  />
+                  <div className={styles.categoryTag}>{material.category}</div>
                 </div>
-              ))}
-            </div>
+                <div className={styles.materialContent}>
+                  <p className={styles.instructorInfo}>{material.instructor}</p>
+                  <p className={styles.materialTitle}>{material.title}</p>
+                  <p
+                    className={styles.subtitle}
+                    dangerouslySetInnerHTML={{ __html: material.subtitle }}
+                  />
+                  <button
+                    className={styles.addToCartButton}
+                    onClick={(e) => handleAddToCart(e, material.id)}
+                    aria-label="장바구니에 담기"
+                  >
+                    <IoCartOutline size={18} />
+                    장바구니 담기
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        
+
       </main>
 
       <footer className={baseStyles.footer}>
         <div className={baseStyles.footerContent}>
           <div className={styles.logoSection}>
-            <Image 
-              src="/transparentLogo.png" 
-              alt="날리자쿠 로고" 
-              width={120} 
+            <Image
+              src="/transparentLogo.png"
+              alt="날리자쿠 로고"
+              width={120}
               height={60}
             />
           </div>

@@ -123,46 +123,93 @@
 
 /* 애니메이션 키프레임 */
 @keyframes fadeIn {
-  0% { 
-    opacity: 0; 
+  0% {
+    opacity: 0;
     transform: translateY(30px) scale(0.9);
   }
-  100% { 
-    opacity: 1; 
+
+  100% {
+    opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse {
-  0% { transform: scale(0.8); opacity: 0.5; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(0.8); opacity: 0.5; }
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
 }
 
 @keyframes typewriter {
-  0%, 90%, 100% { width: 0; }
-  10%, 80% { width: 100%; }
+
+  0%,
+  90%,
+  100% {
+    width: 0;
+  }
+
+  10%,
+  80% {
+    width: 100%;
+  }
 }
 
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes progress {
-  0% { left: -100%; }
-  50% { left: 0%; }
-  100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+
+  50% {
+    left: 0%;
+  }
+
+  100% {
+    left: 100%;
+  }
 }
 
 /* 모바일 반응형 */
@@ -248,7 +295,7 @@
     -moz-appearance: none;
     appearance: none;
   }
-  
+
   .searchButton {
     height: 44px;
     padding: 0 18px;
@@ -346,7 +393,6 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 30px;
   margin-top: 40px;
-  padding: 20px 0;
 }
 
 @media (max-width: 1200px) {
@@ -376,7 +422,7 @@
 .materialItem {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   text-align: left;
   background: #ffffff;
   border: 1px solid #e0e0e0;
@@ -387,6 +433,7 @@
   cursor: pointer;
   gap: 0;
   overflow: hidden;
+  height: 100%;
 }
 
 @media (max-width: 768px) {
@@ -422,7 +469,7 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
     border-color: #04AD74;
   }
-  
+
   .materialItem:active {
     transform: translateY(-1px);
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
@@ -435,7 +482,7 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     border-color: #04AD74;
   }
-  
+
   .materialItem:active {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
@@ -503,10 +550,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  text-align: left;
-  width: 100%;
+  width: 85%;
   padding: 20px;
   background: #ffffff;
+  flex: 1;
 }
 
 @media (max-width: 768px) {
@@ -570,14 +617,15 @@
   font-size: 15px;
   font-weight: 400;
   color: #5E5E5E;
-  margin: 0;
-  line-height: 0.9;
+  margin: 0 0 15px 0;
+  line-height: 1.7;
 }
 
 @media (max-width: 768px) {
   .subtitle {
     font-size: 14px;
     line-height: 1.2;
+    margin: 0 0 12px 0;
   }
 }
 
@@ -585,6 +633,59 @@
   .subtitle {
     font-size: 13px;
     line-height: 1.3;
+    margin: 0 0 10px 0;
+  }
+}
+
+.addToCartButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #04AD74;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: auto;
+  align-self: flex-start;
+  box-sizing: border-box;
+}
+
+.addToCartButton:hover {
+  background: #00A169;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(4, 173, 116, 0.3);
+}
+
+.addToCartButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(4, 173, 116, 0.2);
+}
+
+@media (max-width: 768px) {
+  .addToCartButton {
+    padding: 14px 16px;
+    font-size: 14px;
+    border-radius: 10px;
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 480px) {
+  .addToCartButton {
+    padding: 12px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+    gap: 6px;
+    box-sizing: border-box;
   }
 }
 
@@ -615,8 +716,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 컨텐츠 페이드인 애니메이션 */
@@ -630,6 +736,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -641,8 +748,8 @@
   .content {
     -webkit-overflow-scrolling: touch;
   }
-  
-  
+
+
   /* 터치 영역 확대 */
   .searchButton,
   .topicItem,
