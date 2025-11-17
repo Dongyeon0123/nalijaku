@@ -13,6 +13,8 @@ import { useRouter } from 'next/navigation';
 export default function ResourcesPage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = React.useState('전체');
+  const [cartItems, setCartItems] = React.useState<any[]>([]);
+  const [isCartOpen, setIsCartOpen] = React.useState(false);
 
   React.useEffect(() => {
     document.body.style.margin = '0';
@@ -155,10 +157,35 @@ export default function ResourcesPage() {
   };
 
   const handleAddToCart = (e: React.MouseEvent, materialId: number) => {
-    e.stopPropagation(); // 카드 클릭 이벤트 방지
-    // 장바구니 담기 로직 구현
-    console.log(`장바구니에 추가: ${materialId}`);
-    // 여기에 실제 장바구니 담기 로직을 구현하세요
+    e.stopPropagation();
+    const material = materialsData.find(m => m.id === materialId);
+    if (material) {
+      const existingItem = cartItems.find(item => item.id === materialId);
+      if (existingItem) {
+        setCartItems(cartItems.map(item =>
+          item.id === materialId ? { ...item, quantity: item.quantity + 1 } : item
+        ));
+      } else {
+        setCartItems([...cartItems, { ...material, quantity: 1 }]);
+      }
+      setIsCartOpen(true);
+    }
+  };
+
+  const handleRemoveFromCart = (materialId: number) => {
+    setCartItems(cartItems.filter(item => item.id !== materialId));
+  };
+
+  const handleCreateClass = () => {
+    if (cartItems.length === 0) {
+      alert('장바구니에 자료를 추가해주세요.');
+      return;
+    }
+    // 수업 생성 로직
+    console.log('수업 생성:', cartItems);
+    alert('수업이 생성되었습니다!');
+    setCartItems([]);
+    setIsCartOpen(false);
   };
 
 
@@ -277,6 +304,57 @@ export default function ResourcesPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* 장바구니 사이드바 */}
+        <div className={`${styles.cartSidebar} ${isCartOpen ? styles.cartOpen : ''}`}>
+          <div className={styles.cartHeader}>
+            <div>
+              <span style={{fontSize: '24px', fontWeight: 600}}>수업 쇼핑 카트 확인</span>
+              <br></br><br></br>
+              <span style={{fontSize: '14px', color: 'grey'}}>원하는 수업을 바탕으로<br></br>학교 맞춤형 교육 커리큘럼 생성</span>
+            </div>
+            <button 
+              className={styles.cartClose}
+              onClick={() => setIsCartOpen(false)}
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className={styles.cartContent}>
+            {cartItems.length === 0 ? (
+              <p className={styles.emptyCart}>장바구니가 비어있습니다.</p>
+            ) : (
+              <div className={styles.cartItems}>
+                {cartItems.map((item) => (
+                  <div key={item.id} className={styles.cartItem}>
+                    <div className={styles.cartItemInfo}>
+                      <h4>{item.title}</h4>
+                      <p>{item.instructor}</p>
+                    </div>
+                    <button
+                      className={styles.removeBtn}
+                      onClick={() => handleRemoveFromCart(item.id)}
+                    >
+                      제거
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{width: '100%', textAlign: 'center'}}>
+            <p style={{fontSize: '14px', color: 'grey'}}>위 수업들을 바탕으로<br></br>기관별 맞춤형 수업을 제작해드릴게요 !</p>
+          </div>
+          <button 
+            className={styles.createClassBtn}
+            onClick={handleCreateClass}
+            disabled={cartItems.length === 0}
+          >
+            수업 생성
+          </button>
         </div>
 
       </main>
