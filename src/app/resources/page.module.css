@@ -643,6 +643,7 @@
   justify-content: center;
   gap: 8px;
   padding: 12px 16px;
+  width: 100%;
   background: #04AD74;
   color: #ffffff;
   border: none;
@@ -652,7 +653,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: auto;
-  align-self: flex-start;
+  align-self: center;
   box-sizing: border-box;
 }
 
