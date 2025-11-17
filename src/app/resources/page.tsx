@@ -10,10 +10,24 @@ import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
 import { IoCartOutline } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
 
+interface Material {
+  id: number;
+  category: string;
+  image: string;
+  alt: string;
+  instructor: string;
+  title: string;
+  subtitle: string;
+}
+
+interface CartItem extends Material {
+  quantity: number;
+}
+
 export default function ResourcesPage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = React.useState('전체');
-  const [cartItems, setCartItems] = React.useState<any[]>([]);
+  const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -310,18 +324,18 @@ export default function ResourcesPage() {
         <div className={`${styles.cartSidebar} ${isCartOpen ? styles.cartOpen : ''}`}>
           <div className={styles.cartHeader}>
             <div>
-              <span style={{fontSize: '24px', fontWeight: 600}}>수업 쇼핑 카트 확인</span>
+              <span style={{ fontSize: '24px', fontWeight: 600 }}>수업 쇼핑 카트 확인</span>
               <br></br><br></br>
-              <span style={{fontSize: '14px', color: 'grey'}}>원하는 수업을 바탕으로<br></br>학교 맞춤형 교육 커리큘럼 생성</span>
+              <span style={{ fontSize: '14px', color: 'grey' }}>원하는 수업을 바탕으로<br></br>학교 맞춤형 교육 커리큘럼 생성</span>
             </div>
-            <button 
+            <button
               className={styles.cartClose}
               onClick={() => setIsCartOpen(false)}
             >
               ✕
             </button>
           </div>
-          
+
           <div className={styles.cartContent}>
             {cartItems.length === 0 ? (
               <p className={styles.emptyCart}>장바구니가 비어있습니다.</p>
@@ -345,10 +359,10 @@ export default function ResourcesPage() {
             )}
           </div>
 
-          <div style={{width: '100%', textAlign: 'center'}}>
-            <p style={{fontSize: '14px', color: 'grey'}}>위 수업들을 바탕으로<br></br>기관별 맞춤형 수업을 제작해드릴게요 !</p>
+          <div style={{ width: '100%', textAlign: 'center' }}>
+            <p style={{ fontSize: '14px', color: 'grey' }}>위 수업들을 바탕으로<br></br>기관별 맞춤형 수업을 제작해드릴게요 !</p>
           </div>
-          <button 
+          <button
             className={styles.createClassBtn}
             onClick={handleCreateClass}
             disabled={cartItems.length === 0}
