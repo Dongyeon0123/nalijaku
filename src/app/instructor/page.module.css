@@ -330,7 +330,7 @@
         box-shadow: 0 4px 20px rgba(4, 173, 116, 0.1);
     }
 
-    .backgroundContainer > img {
+    .backgroundContainer>img {
         display: none;
     }
 
@@ -465,9 +465,9 @@
 
 @media (max-width: 480px) {
     .content {
-        width: 100%;
+        width: 90%;
         padding: 30px 12px;
-        margin-top: 20px;
+        margin-top: 80px;
     }
 
     .menuContainer {
