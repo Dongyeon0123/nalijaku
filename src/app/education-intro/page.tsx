@@ -40,6 +40,10 @@ export default function EducationIntroPage() {
     }
   }, [searchParams]);
 
+  const handleRemoveItem = (itemId: number) => {
+    setCartItems(cartItems.filter(item => item.id !== itemId));
+  };
+
   const [formData, setFormData] = React.useState({
     schoolName: '',
     contactPerson: '',
@@ -109,9 +113,30 @@ export default function EducationIntroPage() {
                       <h3 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>선택된 학습자료</h3>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {cartItems.map((item) => (
-                          <div key={item.id} style={{ padding: '8px', backgroundColor: '#ffffff', borderRadius: '6px', border: '1px solid #e0e0e0', fontSize: '13px', color: '#606060' }}>
-                            <div style={{ fontWeight: '600', color: '#383838', marginBottom: '4px' }}>{item.title}</div>
-                            <div style={{ fontSize: '12px', color: '#04AD74' }}>{item.instructor}</div>
+                          <div key={item.id} style={{ padding: '8px', backgroundColor: '#ffffff', borderRadius: '6px', border: '1px solid #e0e0e0', fontSize: '13px', color: '#606060', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                              <div style={{ fontWeight: '600', color: '#383838', marginBottom: '4px' }}>{item.title}</div>
+                              <div style={{ fontSize: '12px', color: '#04AD74' }}>{item.instructor}</div>
+                            </div>
+                            <button
+                              onClick={() => handleRemoveItem(item.id)}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                fontSize: '12px',
+                                cursor: 'pointer',
+                                color: 'grey',
+                                padding: '4px 8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'color 0.2s ease'
+                              }}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = '#ff5252')}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = '#ff6b6b')}
+                            >
+                              ✕
+                            </button>
                           </div>
                         ))}
                       </div>
