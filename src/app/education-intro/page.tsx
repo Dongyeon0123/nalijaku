@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import Header from '@/components/Header';
 import Image from 'next/image';
 import { IoLogoInstagram, IoLogoYoutube, IoBusiness } from 'react-icons/io5';
@@ -19,7 +19,7 @@ interface CartItem {
   quantity: number;
 }
 
-export default function EducationIntroPage() {
+function EducationIntroContent() {
   const searchParams = useSearchParams();
   const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
 
@@ -579,5 +579,14 @@ export default function EducationIntroPage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+
+export default function EducationIntroPage() {
+  return (
+    <Suspense fallback={<div>로딩 중...</div>}>
+      <EducationIntroContent />
+    </Suspense>
   );
 }
