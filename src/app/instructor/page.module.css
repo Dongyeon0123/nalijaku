@@ -58,6 +58,7 @@
     position: relative;
     display: inline-block;
     width: 100%;
+    overflow: hidden;
 }
 
 .profileCircle {
@@ -287,4 +288,233 @@
 
 .secondaryButton:hover {
     background-color: #E5E7EB;
+}
+
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .content {
+        width: 95%;
+        padding: 40px 16px;
+        margin-top: 30px;
+        overflow-x: hidden;
+    }
+
+    .menuContainer {
+        gap: 15px;
+        margin-bottom: 8px;
+        padding-bottom: 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .menuItem {
+        font-size: 14px;
+        padding-left: 12px;
+        padding-right: 12px;
+        white-space: nowrap;
+    }
+
+    .backgroundContainer {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+        border-radius: 20px;
+        padding: 40px 20px;
+        margin: 0 auto 30px;
+        width: 100%;
+        box-sizing: border-box;
+        box-shadow: 0 4px 20px rgba(4, 173, 116, 0.1);
+    }
+
+    .backgroundContainer > img {
+        display: none;
+    }
+
+    .leftContent {
+        position: static;
+        transform: none;
+        max-width: 100%;
+        text-align: center;
+        margin-bottom: 0;
+        order: 2;
+        width: 100%;
+    }
+
+    .subtitle {
+        font-size: 13px;
+        margin: 0 0 8px 0;
+        color: #04AD74;
+        font-weight: 600;
+    }
+
+    .mainTitle {
+        font-size: 22px;
+        margin: 0 0 12px 0;
+        line-height: 1.4;
+    }
+
+    .instructorName {
+        font-size: 14px;
+        margin: 0 0 14px 0;
+        color: #606060;
+    }
+
+    .courseTag {
+        display: inline-block;
+        padding: 8px 14px;
+        font-size: 11px;
+        margin-bottom: 16px;
+        margin-right: 6px;
+        background-color: #ffffff;
+        border: 1px solid #04AD74;
+        color: #04AD74;
+        border-radius: 16px;
+    }
+
+    .detailLink {
+        font-size: 13px;
+        margin-top: 12px;
+        color: #04AD74;
+        font-weight: 600;
+    }
+
+    .profileCircle {
+        position: static;
+        transform: none;
+        width: 140px;
+        height: 140px;
+        margin: 0 auto 25px;
+        order: 1;
+        border: 5px solid #ffffff;
+        box-shadow: 0 6px 16px rgba(4, 173, 116, 0.2);
+    }
+
+    .subImageContainer {
+        display: none;
+    }
+
+    .instructorHeader {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .instructorTitle {
+        font-size: 20px;
+    }
+
+    .registerButton {
+        width: 100%;
+        padding: 12px 16px;
+    }
+
+    .instructorGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .instructorCard {
+        min-height: 300px;
+    }
+
+    .cardHeader {
+        padding: 12px;
+    }
+
+    .region {
+        font-size: 12px;
+        padding: 3px 6px;
+    }
+
+    .name {
+        font-size: 13px;
+    }
+
+    .cardSubtext {
+        font-size: 12px;
+        margin: 0 0 12px 0;
+        padding: 0 12px;
+    }
+
+    .cardImageContainer {
+        padding: 0 12px 12px 12px;
+    }
+
+    .inviteButton {
+        width: calc(100% - 24px);
+        margin: 0 12px 10px 12px;
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+
+    .cardButtonGroup {
+        gap: 6px;
+        padding: 0 12px 12px 12px;
+    }
+
+    .secondaryButton {
+        padding: 9px 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        width: 100%;
+        padding: 30px 12px;
+        margin-top: 20px;
+    }
+
+    .menuContainer {
+        gap: 10px;
+        padding-bottom: 10px;
+    }
+
+    .menuItem {
+        font-size: 12px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .mainTitle {
+        font-size: 20px;
+    }
+
+    .courseTag {
+        padding: 6px 12px;
+        font-size: 11px;
+        margin-bottom: 15px;
+    }
+
+    .profileCircle {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 20px;
+    }
+
+    .instructorGrid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .instructorCard {
+        min-height: 280px;
+    }
+
+    .instructorHeader {
+        margin-bottom: 15px;
+    }
+
+    .instructorTitle {
+        font-size: 18px;
+    }
+
+    .registerButton {
+        font-size: 13px;
+    }
 }

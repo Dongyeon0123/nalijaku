@@ -148,6 +148,7 @@
 @media (max-width: 768px) {
   .logoText {
     font-size: 18px;
+    display: none;
   }
 }
 
