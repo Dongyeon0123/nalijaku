@@ -51,9 +51,11 @@ export default function EducationIntroPage() {
     email: '',
     studentCount: '',
     budget: '',
+    educationRegion: '',
     grade: '',
     preferredDate: '',
     message: '',
+    inquiryMessage: '',
     purchaseInquiry: false,
     schoolVisit: false,
     careerExperience: false,
@@ -108,6 +110,26 @@ export default function EducationIntroPage() {
                   <span style={{ fontSize: '14px', fontWeight: '500', color: '#606060', textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}>개인/단체/내부자교육</span>
                   <p style={{ marginTop: '15px', marginBottom: '20px', fontWeight: '500', color: '#383838', textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}>Please fill out and submit to<br></br>receive a call from us.</p>
 
+                  <button
+                    onClick={() => window.location.href = '/resources'}
+                    style={{
+                      padding: '10px 20px',
+                      backgroundColor: '#04AD74',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      marginBottom: '30px',
+                      transition: 'background 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#00A169')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#04AD74')}
+                  >
+                    강의 고르러 가기
+                  </button>
+
                   {cartItems.length > 0 && (
                     <div style={{ marginBottom: '30px', padding: '15px', backgroundColor: '#f8f8f8', borderRadius: '8px', border: '1px solid #e0e0e0', width: '70%' }}>
                       <h3 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>선택된 학습자료</h3>
@@ -143,11 +165,15 @@ export default function EducationIntroPage() {
                     </div>
                   )}
 
-                  <a href="http://pf.kakao.com/_Wxmdxen" target="_blank" rel="noopener noreferrer" className={styles.kakaoButton}>
+                  <p style={{ marginTop: '-20px', fontSize: '12px', color: '#999999', fontWeight: '500', lineHeight: '1.6', textAlign: 'center' }}>
+                    선택해주신 예산, 수업, 기관 정보를 바탕으로<br></br>개인화된 맞춤형 교육 커리큘럼을 생성해드립니다
+                  </p>
+
+                </div>
+                <div className={styles.formFields} style={{ position: 'relative', paddingTop: '80px' }}>
+                  <a href="http://pf.kakao.com/_Wxmdxen" target="_blank" rel="noopener noreferrer" className={styles.kakaoButton} style={{ position: 'absolute', top: '0', right: '0' }}>
                     <span style={{ marginTop: '8px' }}><BiMessageDetail size={20} /></span> 1:1 카카오톡 채널 문의
                   </a>
-                </div>
-                <div className={styles.formFields}>
                   <div className={styles.formGroup}>
                     <label htmlFor="schoolName">기관명 <span style={{ color: 'red' }}>*</span></label>
                     <input
@@ -231,6 +257,57 @@ export default function EducationIntroPage() {
                       <option value="over-5000">500만원 이상</option>
                       <option value="discuss">상담 후 결정</option>
                     </select>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="educationRegion">교육 지역 (선택사항)</label>
+                    <select
+                      id="educationRegion"
+                      name="educationRegion"
+                      value={formData.educationRegion}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">교육 지역을 선택해주세요</option>
+                      <option value="seoul">서울</option>
+                      <option value="busan">부산</option>
+                      <option value="daegu">대구</option>
+                      <option value="incheon">인천</option>
+                      <option value="gwangju">광주</option>
+                      <option value="daejeon">대전</option>
+                      <option value="ulsan">울산</option>
+                      <option value="sejong">세종</option>
+                      <option value="gyeonggi">경기</option>
+                      <option value="gangwon">강원</option>
+                      <option value="chungbuk">충북</option>
+                      <option value="chungnam">충남</option>
+                      <option value="jeonbuk">전북</option>
+                      <option value="jeonnam">전남</option>
+                      <option value="gyeongbuk">경북</option>
+                      <option value="gyeongnam">경남</option>
+                      <option value="jeju">제주</option>
+                      <option value="online">온라인</option>
+                    </select>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="inquiryMessage">문의 사항 (선택사항)</label>
+                    <textarea
+                      id="inquiryMessage"
+                      name="inquiryMessage"
+                      value={formData.inquiryMessage}
+                      onChange={handleInputChange}
+                      placeholder="추가 문의사항이 있으시면 입력해주세요"
+                      rows={5}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        border: '1px solid #ddd',
+                        borderRadius: '6px',
+                        fontFamily: 'inherit',
+                        fontSize: '14px',
+                        resize: 'vertical'
+                      }}
+                    />
                   </div>
                 </div>
 
