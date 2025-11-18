@@ -195,11 +195,10 @@ export default function ResourcesPage() {
       alert('장바구니에 자료를 추가해주세요.');
       return;
     }
-    // 수업 생성 로직
-    console.log('수업 생성:', cartItems);
-    alert('수업이 생성되었습니다!');
-    setCartItems([]);
-    setIsCartOpen(false);
+    // 장바구니 데이터를 URL 쿼리 파라미터로 인코딩
+    const cartData = JSON.stringify(cartItems);
+    const encodedCart = encodeURIComponent(cartData);
+    router.push(`/education-intro?cart=${encodedCart}`);
   };
 
 
