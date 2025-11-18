@@ -441,6 +441,9 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
           >
             학습 자료
           </button>
+          <a href="/instructor" className={styles.navLink}>
+            강사 소개
+          </a>
           <a href="#" className={styles.navLink}>
             날리자쿠 소개
           </a>
