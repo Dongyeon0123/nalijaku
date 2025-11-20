@@ -16,18 +16,29 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
   },
-  
+
+  // 학습자료
+  RESOURCES: {
+    LIST: '/resources',
+    DETAIL: (id: number) => `/resources/${id}`,
+    CATEGORIES: '/resources/categories',
+    INSTRUCTORS: '/resources/instructors',
+    RECENT: '/resources/recent',
+    COUNT: '/resources/count',
+    UPLOAD_IMAGE: '/resources/upload-image',
+  },
+
   // 교육 문의
   EDUCATION: {
     INQUIRY: '/education-inquiries',
     APPLICATION: '/education-applications',
   },
-  
+
   // 파트너 지원
   PARTNER: {
     APPLICATION: '/partner-applications',
   },
-  
+
   // 시스템
   SYSTEM: {
     HEALTH: '/health',
