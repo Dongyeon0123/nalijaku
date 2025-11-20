@@ -4,13 +4,15 @@ import React from 'react';
 import Image from 'next/image';
 import { IoHomeOutline, IoBusinessOutline, IoPeopleOutline, IoCallOutline, IoMenuOutline, IoBookOutline ,IoHelpOutline, IoHeartOutline, IoNewspaperOutline, IoPersonOutline } from 'react-icons/io5';
 import styles from '@/styles/SidebarNav.module.css';
+import { checkAdminStatus } from '@/services/authService';
 
 export default function SidebarNav() {
   const [activeSection, setActiveSection] = React.useState('home');
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [isDarkBackground, setIsDarkBackground] = React.useState(true);
+  const [isAdmin, setIsAdmin] = React.useState(false);
 
-  const navItems = React.useMemo(() => [
+  const allNavItems = [
     { id: 'home', label: 'Home', icon: IoHomeOutline },
     { id: 'cooperation', label: '협력 업체', icon: IoPeopleOutline },
     { id: 'customer', label: '고객사', icon: IoBusinessOutline },
@@ -21,7 +23,15 @@ export default function SidebarNav() {
     { id: 'team', label: 'Team 날리자쿠', icon: IoPeopleOutline },
     { id: 'news', label: '날리자쿠 News', icon: IoNewspaperOutline },
     { id: 'contact', label: 'Contact Us', icon: IoCallOutline },
-  ], []);
+  ];
+
+  const navItems = React.useMemo(() => {
+    // 관리자 계정이면 Contact Us 제외
+    if (isAdmin) {
+      return allNavItems.filter(item => item.id !== 'contact');
+    }
+    return allNavItems;
+  }, [isAdmin]);
 
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
@@ -66,6 +76,28 @@ export default function SidebarNav() {
       requestAnimationFrame(animate);
     }
   };
+
+  // 관리자 상태 확인
+  React.useEffect(() => {
+    const savedUserInfo = localStorage.getItem('userInfo');
+    if (savedUserInfo) {
+      try {
+        const userData = JSON.parse(savedUserInfo);
+        if (userData.username) {
+          checkAdminStatus(userData.username)
+            .then(adminResult => {
+              setIsAdmin(adminResult.data.isAdmin);
+            })
+            .catch(error => {
+              console.log('관리자 권한 확인 실패:', error);
+              setIsAdmin(false);
+            });
+        }
+      } catch (error) {
+        console.error('사용자 정보 파싱 오류:', error);
+      }
+    }
+  }, []);
 
   // 스크롤 위치에 따른 active 섹션 업데이트
   React.useEffect(() => {

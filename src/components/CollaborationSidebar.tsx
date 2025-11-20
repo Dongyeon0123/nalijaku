@@ -2,10 +2,13 @@
 
 import React from 'react';
 import { HiChatBubbleLeftRight } from 'react-icons/hi2';
+import { usePathname } from 'next/navigation';
 import styles from '@/styles/CollaborationSidebar.module.css';
 
 export default function CollaborationSidebar() {
+  const pathname = usePathname();
   const [isDarkBackground, setIsDarkBackground] = React.useState(true);
+  const isAdminPage = pathname?.startsWith('/admin');
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -63,6 +66,11 @@ export default function CollaborationSidebar() {
       return () => mainElement.removeEventListener('scroll', throttledHandleScroll);
     }
   }, []);
+
+  // 관리자 페이지에서는 고객센터 버튼 숨김
+  if (isAdminPage) {
+    return null;
+  }
 
   return (
     <div className={styles.sidebar}>

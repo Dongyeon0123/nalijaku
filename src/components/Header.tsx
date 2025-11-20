@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { IoChevronBack } from 'react-icons/io5';
 import styles from '@/styles/Header.module.css';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { SignupData, LoginData } from '@/types/auth';
 import { signup, login, checkServerHealth, getUserCount, checkAdminStatus } from '@/services/authService';
 import { validateSignupStep1, validateSignupStep2, validateSignupStep3 } from '@/utils/validation';
@@ -17,6 +18,9 @@ interface HeaderProps {
 
 
 export default function Header({ forceLightMode = false }: HeaderProps) {
+  const pathname = usePathname();
+  const isAdminPage = pathname?.startsWith('/admin');
+
   const [progress, setProgress] = React.useState(0);
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
@@ -59,7 +63,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
 
   // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [userInfo, setUserInfo] = React.useState<{username: string; token?: string; role?: string} | null>(null);
+  const [userInfo, setUserInfo] = React.useState<{ username: string; token?: string; role?: string } | null>(null);
   const [isAdmin, setIsAdmin] = React.useState(false);
 
 
@@ -85,12 +89,12 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       // role 매핑 (프론트엔드 값 → 백엔드 enum 값)
       const roleMapping: { [key: string]: string } = {
         '1': 'GENERAL',
-        '2': 'STUDENT', 
+        '2': 'STUDENT',
         '3': 'TEACHER',
         '4': 'INSTRUCTOR',
         '5': 'ADMIN'
       };
-      
+
       const signupData = {
         ...signupForm,
         organization: affiliation,
@@ -99,7 +103,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       };
 
       const result = await signup(signupData);
-      
+
       if (result.success) {
         setSuccessMessage('회원가입이 완료되었습니다!');
         setTimeout(() => {
@@ -129,25 +133,25 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
 
     try {
       const result = await login(loginForm);
-      
+
       if (result.success) {
         // 로그인 상태 업데이트
         console.log('🔍 로그인 응답 데이터:', result.data);
         console.log('🔍 사용자 role:', result.data?.role);
-        
-        const userData: {username: string; token?: string; role?: string} = {
+
+        const userData: { username: string; token?: string; role?: string } = {
           username: loginForm.username,
           token: result.data?.token,
           role: result.data?.role || 'GENERAL' // 백엔드에서 role 정보 받기
         };
-        
+
         console.log('🔍 저장할 userData:', userData);
         setIsLoggedIn(true);
         setUserInfo(userData);
-        
+
         // localStorage에 사용자 정보 저장
         localStorage.setItem('userInfo', JSON.stringify(userData));
-        
+
         // 관리자 권한 확인
         try {
           const adminResult = await checkAdminStatus(loginForm.username);
@@ -157,12 +161,12 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
           console.log('❌ 관리자 권한 확인 실패:', error);
           setIsAdmin(false);
         }
-        
+
         setSuccessMessage('로그인되었습니다!');
-        
+
         // 로그인 성공 이벤트 발생
         window.dispatchEvent(new CustomEvent('loginSuccess'));
-        
+
         setTimeout(() => {
           setIsLoginOpen(false);
           resetLoginForm();
@@ -182,21 +186,21 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
     try {
       // 로그아웃 API 호출 (선택사항)
       // await logout();
-      
+
       // 현재 페이지가 resources인지 확인
       const isOnResourcesPage = window.location.pathname === '/resources';
-      
+
       // 로그인 상태 초기화
       setIsLoggedIn(false);
       setUserInfo(null);
       setIsAdmin(false);
-      
+
       // localStorage에서 사용자 정보 삭제
       localStorage.removeItem('userInfo');
-      
+
       // 로그아웃 성공 모달 표시
       setShowLogoutSuccessModal(true);
-      
+
       setTimeout(() => {
         setShowLogoutSuccessModal(false);
         // resources 페이지에서 로그아웃한 경우 메인 페이지로 이동
@@ -252,29 +256,29 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
     if (step === 1) {
       // 1단계 유효성 검사
       const errors = validateSignupStep1(
-        signupForm.username, 
-        signupForm.password, 
-        signupForm.confirmPassword, 
+        signupForm.username,
+        signupForm.password,
+        signupForm.confirmPassword,
         signupForm.email
       );
-      
+
       if (errors.length > 0) {
         setErrorMessage(errors[0]);
         return;
       }
-      
+
       setErrorMessage(''); // 에러 메시지 초기화
     } else if (step === 2) {
       // 2단계 유효성 검사
       const errors = validateSignupStep2(affiliation, role, hasDroneExp);
-      
+
       if (errors.length > 0) {
         setErrorMessage(errors[0]);
         return;
       }
-      
+
       setErrorMessage(''); // 에러 메시지 초기화
-      
+
       // 2단계 데이터 저장
       setSignupForm(prev => ({
         ...prev,
@@ -283,7 +287,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
         droneExperience: hasDroneExp === '있음'
       }));
     }
-    
+
     setSignupStep(step as 0 | 1 | 2);
   };
 
@@ -293,13 +297,13 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       if (!mainElement) return;
 
       const scrollTop = mainElement.scrollTop;
-      
+
       // 스크롤 진행도 계산
       const { scrollHeight, clientHeight } = mainElement;
       const maxScrollable = scrollHeight - clientHeight;
       const percent = maxScrollable > 0 ? (scrollTop / maxScrollable) * 100 : 0;
       setProgress(percent);
-      
+
       // 현재 섹션 확인하여 헤더 스타일 결정
       const homeSection = document.getElementById('home');
       if (homeSection) {
@@ -338,7 +342,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
 
   React.useEffect(() => {
     setIsMounted(true);
-    
+
     // 페이지 로드 시 로그인 상태 확인
     const savedUserInfo = localStorage.getItem('userInfo');
     if (savedUserInfo) {
@@ -346,7 +350,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
         const userData = JSON.parse(savedUserInfo);
         setIsLoggedIn(true);
         setUserInfo(userData);
-        
+
         // 저장된 사용자의 관리자 권한 확인
         if (userData.username) {
           checkAdminStatus(userData.username)
@@ -395,7 +399,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
   const handleScrollToHome = () => {
     const homeSection = document.getElementById('home');
     const mainElement = document.querySelector('main');
-    
+
     if (homeSection && mainElement) {
       // main 요소 내에서 home 섹션으로 스크롤
       const targetTop = homeSection.offsetTop - mainElement.offsetTop;
@@ -409,14 +413,19 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
     }
   };
 
+  // 관리자 페이지에서는 Header를 표시하지 않음
+  if (isAdminPage) {
+    return null;
+  }
+
   return (
     <header ref={headerRef} className={`${styles.header} ${forceLightMode ? styles.scrolled : (isScrolled ? styles.scrolled : styles.transparent)}`}>
       <div className={styles.container}>
         <div className={styles.logoSection} onClick={handleScrollToHome}>
-          <Image 
-            src="/logo.png" 
-            alt="날리자쿠 로고" 
-            width={72} 
+          <Image
+            src="/logo.png"
+            alt="날리자쿠 로고"
+            width={72}
             height={40}
             className={styles.logoImage}
           />
@@ -426,7 +435,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
         </div>
 
         <nav className={styles.navigation}>
-          <button 
+          <button
             className={styles.navLink}
             onClick={() => {
               if (isLoggedIn) {
@@ -491,23 +500,23 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                 {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
                 {successMessage && <div className={styles.successMessage}>{successMessage}</div>}
                 <p>아이디</p>
-                <input 
-                  type="text" 
-                  placeholder="아이디" 
+                <input
+                  type="text"
+                  placeholder="아이디"
                   value={loginForm.username}
                   onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
                 />
                 <p>비밀번호</p>
-                <input 
-                  type="password" 
-                  placeholder="비밀번호" 
+                <input
+                  type="password"
+                  placeholder="비밀번호"
                   value={loginForm.password}
                   onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
                 />
                 <div className={styles.rememberMeRow}>
                   <label className={styles.checkboxLabel}>
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={loginForm.rememberMe}
                       onChange={(e) => setLoginForm(prev => ({ ...prev, rememberMe: e.target.checked }))}
                     />
@@ -519,8 +528,8 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                 </div>
               </div>
               <div className={styles.modalFooter}>
-                <button 
-                  className={styles.primaryAction} 
+                <button
+                  className={styles.primaryAction}
                   onClick={handleLogin}
                   disabled={isLoading}
                 >
@@ -562,30 +571,30 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                 {signupStep === 0 && (
                   <>
                     <p>아이디 <span style={{ color: 'red' }}>*</span></p>
-                    <input 
-                      type="text" 
-                      placeholder="사용할 아이디를 입력하세요." 
+                    <input
+                      type="text"
+                      placeholder="사용할 아이디를 입력하세요."
                       value={signupForm.username}
                       onChange={(e) => setSignupForm(prev => ({ ...prev, username: e.target.value }))}
                     />
                     <p>비밀번호 <span style={{ color: 'red' }}>*</span></p>
-                    <input 
-                      type="password" 
-                      placeholder="비밀번호를 입력하세요." 
+                    <input
+                      type="password"
+                      placeholder="비밀번호를 입력하세요."
                       value={signupForm.password}
                       onChange={(e) => setSignupForm(prev => ({ ...prev, password: e.target.value }))}
                     />
                     <p>비밀번호 확인 <span style={{ color: 'red' }}>*</span></p>
-                    <input 
-                      type="password" 
-                      placeholder="비밀번호를 다시 입력하세요." 
+                    <input
+                      type="password"
+                      placeholder="비밀번호를 다시 입력하세요."
                       value={signupForm.confirmPassword}
                       onChange={(e) => setSignupForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                     />
                     <p>이메일 <span style={{ color: 'red' }}>*</span></p>
-                    <input 
-                      type="text" 
-                      placeholder="학습 자료를 받을 이메일 주소를 입력하세요." 
+                    <input
+                      type="text"
+                      placeholder="학습 자료를 받을 이메일 주소를 입력하세요."
                       value={signupForm.email}
                       onChange={(e) => setSignupForm(prev => ({ ...prev, email: e.target.value }))}
                     />
@@ -613,19 +622,19 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                       </div>
                     </div>
                     <p>소속 <span style={{ color: 'red' }}>*</span></p>
-                    <input 
-                      type="text" 
-                      placeholder="소속을 입력하세요." 
-                      value={affiliation} 
-                      onChange={(e) => setAffiliation(e.target.value)} 
+                    <input
+                      type="text"
+                      placeholder="소속을 입력하세요."
+                      value={affiliation}
+                      onChange={(e) => setAffiliation(e.target.value)}
                     />
                     <p className={styles.exampleText}>ex) ㅇㅇ중학교, 충주시 ㅇㅇ센터 등</p>
                     <p>직무/역할 <span style={{ color: 'red' }}>*</span></p>
-                    <input 
-                      type="text" 
-                      placeholder="현재 직무/역할을 입력하세요." 
-                      value={role} 
-                      onChange={(e) => setRole(e.target.value)} 
+                    <input
+                      type="text"
+                      placeholder="현재 직무/역할을 입력하세요."
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
                     />
                     <p className={styles.exampleText}>ex) 교사, 과장, 교육담당자, 학생 등</p>
                   </>
@@ -633,25 +642,25 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                 {signupStep === 2 && (
                   <>
                     <p>연락처 <span style={{ color: 'red' }}>*</span></p>
-                    <input 
-                      type="tel" 
-                      placeholder="연락처를 입력하세요." 
+                    <input
+                      type="tel"
+                      placeholder="연락처를 입력하세요."
                       value={signupForm.phone}
                       onChange={(e) => setSignupForm(prev => ({ ...prev, phone: e.target.value }))}
                     />
                     <p className={styles.exampleText}>숫자만 입력해 주세요. ex) 01012345678</p>
                     <div className={styles.checkboxGroup}>
                       <label className={styles.checkboxLabel}>
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           checked={ageCheck}
                           onChange={(e) => setAgeCheck(e.target.checked)}
                         />
                         <span>만 14세 이상입니다.</span>
                       </label>
                       <label className={styles.checkboxLabel}>
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           checked={termsCheck}
                           onChange={(e) => setTermsCheck(e.target.checked)}
                         />
@@ -666,15 +675,15 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
               </div>
               <div className={styles.modalFooter}>
                 {signupStep < 2 ? (
-                  <button 
-                    className={styles.primaryAction} 
+                  <button
+                    className={styles.primaryAction}
                     onClick={() => handleSignupStepChange(signupStep + 1)}
                   >
                     다음
                   </button>
                 ) : (
-                  <button 
-                    className={styles.primaryAction} 
+                  <button
+                    className={styles.primaryAction}
                     onClick={handleSignup}
                     disabled={isLoading}
                   >
@@ -695,8 +704,8 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
             <div className={styles.modalContent}>
               <div className={styles.successIcon}>
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="10" fill="#04AD74"/>
-                  <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="12" cy="12" r="10" fill="#04AD74" />
+                  <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               <h3 className={styles.modalTitle}>로그아웃 완료</h3>
