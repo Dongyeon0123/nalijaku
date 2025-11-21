@@ -60,11 +60,17 @@ export default function ResourcesPage() {
         setLoading(true);
         setError(null);
 
-        console.log('📡 학습자료 API 호출:', `${API_BASE_URL}${API_ENDPOINTS.RESOURCES.LIST}`);
+        const apiUrl = `${API_BASE_URL}${API_ENDPOINTS.RESOURCES.LIST}`;
+        console.log('📡 학습자료 API 호출:', apiUrl);
 
-        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.LIST}`);
+        const response = await fetch(apiUrl);
+        
+        console.log('📊 API 응답 상태:', response.status, response.statusText);
+
         if (!response.ok) {
-          throw new Error('학습자료를 불러올 수 없습니다');
+          const errorText = await response.text();
+          console.error('❌ API 에러 응답:', errorText);
+          throw new Error(`학습자료를 불러올 수 없습니다 (${response.status})`);
         }
 
         const result = await response.json();
@@ -78,9 +84,18 @@ export default function ResourcesPage() {
           const categorySet = new Set<string>(result.data.map((m: Material) => m.category));
           const uniqueCategories: string[] = ['전체', ...Array.from(categorySet)];
           setCategories(uniqueCategories);
+        } else if (result.data && Array.isArray(result.data)) {
+          // success 필드가 없어도 data가 배열이면 처리
+          setMaterialsData(result.data);
+          const categorySet = new Set<string>(result.data.map((m: Material) => m.category));
+          const uniqueCategories: string[] = ['전체', ...Array.from(categorySet)];
+          setCategories(uniqueCategories);
+        } else {
+          console.warn('⚠️ 예상치 못한 API 응답 형식:', result);
+          setError('학습자료 데이터 형식이 올바르지 않습니다.');
         }
       } catch (err) {
-        console.error('학습자료 로드 실패:', err);
+        console.error('❌ 학습자료 로드 실패:', err);
         setError('학습자료를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
       } finally {
         setLoading(false);
