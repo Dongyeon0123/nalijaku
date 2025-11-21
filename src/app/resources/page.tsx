@@ -64,7 +64,7 @@ export default function ResourcesPage() {
         console.log('📡 학습자료 API 호출:', apiUrl);
 
         const response = await fetch(apiUrl);
-        
+
         console.log('📊 API 응답 상태:', response.status, response.statusText);
 
         if (!response.ok) {
@@ -203,12 +203,14 @@ export default function ResourcesPage() {
                     style={{ cursor: 'pointer' }}
                   >
                     <div className={styles.imageContainer}>
-                      <Image
-                        src={material.image}
+                      <img
+                        src={material.image.startsWith('http') ? material.image : `${API_BASE_URL}${material.image}`}
                         alt={material.alt}
-                        width={200}
-                        height={200}
                         className={styles.materialImage}
+                        onError={(e) => {
+                          console.error('이미지 로드 실패:', material.image);
+                          (e.target as HTMLImageElement).src = '/placeholder.png';
+                        }}
                       />
                       <div className={styles.categoryTag}>{material.category}</div>
                     </div>

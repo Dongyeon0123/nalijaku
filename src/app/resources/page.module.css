@@ -492,28 +492,40 @@
 .imageContainer {
   position: relative;
   width: 100%;
+  padding-bottom: 70%;
   overflow: hidden;
   border-radius: 12px 12px 0 0;
+  background: #f0f0f0;
 }
 
 .materialImage {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 250px;
+  height: 100%;
   border-radius: 12px 12px 0 0;
   object-fit: cover;
-  flex-shrink: 0;
   transition: transform 0.3s ease;
 }
 
 @media (max-width: 768px) {
+  .imageContainer {
+    padding-bottom: 100%;
+  }
+
   .materialImage {
-    height: 200px;
+    height: 100%;
   }
 }
 
 @media (max-width: 480px) {
+  .imageContainer {
+    padding-bottom: 100%;
+  }
+
   .materialImage {
-    height: 180px;
+    height: 100%;
   }
 }
 
