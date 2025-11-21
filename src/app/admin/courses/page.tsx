@@ -117,28 +117,7 @@ export default function CoursesPage() {
     }
   };
 
-  const uploadImage = async (file: File): Promise<string> => {
-    const formDataToSend = new FormData();
-    formDataToSend.append('file', file);
 
-    try {
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.UPLOAD_IMAGE}`, {
-        method: 'POST',
-        body: formDataToSend,
-      });
-
-      if (!response.ok) {
-        throw new Error('이미지 업로드 실패');
-      }
-
-      const result = await response.json();
-      // 백엔드에서 반환한 이미지 경로 사용
-      return result.filePath || result.data?.filePath || result.url || result.data?.url;
-    } catch (error) {
-      console.error('이미지 업로드 오류:', error);
-      throw error;
-    }
-  };
 
   const handleAddCourse = () => {
     setEditingCourse(null);
@@ -457,7 +436,7 @@ export default function CoursesPage() {
                         borderRadius: '4px',
                         border: '1px solid #ddd',
                       }}
-                      onError={(e) => {
+                      onError={() => {
                         console.error('이미지 로드 실패:', imagePreview);
                       }}
                     />
