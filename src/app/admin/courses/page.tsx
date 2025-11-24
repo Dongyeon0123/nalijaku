@@ -181,44 +181,59 @@ export default function CoursesPage() {
     try {
       setUploading(true);
 
-      // FormData 생성 (multipart/form-data)
-      const formDataToSend = new FormData();
-      formDataToSend.append('category', formData.category);
-      formDataToSend.append('title', formData.title);
-      formDataToSend.append('subtitle', formData.subtitle);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('instructor', formData.instructor);
-      formDataToSend.append('price', formData.price.toString());
-      formDataToSend.append('duration', formData.duration);
-      formDataToSend.append('level', formData.level);
-      formDataToSend.append('alt', formData.alt);
+      // 이미지 처리
+      let imageUrl = formData.image;
 
-      // 새로 추가할 때는 이미지 필수
-      if (!editingCourse) {
-        if (imageFile) {
-          formDataToSend.append('file', imageFile);
-        } else if (formData.image) {
-          formDataToSend.append('image', formData.image);
+      if (imageFile) {
+        // 새 이미지 파일이 있으면 업로드
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', imageFile);
+
+        const uploadResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.UPLOAD_IMAGE}`, {
+          method: 'POST',
+          body: uploadFormData,
+        });
+
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          imageUrl = uploadResult.filePath || uploadResult.data?.filePath || uploadResult.url || uploadResult.data?.url;
         } else {
-          alert('이미지를 선택하거나 URL을 입력해주세요.');
+          alert('이미지 업로드에 실패했습니다.');
           setUploading(false);
           return;
         }
-      } else {
-        // 수정할 때는 새 이미지가 있으면 추가
-        if (imageFile) {
-          formDataToSend.append('file', imageFile);
-        } else if (formData.image && formData.image !== editingCourse.image) {
-          // 이미지 URL이 변경되었으면 추가
-          formDataToSend.append('image', formData.image);
-        }
+      } else if (!imageUrl && editingCourse) {
+        // 수정할 때 이미지가 없으면 기존 이미지 유지
+        imageUrl = editingCourse.image;
+      } else if (!imageUrl && !editingCourse) {
+        // 새로 추가할 때 이미지가 없으면 오류
+        alert('이미지를 선택하거나 URL을 입력해주세요.');
+        setUploading(false);
+        return;
       }
+
+      // JSON 형식으로 요청 데이터 생성
+      const requestData = {
+        category: formData.category,
+        title: formData.title,
+        subtitle: formData.subtitle,
+        description: formData.description,
+        instructor: formData.instructor,
+        price: formData.price,
+        duration: formData.duration,
+        level: formData.level,
+        alt: formData.alt,
+        image: imageUrl,
+      };
+
+      console.log('📤 요청 데이터:', requestData);
 
       if (editingCourse) {
         // 수정
         const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.DETAIL(editingCourse.id)}`, {
           method: 'PUT',
-          body: formDataToSend,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestData),
         });
 
         const responseData = await response.json();
@@ -237,7 +252,8 @@ export default function CoursesPage() {
         // 추가
         const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.LIST}`, {
           method: 'POST',
-          body: formDataToSend,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestData),
         });
 
         const responseData = await response.json();
