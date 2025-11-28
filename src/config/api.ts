@@ -28,6 +28,13 @@ export const API_ENDPOINTS = {
     UPLOAD_IMAGE: '/resources/upload-image',
   },
 
+  // 강사
+  INSTRUCTORS: {
+    LIST: '/instructors',
+    DETAIL: (id: number) => `/instructors/${id}`,
+    BY_REGION: (region: string) => `/instructors/region/${region}`,
+  },
+
   // 교육 문의
   EDUCATION: {
     INQUIRY: '/education-inquiries',

@@ -4,14 +4,75 @@ import React from 'react';
 import Header from '@/components/Header';
 import Image from 'next/image';
 import styles from './page.module.css';
+import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
+
+interface Instructor {
+    id: number;
+    name: string;
+    region: string;
+    subtitle: string;
+    imageUrl: string;
+    profile?: string;
+    curriculum?: string;
+}
 
 export default function InstructorPage() {
     const [selectedRegion, setSelectedRegion] = React.useState('전체');
+    const [instructors, setInstructors] = React.useState<Instructor[]>([]);
+    const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState<string | null>(null);
+    const [selectedInstructor, setSelectedInstructor] = React.useState<Instructor | null>(null);
+    const [showModal, setShowModal] = React.useState(false);
 
     React.useEffect(() => {
         document.body.style.margin = '0';
         document.body.style.padding = '0';
     }, []);
+
+    // 강사 데이터 가져오기
+    React.useEffect(() => {
+        const fetchInstructors = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const endpoint = selectedRegion === '전체'
+                    ? API_ENDPOINTS.INSTRUCTORS.LIST
+                    : API_ENDPOINTS.INSTRUCTORS.BY_REGION(selectedRegion);
+
+                const response = await fetch(`${API_BASE_URL}${endpoint}`);
+
+                if (!response.ok) {
+                    throw new Error('강사 정보를 불러올 수 없습니다');
+                }
+
+                const result = await response.json();
+                console.log('📚 강사 데이터:', result);
+
+                // result가 배열이거나 result.data가 배열인 경우 처리
+                let instructorData: Instructor[] = Array.isArray(result) ? result : (Array.isArray(result.data) ? result.data : []);
+
+                // 이미지 경로 변환
+                instructorData = instructorData.map((instructor: Instructor) => ({
+                    ...instructor,
+                    imageUrl: instructor.imageUrl.includes('강사소개')
+                        ? instructor.imageUrl.replace('강사소개', 'instructor')
+                        : instructor.imageUrl
+                }));
+
+                console.log('📍 변환된 강사 데이터:', instructorData);
+                setInstructors(instructorData);
+            } catch (err) {
+                console.error('강사 데이터 로드 실패:', err);
+                setError('강사 정보를 불러올 수 없습니다');
+            } finally {
+                setLoading(false);
+                console.log('⏹️ 로딩 완료');
+            }
+        };
+
+        fetchInstructors();
+    }, [selectedRegion]);
 
     const regions = ['전체', '서울', '경기', '충북', '충남', '강원', '전북', '전남', '경북', '경남', '제주'];
 
@@ -75,38 +136,152 @@ export default function InstructorPage() {
                             <button className={styles.registerButton}>강사 등록</button>
                         </div>
 
-                        <div className={styles.instructorGrid}>
-                            {[
-                                { region: '수원', name: '이동연', image: 'dongyeon.jpeg', subtitle: '코딩으로 배우는 드론' },
-                                { region: '충북', name: '유한상', image: 'hansang.png', subtitle: '대한드론협회 주강사 출신' },
-                                { region: '서울', name: '임승원', image: 'seungwon.png', subtitle: '드론으로 세상을 열다' },
-                                { region: '경남', name: '이민상', image: 'minsang.png', subtitle: '드론운용병 출신 강사' }
-                            ].map((instructor, index) => (
-                                <div key={index} className={styles.instructorCard}>
-                                    <div className={styles.cardHeader}>
-                                        <span className={styles.region}>{instructor.region}</span>
-                                        <span className={styles.name}>{instructor.name}</span>
-                                    </div>
-                                    <p className={styles.cardSubtext}>{instructor.subtitle}</p>
-                                    <div className={styles.cardImageContainer}>
-                                        <Image
-                                            src={`/instructor/${instructor.image}`}
-                                            alt={instructor.name}
-                                            width={150}
-                                            height={150}
-                                        />
-                                    </div>
-                                    <button className={styles.inviteButton}>강사님 모셔오기</button>
-                                    <div className={styles.cardButtonGroup}>
-                                        <button className={styles.secondaryButton}>프로필</button>
-                                        <button className={styles.secondaryButton}>커리큘럼</button>
-                                    </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+                            {loading ? (
+                                <div style={{ textAlign: 'center', padding: '40px', color: '#999', gridColumn: '1 / -1' }}>
+                                    <p>강사 정보를 불러오는 중입니다...</p>
                                 </div>
-                            ))}
+                            ) : error ? (
+                                <div style={{ textAlign: 'center', padding: '40px', color: '#d32f2f', gridColumn: '1 / -1' }}>
+                                    <p>{error}</p>
+                                </div>
+                            ) : instructors.length > 0 ? (
+                                instructors.map((instructor) => (
+                                    <div key={instructor.id} style={{ border: '1px solid #e0e0e0', borderRadius: '12px', padding: '16px', minHeight: '350px' }}>
+                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
+                                            <span style={{ fontSize: '14px', fontWeight: '600', color: '#04AD74', backgroundColor: '#f0f8f5', padding: '4px 8px', borderRadius: '4px' }}>{instructor.region}</span>
+                                            <span style={{ fontSize: '15px', fontWeight: '700', color: '#383838' }}>{instructor.name}</span>
+                                        </div>
+                                        <p style={{ textAlign: 'center', fontSize: '14px', color: '#565D6DFF', margin: '0 0 16px 0' }}>{instructor.subtitle}</p>
+                                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+                                            <img
+                                                src={instructor.imageUrl}
+                                                alt={instructor.name}
+                                                style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #f0f0f0' }}
+                                            />
+                                        </div>
+                                        <button style={{ width: '100%', padding: '10px 16px', backgroundColor: '#04AD74', color: '#ffffff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', marginBottom: '12px' }}>강사님 모셔오기</button>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedInstructor(instructor);
+                                                    setShowModal(true);
+                                                }}
+                                                style={{ flex: 1, padding: '10px 12px', backgroundColor: '#F3F4F6', color: '#323742', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>프로필</button>
+                                            <button style={{ flex: 1, padding: '10px 12px', backgroundColor: '#F3F4F6', color: '#323742', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>커리큘럼</button>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '40px', color: '#999', gridColumn: '1 / -1' }}>
+                                    <p>강사 정보가 없습니다.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </main>
+
+            {/* 프로필 모달 */}
+            {showModal && selectedInstructor && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '16px',
+                        padding: '40px',
+                        maxWidth: '600px',
+                        width: '90%',
+                        maxHeight: '80vh',
+                        overflowY: 'auto',
+                        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                            <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '700', color: '#383838' }}>{selectedInstructor.name}</h2>
+                            <button
+                                onClick={() => setShowModal(false)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: '28px',
+                                    cursor: 'pointer',
+                                    color: '#999',
+                                    padding: 0,
+                                    width: '32px',
+                                    height: '32px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '24px', marginBottom: '32px' }}>
+                            <img
+                                src={selectedInstructor.imageUrl}
+                                alt={selectedInstructor.name}
+                                style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover' }}
+                            />
+                            <div>
+                                <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#04AD74', fontWeight: '600' }}>{selectedInstructor.region}</p>
+                                <p style={{ margin: 0, fontSize: '16px', color: '#565D6DFF' }}>{selectedInstructor.subtitle}</p>
+                            </div>
+                        </div>
+
+                        <div style={{ borderTop: '1px solid #e0e0e0', paddingTop: '24px' }}>
+                            <div style={{ marginBottom: '24px' }}>
+                                <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '700', color: '#383838' }}>학력</h3>
+                                <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>데이터 준비 중입니다.</p>
+                            </div>
+
+                            <div style={{ marginBottom: '24px' }}>
+                                <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '700', color: '#383838' }}>자격증</h3>
+                                <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>데이터 준비 중입니다.</p>
+                            </div>
+
+                            <div style={{ marginBottom: '24px' }}>
+                                <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '700', color: '#383838' }}>경력</h3>
+                                <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>데이터 준비 중입니다.</p>
+                            </div>
+
+                            <div>
+                                <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '700', color: '#383838' }}>수상</h3>
+                                <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>데이터 준비 중입니다.</p>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setShowModal(false)}
+                            style={{
+                                width: '100%',
+                                padding: '12px 24px',
+                                marginTop: '32px',
+                                backgroundColor: '#04AD74',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            닫기
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
