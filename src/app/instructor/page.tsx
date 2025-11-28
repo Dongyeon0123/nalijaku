@@ -6,14 +6,47 @@ import Image from 'next/image';
 import styles from './page.module.css';
 import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
 
+interface Education {
+    school: string;
+    major: string;
+    degree: string;
+    graduationYear: number;
+}
+
+interface Certificate {
+    name: string;
+    issuer: string;
+    issueDate: string;
+}
+
+interface Experience {
+    company: string;
+    position: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+}
+
+interface Award {
+    name: string;
+    issuer: string;
+    awardDate: string;
+    description: string;
+}
+
 interface Instructor {
     id: number;
     name: string;
     region: string;
     subtitle: string;
     imageUrl: string;
-    profile?: string;
-    curriculum?: string;
+    profileDescription?: string;
+    curriculum?: string | null;
+    education?: Education[];
+    certificates?: Certificate[];
+    experience?: Experience[];
+    awards?: Award[];
+    isFeatured?: boolean;
 }
 
 export default function InstructorPage() {
@@ -23,6 +56,7 @@ export default function InstructorPage() {
     const [error, setError] = React.useState<string | null>(null);
     const [selectedInstructor, setSelectedInstructor] = React.useState<Instructor | null>(null);
     const [showModal, setShowModal] = React.useState(false);
+    const [modalLoading, setModalLoading] = React.useState(false);
 
     React.useEffect(() => {
         document.body.style.margin = '0';
@@ -163,9 +197,22 @@ export default function InstructorPage() {
                                         <button style={{ width: '100%', padding: '10px 16px', backgroundColor: '#04AD74', color: '#ffffff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', marginBottom: '12px' }}>강사님 모셔오기</button>
                                         <div style={{ display: 'flex', gap: '8px' }}>
                                             <button
-                                                onClick={() => {
-                                                    setSelectedInstructor(instructor);
-                                                    setShowModal(true);
+                                                onClick={async () => {
+                                                    setModalLoading(true);
+                                                    try {
+                                                        const response = await fetch(`${API_BASE_URL}/api/instructors/${instructor.id}`);
+                                                        if (response.ok) {
+                                                            const detailData = await response.json();
+                                                            setSelectedInstructor(detailData);
+                                                            setShowModal(true);
+                                                        }
+                                                    } catch (err) {
+                                                        console.error('강사 상세 정보 로드 실패:', err);
+                                                        setSelectedInstructor(instructor);
+                                                        setShowModal(true);
+                                                    } finally {
+                                                        setModalLoading(false);
+                                                    }
                                                 }}
                                                 style={{ flex: 1, padding: '10px 12px', backgroundColor: '#F3F4F6', color: '#323742', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>프로필</button>
                                             <button style={{ flex: 1, padding: '10px 12px', backgroundColor: '#F3F4F6', color: '#323742', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>커리큘럼</button>
@@ -230,7 +277,9 @@ export default function InstructorPage() {
 
                         <div style={{ display: 'flex', gap: '24px', marginBottom: '32px' }}>
                             <img
-                                src={selectedInstructor.imageUrl}
+                                src={selectedInstructor.imageUrl.includes('강사소개')
+                                    ? selectedInstructor.imageUrl.replace('강사소개', 'instructor')
+                                    : selectedInstructor.imageUrl}
                                 alt={selectedInstructor.name}
                                 style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover' }}
                             />
@@ -240,25 +289,85 @@ export default function InstructorPage() {
                             </div>
                         </div>
 
+                        {selectedInstructor.profileDescription && (
+                            <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                                <p style={{ margin: 0, fontSize: '14px', color: '#565D6D', lineHeight: '1.6' }}>{selectedInstructor.profileDescription}</p>
+                            </div>
+                        )}
+
                         <div style={{ borderTop: '1px solid #e0e0e0', paddingTop: '24px' }}>
+                            {/* 학력 */}
                             <div style={{ marginBottom: '24px' }}>
                                 <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '700', color: '#383838' }}>학력</h3>
-                                <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>데이터 준비 중입니다.</p>
+                                {selectedInstructor.education && selectedInstructor.education.length > 0 ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        {selectedInstructor.education.map((edu, idx) => (
+                                            <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{edu.school}</p>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{edu.major} ({edu.degree})</p>
+                                                <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{edu.graduationYear}년</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>정보가 없습니다.</p>
+                                )}
                             </div>
 
+                            {/* 자격증 */}
                             <div style={{ marginBottom: '24px' }}>
                                 <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '700', color: '#383838' }}>자격증</h3>
-                                <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>데이터 준비 중입니다.</p>
+                                {selectedInstructor.certificates && selectedInstructor.certificates.length > 0 ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        {selectedInstructor.certificates.map((cert, idx) => (
+                                            <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{cert.name}</p>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{cert.issuer}</p>
+                                                <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{cert.issueDate}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>정보가 없습니다.</p>
+                                )}
                             </div>
 
+                            {/* 경력 */}
                             <div style={{ marginBottom: '24px' }}>
                                 <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '700', color: '#383838' }}>경력</h3>
-                                <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>데이터 준비 중입니다.</p>
+                                {selectedInstructor.experience && selectedInstructor.experience.length > 0 ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        {selectedInstructor.experience.map((exp, idx) => (
+                                            <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{exp.company}</p>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{exp.position}</p>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>{exp.startDate} ~ {exp.endDate}</p>
+                                                <p style={{ margin: 0, fontSize: '13px', color: '#565D6D' }}>{exp.description}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>정보가 없습니다.</p>
+                                )}
                             </div>
 
+                            {/* 수상 */}
                             <div>
                                 <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '700', color: '#383838' }}>수상</h3>
-                                <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>데이터 준비 중입니다.</p>
+                                {selectedInstructor.awards && selectedInstructor.awards.length > 0 ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        {selectedInstructor.awards.map((award, idx) => (
+                                            <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{award.name}</p>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{award.issuer}</p>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>{award.awardDate}</p>
+                                                <p style={{ margin: 0, fontSize: '13px', color: '#565D6D' }}>{award.description}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>정보가 없습니다.</p>
+                                )}
                             </div>
                         </div>
 
