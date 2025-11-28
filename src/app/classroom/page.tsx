@@ -321,7 +321,7 @@ export default function ClassroomPage() {
                 <label>상태</label>
                 <select
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'upcoming' | 'completed' })}
                 >
                   <option value="upcoming">예정</option>
                   <option value="active">진행 중</option>
