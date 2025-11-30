@@ -5,6 +5,14 @@ import styles from './page.module.css';
 import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
 
+interface Lesson {
+  id: number;
+  order: number;
+  materials: string;
+  description: string;
+  pdfUrl?: string;
+}
+
 interface Course {
   id: number;
   category: string;
@@ -17,6 +25,7 @@ interface Course {
   price?: number;
   duration?: string;
   level?: string;
+  lessons?: Lesson[];
 }
 
 export default function CoursesPage() {
@@ -33,6 +42,11 @@ export default function CoursesPage() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
   const modalRef = React.useRef<HTMLDivElement>(null);
+  const [expandedCourseId, setExpandedCourseId] = useState<number | null>(null);
+  const [showLessonModal, setShowLessonModal] = useState(false);
+  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+  const [lessonFormData, setLessonFormData] = useState({ order: 1, materials: '', description: '' });
+  const [lessonPdfFile, setLessonPdfFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     category: '',
     image: '',
@@ -173,6 +187,90 @@ export default function CoursesPage() {
       } catch (error) {
         console.error('강좌 삭제 실패:', error);
         alert('강좌 삭제에 실패했습니다.');
+      }
+    }
+  };
+
+  // 차시 추가 모달 열기
+  const handleAddLesson = (courseId: number) => {
+    setEditingLesson(null);
+    setLessonFormData({ order: 1, materials: '', description: '' });
+    setLessonPdfFile(null);
+    setShowLessonModal(true);
+  };
+
+  // 차시 저장
+  const handleSaveLesson = async (courseId: number) => {
+    try {
+      if (!lessonFormData.materials || !lessonFormData.description) {
+        alert('준비물과 설명을 입력해주세요.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('order', lessonFormData.order.toString());
+      formData.append('materials', lessonFormData.materials);
+      formData.append('description', lessonFormData.description);
+      if (lessonPdfFile) {
+        formData.append('pdfFile', lessonPdfFile);
+      }
+
+      const method = editingLesson ? 'PUT' : 'POST';
+      const endpoint = editingLesson
+        ? API_ENDPOINTS.RESOURCES.LESSONS.DETAIL(courseId, editingLesson.order)
+        : API_ENDPOINTS.RESOURCES.LESSONS.LIST(courseId);
+      const url = `${API_BASE_URL}${endpoint}`;
+
+      console.log('📤 차시 저장 요청:', { method, url, courseId, lessonFormData });
+
+      const response = await fetch(url, {
+        method,
+        body: formData,
+      });
+
+      console.log('📥 차시 저장 응답:', response.status);
+
+      if (response.ok) {
+        alert(editingLesson ? '차시가 수정되었습니다.' : '차시가 추가되었습니다.');
+        setShowLessonModal(false);
+        setLessonFormData({ order: 1, materials: '', description: '' });
+        setLessonPdfFile(null);
+        loadCourses();
+      } else {
+        try {
+          const errorData = await response.json();
+          alert(`차시 저장에 실패했습니다: ${errorData.message || '알 수 없는 오류'}`);
+        } catch {
+          alert(`차시 저장에 실패했습니다: ${response.statusText}`);
+        }
+      }
+    } catch (error) {
+      console.error('차시 저장 실패:', error);
+      alert('차시 저장 중 오류가 발생했습니다: ' + (error instanceof Error ? error.message : '알 수 없는 오류'));
+    }
+  };
+
+  // 차시 삭제
+  const handleDeleteLesson = async (courseId: number, order: number) => {
+    if (confirm('정말 삭제하시겠습니까?')) {
+      try {
+        const endpoint = API_ENDPOINTS.RESOURCES.LESSONS.DETAIL(courseId, order);
+        const url = `${API_BASE_URL}${endpoint}`;
+
+        const response = await fetch(url, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          alert('차시가 삭제되었습니다.');
+          loadCourses();
+        } else {
+          const errorData = await response.json();
+          alert(`차시 삭제에 실패했습니다: ${errorData.message || '알 수 없는 오류'}`);
+        }
+      } catch (error) {
+        console.error('차시 삭제 실패:', error);
+        alert('차시 삭제 중 오류가 발생했습니다: ' + (error instanceof Error ? error.message : '알 수 없는 오류'));
       }
     }
   };
@@ -323,29 +421,78 @@ export default function CoursesPage() {
             <tbody>
               {filteredCourses.length > 0 ? (
                 filteredCourses.map((course) => (
-                  <tr key={course.id}>
-                    <td>{course.id}</td>
-                    <td>{course.category}</td>
-                    <td>{course.title}</td>
-                    <td>{course.instructor}</td>
-                    <td>{course.subtitle}</td>
-                    <td className={styles.actions}>
-                      <button
-                        className={styles.editBtn}
-                        onClick={() => handleEditCourse(course)}
-                        title="수정"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        className={styles.deleteBtn}
-                        onClick={() => handleDeleteCourse(course.id)}
-                        title="삭제"
-                      >
-                        <FaTrash />
-                      </button>
-                    </td>
-                  </tr>
+                  <React.Fragment key={course.id}>
+                    <tr>
+                      <td>{course.id}</td>
+                      <td>{course.category}</td>
+                      <td>{course.title}</td>
+                      <td>{course.instructor}</td>
+                      <td>{course.subtitle}</td>
+                      <td className={styles.actions}>
+                        <button
+                          className={styles.expandBtn}
+                          onClick={() => setExpandedCourseId(expandedCourseId === course.id ? null : course.id)}
+                          title="차시 보기"
+                        >
+                          {expandedCourseId === course.id ? '▼' : '▶'} 차시
+                        </button>
+                        <button
+                          className={styles.editBtn}
+                          onClick={() => handleEditCourse(course)}
+                          title="수정"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={() => handleDeleteCourse(course.id)}
+                          title="삭제"
+                        >
+                          <FaTrash />
+                        </button>
+                      </td>
+                    </tr>
+                    {expandedCourseId === course.id && (
+                      <tr style={{ backgroundColor: '#f9f9f9' }}>
+                        <td colSpan={6} style={{ padding: '20px' }}>
+                          <div style={{ marginBottom: '16px' }}>
+                            <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>차시 관리</h4>
+                            {course.lessons && course.lessons.length > 0 ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {course.lessons.map((lesson, idx) => (
+                                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+                                    <div>
+                                      <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{lesson.order}차시</p>
+                                      <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#565D6D' }}>준비물: {lesson.materials}</p>
+                                      {lesson.description && <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{lesson.description}</p>}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                      <button
+                                        onClick={() => {
+                                          setEditingLesson(lesson);
+                                          setLessonFormData({ order: lesson.order, materials: lesson.materials, description: lesson.description });
+                                          setLessonPdfFile(null);
+                                          setShowLessonModal(true);
+                                        }}
+                                        style={{ padding: '6px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>수정</button>
+                                      <button
+                                        onClick={() => handleDeleteLesson(course.id, lesson.order)}
+                                        style={{ padding: '6px 12px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>삭제</button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>등록된 차시가 없습니다.</p>
+                            )}
+                            <button
+                              onClick={() => handleAddLesson(course.id)}
+                              style={{ marginTop: '12px', padding: '8px 16px', backgroundColor: '#04AD74', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>+ 차시 추가</button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))
               ) : (
                 <tr>
@@ -515,6 +662,79 @@ export default function CoursesPage() {
                 </button>
                 <button className={styles.saveBtn} onClick={handleSaveCourse} disabled={uploading}>
                   {uploading ? '저장 중...' : '저장'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 차시 관리 모달 */}
+      {showLessonModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3>{editingLesson ? '차시 수정' : '차시 추가'}</h3>
+              <button
+                className={styles.modalCloseBtn}
+                onClick={() => setShowLessonModal(false)}
+                type="button"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.formGroup}>
+                <label>차시 번호</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={lessonFormData.order}
+                  onChange={(e) => setLessonFormData({ ...lessonFormData, order: parseInt(e.target.value) })}
+                  placeholder="차시 번호를 입력하세요"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>준비물</label>
+                <input
+                  type="text"
+                  value={lessonFormData.materials}
+                  onChange={(e) => setLessonFormData({ ...lessonFormData, materials: e.target.value })}
+                  placeholder="준비물을 입력하세요"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>설명</label>
+                <textarea
+                  value={lessonFormData.description}
+                  onChange={(e) => setLessonFormData({ ...lessonFormData, description: e.target.value })}
+                  placeholder="차시 설명을 입력하세요"
+                  rows={4}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>PDF 파일</label>
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => setLessonPdfFile(e.target.files?.[0] || null)}
+                />
+              </div>
+              <div className={styles.formActions}>
+                <button
+                  className={styles.cancelBtn}
+                  onClick={() => setShowLessonModal(false)}
+                  type="button"
+                >
+                  취소
+                </button>
+                <button className={styles.saveBtn} onClick={() => {
+                  const expandedId = expandedCourseId;
+                  if (expandedId) {
+                    handleSaveLesson(expandedId);
+                  }
+                }}>
+                  저장
                 </button>
               </div>
             </div>

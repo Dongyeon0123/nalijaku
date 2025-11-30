@@ -26,6 +26,10 @@ export const API_ENDPOINTS = {
     RECENT: '/resources/recent',
     COUNT: '/resources/count',
     UPLOAD_IMAGE: '/resources/upload-image',
+    LESSONS: {
+      LIST: (courseId: number) => `/resources/${courseId}/lessons`,
+      DETAIL: (courseId: number, order: number) => `/resources/${courseId}/lessons/${order}`,
+    },
   },
 
   // 강사

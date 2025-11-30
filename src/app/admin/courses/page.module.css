@@ -109,6 +109,7 @@
   gap: 8px;
 }
 
+.expandBtn,
 .editBtn,
 .deleteBtn {
   padding: 6px 10px;
@@ -120,6 +121,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.expandBtn {
+  background: #04AD74;
+  color: white;
+  margin-right: 5px;
+}
+
+.expandBtn:hover {
+  background: #00A169;
 }
 
 .editBtn {
