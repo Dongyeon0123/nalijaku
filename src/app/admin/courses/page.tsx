@@ -192,7 +192,7 @@ export default function CoursesPage() {
   };
 
   // 차시 추가 모달 열기
-  const handleAddLesson = (courseId: number) => {
+  const handleAddLesson = () => {
     setEditingLesson(null);
     setLessonFormData({ order: 1, materials: '', description: '' });
     setLessonPdfFile(null);
@@ -486,7 +486,7 @@ export default function CoursesPage() {
                               <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>등록된 차시가 없습니다.</p>
                             )}
                             <button
-                              onClick={() => handleAddLesson(course.id)}
+                              onClick={() => handleAddLesson()}
                               style={{ marginTop: '12px', padding: '8px 16px', backgroundColor: '#04AD74', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>+ 차시 추가</button>
                           </div>
                         </td>

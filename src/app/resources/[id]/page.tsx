@@ -265,9 +265,6 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
     }
   ];
 
-  // 현재 자료 찾기
-  const currentMaterial = materialsData.find(material => material.id === parseInt(resolvedParams.id));
-
   // 차시 버튼 클릭 핸들러
   const handleLessonClick = React.useCallback((lesson: { id: number }) => {
     setSelectedLesson(lesson.id);
