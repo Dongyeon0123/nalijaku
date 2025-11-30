@@ -56,7 +56,6 @@ export default function InstructorPage() {
     const [error, setError] = React.useState<string | null>(null);
     const [selectedInstructor, setSelectedInstructor] = React.useState<Instructor | null>(null);
     const [showModal, setShowModal] = React.useState(false);
-    const [modalLoading, setModalLoading] = React.useState(false);
 
     React.useEffect(() => {
         document.body.style.margin = '0';
@@ -198,7 +197,6 @@ export default function InstructorPage() {
                                         <div style={{ display: 'flex', gap: '8px' }}>
                                             <button
                                                 onClick={async () => {
-                                                    setModalLoading(true);
                                                     try {
                                                         const response = await fetch(`${API_BASE_URL}/api/instructors/${instructor.id}`);
                                                         if (response.ok) {
@@ -210,8 +208,6 @@ export default function InstructorPage() {
                                                         console.error('강사 상세 정보 로드 실패:', err);
                                                         setSelectedInstructor(instructor);
                                                         setShowModal(true);
-                                                    } finally {
-                                                        setModalLoading(false);
                                                     }
                                                 }}
                                                 style={{ flex: 1, padding: '10px 12px', backgroundColor: '#F3F4F6', color: '#323742', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>프로필</button>
