@@ -40,14 +40,14 @@ export default function Cooperation() {
 
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className={`${styles.cooperationSection} ${isVisible ? styles.visible : ''}`}
     >
       <div className={styles.container}>
         <h2 className={`${styles.title} ${styles.animateUp}`}>협력업체</h2>
         <p className={`${styles.subtitle} ${styles.animateUp} ${styles.delay1}`}>
-          이미 많은 업체에서 <span style={{color: '#00A169', fontWeight: 'bold'}}>날리자쿠</span>와 함께하고 있습니다
+          이미 많은 업체에서 <span style={{ color: '#00A169', fontWeight: 'bold' }}>날리자쿠</span>와 함께하고 있습니다
         </p>
 
         <div className={`${styles.marquee} ${styles.rowTop} ${styles.animateUp} ${styles.delay2}`}>
@@ -55,32 +55,44 @@ export default function Cooperation() {
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
-            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoLarge} src="/Cooperation/KidZania.png" alt="협력사 KidZania" width={300} height={200} sizes="(max-width: 768px) 200px, 300px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/Coworker.jpg" alt="협력사 Coworker" width={250} height={170} sizes="(max-width: 768px) 150px, 250px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/4spark.jpg" alt="협력사 4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
-            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoLarge} src="/Cooperation/KidZania.png" alt="협력사 KidZania" width={250} height={170} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/Coworker.jpg" alt="협력사 Coworker-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/4spark.jpg" alt="협력사 4-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
-            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoLarge} src="/Cooperation/KidZania.png" alt="협력사 KidZania" width={300} height={200} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/Coworker.jpg" alt="협력사 Coworker-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/4spark.jpg" alt="협력사 4-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
-            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoLarge} src="/Cooperation/KidZania.png" alt="협력사 KidZania" width={300} height={200} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/Coworker.jpg" alt="협력사 Coworker-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/4spark.jpg" alt="협력사 4-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
-            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoLarge} src="/Cooperation/KidZania.png" alt="협력사 KidZania" width={300} height={200} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/Coworker.jpg" alt="협력사 Coworker-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/4spark.jpg" alt="협력사 4-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/1arrbot.jpg" alt="협력사 1-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/2dello.jpg" alt="협력사 2-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/3curioud.jpg" alt="협력사 3-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
-            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/4spark.jpg" alt="협력사 4-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoLarge} src="/Cooperation/KidZania.png" alt="협력사 KidZania" width={300} height={200} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logo} src="/Cooperation/Coworker.jpg" alt="협력사 Coworker-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/4spark.jpg" alt="협력사 4-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/5kitech.jpg" alt="협력사 5-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
           </div>
         </div>
@@ -89,26 +101,32 @@ export default function Cooperation() {
           <div ref={bottomRowRef} className={styles.marqueeInner}>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/Kobia.png" alt="협력사 Kobia" width={250} height={170} sizes="(max-width: 768px) 150px, 250px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/Kobia.png" alt="협력사 Kobia-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/Kobia.png" alt="협력사 Kobia-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup2" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/Kobia.png" alt="협력사 Kobia-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup3" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/Kobia.png" alt="협력사 Kobia-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup4" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/6seoul.jpg" alt="협력사 6-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/7chungju.jpg" alt="협력사 7-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
+            <div className={styles.card}><Image className={styles.logoXLarge} src="/Cooperation/Kobia.png" alt="협력사 Kobia-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/8KU.jpg" alt="협력사 8-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
             <div className={styles.card}><Image className={styles.logo} src="/Cooperation/9sori.jpg" alt="협력사 9-dup5" width={200} height={120} sizes="(max-width: 768px) 100px, 200px" priority={false} /></div>
           </div>
