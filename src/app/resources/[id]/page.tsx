@@ -60,8 +60,12 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
     const fetchMaterial = async () => {
       try {
         setLoading(true);
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.nallijaku.com/';
-        const response = await fetch(`${API_BASE_URL}api/resources/${resolvedParams.id}`);
+        const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.nallijaku.com').replace(/\/$/, '');
+        const url = `${API_BASE_URL}/api/resources/${resolvedParams.id}`;
+        
+        console.log('📡 학습자료 API 호출:', url);
+        
+        const response = await fetch(url);
         
         if (response.ok) {
           const result = await response.json();
@@ -69,17 +73,20 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
           
           // 응답 형식에 따라 처리
           const materialData = result.success ? result.data : result.data || result;
+          console.log('✅ 처리된 자료 데이터:', materialData);
+          
           setMaterial(materialData);
           
           // 첫 번째 차시 선택
           if (materialData.lessons && materialData.lessons.length > 0) {
+            console.log('📖 차시 목록:', materialData.lessons);
             setSelectedLesson(materialData.lessons[0].id);
           }
         } else {
-          console.error('학습자료 로드 실패:', response.status);
+          console.error('❌ 학습자료 로드 실패:', response.status, response.statusText);
         }
       } catch (error) {
-        console.error('학습자료 로드 중 오류:', error);
+        console.error('❌ 학습자료 로드 중 오류:', error);
       } finally {
         setLoading(false);
       }
@@ -152,20 +159,31 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                     {material.lessons && material.lessons.length > 0 && selectedLesson ? (
                       (() => {
                         const selectedLessonData = material.lessons.find(l => l.id === selectedLesson);
-                        return selectedLessonData && selectedLessonData.pdfUrl ? (
-                          <div style={{ width: '100%', height: '600px', border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
-                            <iframe
-                              src={`https://docs.google.com/gview?url=${encodeURIComponent(selectedLessonData.pdfUrl)}&embedded=true`}
-                              style={{ width: '100%', height: '100%', border: 'none' }}
-                              title="PDF Viewer"
-                            />
-                          </div>
-                        ) : (
-                          <div className={styles.errorContainer}>
-                            <h3>PDF를 불러올 수 없습니다</h3>
-                            <p>이 차시에는 PDF 파일이 없습니다.</p>
-                          </div>
-                        );
+                        if (selectedLessonData && selectedLessonData.pdfUrl) {
+                          const fullPdfUrl = `https://api.nallijaku.com${selectedLessonData.pdfUrl}`;
+                          const pdfViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullPdfUrl)}&embedded=true`;
+                          
+                          console.log('📄 PDF URL:', fullPdfUrl);
+                          console.log('🔗 Viewer URL:', pdfViewerUrl);
+                          
+                          return (
+                            <div style={{ width: '100%', height: '600px', border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
+                              <iframe
+                                src={pdfViewerUrl}
+                                style={{ width: '100%', height: '100%', border: 'none' }}
+                                title="PDF Viewer"
+                                onError={() => console.error('PDF 로드 실패:', fullPdfUrl)}
+                              />
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div className={styles.errorContainer}>
+                              <h3>PDF를 불러올 수 없습니다</h3>
+                              <p>이 차시에는 PDF 파일이 없습니다.</p>
+                            </div>
+                          );
+                        }
                       })()
                     ) : (
                       <div className={styles.errorContainer}>

@@ -69,19 +69,41 @@ export default function CoursesPage() {
   const loadCourses = async () => {
     try {
       setLoading(true);
+      console.log('🔄 강좌 목록 새로고침 중...');
+
       // 백엔드에서 강좌 목록 가져오기
       const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.LIST}`);
+
       if (response.ok) {
         const result = await response.json();
+        console.log('✅ 강좌 목록 로드 성공:', result);
+
         if (result.success && result.data) {
           setCourses(result.data);
+
+          // 각 강좌의 차시 정보 로깅
+          result.data.forEach((course: Course) => {
+            if (course.lessons && course.lessons.length > 0) {
+              console.log(`📚 강좌 "${course.title}" 차시 목록:`, course.lessons);
+              course.lessons.forEach((lesson: Lesson) => {
+                console.log(`  - ${lesson.order}차시:`, {
+                  materials: lesson.materials,
+                  description: lesson.description,
+                  pdfUrl: lesson.pdfUrl || '없음',
+                });
+              });
+            }
+          });
+
           // 카테고리 추출
           const categorySet = new Set<string>(result.data.map((c: Course) => c.category));
           setCategories(Array.from(categorySet).sort());
         }
+      } else {
+        console.error('❌ 강좌 목록 로드 실패:', response.status, response.statusText);
       }
     } catch (error) {
-      console.error('강좌 로드 실패:', error);
+      console.error('❌ 강좌 로드 실패:', error);
     } finally {
       setLoading(false);
     }
@@ -223,8 +245,20 @@ export default function CoursesPage() {
       formData.append('order', lessonFormData.order.toString());
       formData.append('materials', lessonFormData.materials);
       formData.append('description', lessonFormData.description);
+
+      console.log('📋 FormData 구성:');
+      console.log('  - order:', lessonFormData.order);
+      console.log('  - materials:', lessonFormData.materials);
+      console.log('  - description:', lessonFormData.description);
+
       if (lessonPdfFile) {
         formData.append('pdfFile', lessonPdfFile);
+        console.log('📄 PDF 파일 정보:');
+        console.log('  - 파일명:', lessonPdfFile.name);
+        console.log('  - 파일 크기:', (lessonPdfFile.size / (1024 * 1024)).toFixed(2), 'MB');
+        console.log('  - 파일 타입:', lessonPdfFile.type);
+      } else {
+        console.log('⚠️ PDF 파일 없음');
       }
 
       const method = editingLesson ? 'PUT' : 'POST';
@@ -233,7 +267,11 @@ export default function CoursesPage() {
         : API_ENDPOINTS.RESOURCES.LESSONS.LIST(courseId);
       const url = `${API_BASE_URL}${endpoint}`;
 
-      console.log('📤 차시 저장 요청:', { method, url, courseId, fileSize: lessonPdfFile?.size });
+      console.log('📤 차시 저장 요청:');
+      console.log('  - 메서드:', method);
+      console.log('  - URL:', url);
+      console.log('  - 강좌 ID:', courseId);
+      console.log('  - 편집 모드:', editingLesson ? '수정' : '신규');
 
       // XMLHttpRequest를 사용하여 진행률 추적
       const xhr = new XMLHttpRequest();
@@ -247,18 +285,37 @@ export default function CoursesPage() {
       });
 
       xhr.addEventListener('load', async () => {
+        console.log('✅ 업로드 완료');
+        console.log('📊 응답 상태:', xhr.status, xhr.statusText);
+        console.log('📝 응답 본문:', xhr.responseText);
+        console.log('📋 응답 헤더:', {
+          'Content-Type': xhr.getResponseHeader('Content-Type'),
+        });
+
         if (xhr.status >= 200 && xhr.status < 300) {
-          alert(editingLesson ? '차시가 수정되었습니다.' : '차시가 추가되었습니다.');
-          setShowLessonModal(false);
-          setLessonFormData({ order: 1, materials: '', description: '' });
-          setLessonPdfFile(null);
-          setUploadProgress(0);
-          loadCourses();
+          try {
+            const responseData = JSON.parse(xhr.responseText);
+            console.log('✅ 파싱된 응답 데이터:', responseData);
+            console.log('📄 저장된 PDF URL:', responseData.pdfUrl || responseData.data?.pdfUrl || '없음');
+
+            alert(editingLesson ? '차시가 수정되었습니다.' : '차시가 추가되었습니다.');
+            setShowLessonModal(false);
+            setLessonFormData({ order: 1, materials: '', description: '' });
+            setLessonPdfFile(null);
+            setUploadProgress(0);
+            loadCourses();
+          } catch (parseError) {
+            console.error('❌ 응답 파싱 실패:', parseError);
+            alert('차시가 저장되었으나 응답 처리 중 오류가 발생했습니다.');
+            loadCourses();
+          }
         } else {
           try {
             const errorData = JSON.parse(xhr.responseText);
+            console.error('❌ 백엔드 에러:', errorData);
             alert(`차시 저장에 실패했습니다: ${errorData.message || '알 수 없는 오류'}`);
           } catch {
+            console.error('❌ 응답 파싱 실패:', xhr.statusText);
             alert(`차시 저장에 실패했습니다: ${xhr.statusText}`);
           }
         }
@@ -765,15 +822,45 @@ export default function CoursesPage() {
               </div>
               <div className={styles.formGroup}>
                 <label>PDF 파일</label>
+                {editingLesson && editingLesson.pdfUrl && (
+                  <div style={{ marginBottom: '12px', padding: '12px', backgroundColor: '#E8F5E9', borderRadius: '6px', border: '1px solid #4CAF50' }}>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: '600', color: '#2E7D32' }}>
+                      📄 현재 PDF 파일
+                    </p>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#555' }}>
+                      {editingLesson.pdfUrl.split('/').pop()}
+                    </p>
+                    <a
+                      href={`https://api.nallijaku.com${editingLesson.pdfUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-block',
+                        padding: '6px 12px',
+                        backgroundColor: '#4CAF50',
+                        color: '#fff',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        textDecoration: 'none',
+                        fontWeight: '600',
+                      }}
+                    >
+                      다운로드
+                    </a>
+                  </div>
+                )}
                 <input
                   type="file"
                   accept=".pdf"
                   onChange={(e) => setLessonPdfFile(e.target.files?.[0] || null)}
                   disabled={isUploading}
                 />
+                <p style={{ fontSize: '12px', color: '#999', margin: '8px 0 0 0' }}>
+                  {editingLesson && editingLesson.pdfUrl ? '새 파일을 선택하면 기존 파일이 대체됩니다.' : ''}
+                </p>
                 {lessonPdfFile && (
-                  <p style={{ fontSize: '12px', color: '#666', margin: '8px 0 0 0' }}>
-                    선택된 파일: {lessonPdfFile.name} ({(lessonPdfFile.size / (1024 * 1024)).toFixed(2)}MB)
+                  <p style={{ fontSize: '12px', color: '#1976D2', margin: '8px 0 0 0', fontWeight: '600' }}>
+                    ✓ 새 파일 선택됨: {lessonPdfFile.name} ({(lessonPdfFile.size / (1024 * 1024)).toFixed(2)}MB)
                   </p>
                 )}
               </div>
