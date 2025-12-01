@@ -1,5 +1,7 @@
-// API 기본 URL - 환경변수로 관리
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.nallijaku.com/';
+// API 기본 URL - 환경에 따라 다름
+// 개발: 프록시 사용 (CORS 우회)
+// 프로덕션: 직접 호출
+export const API_BASE_URL = process.env.NODE_ENV === 'development' ? '' : 'https://api.nallijaku.com';
 
 // API 설정 로그 출력
 console.log('🔧 API 설정 정보:');
@@ -19,42 +21,42 @@ export const API_ENDPOINTS = {
 
   // 학습자료
   RESOURCES: {
-    LIST: '/resources',
-    DETAIL: (id: number) => `/resources/${id}`,
-    CATEGORIES: '/resources/categories',
-    INSTRUCTORS: '/resources/instructors',
-    RECENT: '/resources/recent',
-    COUNT: '/resources/count',
-    UPLOAD_IMAGE: '/resources/upload-image',
+    LIST: '/api/resources',
+    DETAIL: (id: number) => `/api/resources/${id}`,
+    CATEGORIES: '/api/resources/categories',
+    INSTRUCTORS: '/api/resources/instructors',
+    RECENT: '/api/resources/recent',
+    COUNT: '/api/resources/count',
+    UPLOAD_IMAGE: '/api/resources/upload-image',
     LESSONS: {
-      LIST: (courseId: number) => `/resources/${courseId}/lessons`,
-      DETAIL: (courseId: number, order: number) => `/resources/${courseId}/lessons/${order}`,
+      LIST: (courseId: number) => `/api/resources/${courseId}/lessons`,
+      DETAIL: (courseId: number, order: number) => `/api/resources/${courseId}/lessons/${order}`,
     },
   },
 
   // 강사
   INSTRUCTORS: {
-    LIST: '/instructors',
-    DETAIL: (id: number) => `/instructors/${id}`,
-    BY_REGION: (region: string) => `/instructors/region/${region}`,
+    LIST: '/api/instructors',
+    DETAIL: (id: number) => `/api/instructors/${id}`,
+    BY_REGION: (region: string) => `/api/instructors/region/${region}`,
   },
 
   // 교육 문의
   EDUCATION: {
-    INQUIRY: '/education-inquiries',
-    APPLICATION: '/education-applications',
+    INQUIRY: '/api/education-inquiries',
+    APPLICATION: '/api/education-applications',
   },
 
   // 파트너 지원
   PARTNER: {
-    APPLICATION: '/partner-applications',
+    APPLICATION: '/api/partner-applications',
   },
 
   // 시스템
   SYSTEM: {
-    HEALTH: '/health',
-    USER_COUNT: '/users/count',
-    USERS: '/users',
+    HEALTH: '/api/health',
+    USER_COUNT: '/api/users/count',
+    USERS: '/api/users',
   },
 } as const;
 

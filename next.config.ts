@@ -6,6 +6,16 @@ const nextConfig: NextConfig = {
     domains: [],
     remotePatterns: [],
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/api/:path*',
+          destination: 'https://api.nallijaku.com/api/:path*',
+        },
+      ],
+    };
+  },
 };
 
 export default nextConfig;

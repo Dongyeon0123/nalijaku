@@ -47,6 +47,8 @@ export default function CoursesPage() {
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [lessonFormData, setLessonFormData] = useState({ order: 1, materials: '', description: '' });
   const [lessonPdfFile, setLessonPdfFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     category: '',
     image: '',
@@ -207,6 +209,16 @@ export default function CoursesPage() {
         return;
       }
 
+      // PDF 파일 크기 체크 (100MB 제한)
+      if (lessonPdfFile && lessonPdfFile.size > 100 * 1024 * 1024) {
+        const sizeMB = (lessonPdfFile.size / (1024 * 1024)).toFixed(2);
+        alert(`PDF 파일 크기가 100MB를 초과합니다. (현재: ${sizeMB}MB)`);
+        return;
+      }
+
+      setIsUploading(true);
+      setUploadProgress(0);
+
       const formData = new FormData();
       formData.append('order', lessonFormData.order.toString());
       formData.append('materials', lessonFormData.materials);
@@ -221,32 +233,71 @@ export default function CoursesPage() {
         : API_ENDPOINTS.RESOURCES.LESSONS.LIST(courseId);
       const url = `${API_BASE_URL}${endpoint}`;
 
-      console.log('📤 차시 저장 요청:', { method, url, courseId, lessonFormData });
+      console.log('📤 차시 저장 요청:', { method, url, courseId, fileSize: lessonPdfFile?.size });
 
-      const response = await fetch(url, {
-        method,
-        body: formData,
+      // XMLHttpRequest를 사용하여 진행률 추적
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const percentComplete = (e.loaded / e.total) * 100;
+          setUploadProgress(Math.round(percentComplete));
+          console.log(`📊 업로드 진행률: ${Math.round(percentComplete)}%`);
+        }
       });
 
-      console.log('📥 차시 저장 응답:', response.status);
-
-      if (response.ok) {
-        alert(editingLesson ? '차시가 수정되었습니다.' : '차시가 추가되었습니다.');
-        setShowLessonModal(false);
-        setLessonFormData({ order: 1, materials: '', description: '' });
-        setLessonPdfFile(null);
-        loadCourses();
-      } else {
-        try {
-          const errorData = await response.json();
-          alert(`차시 저장에 실패했습니다: ${errorData.message || '알 수 없는 오류'}`);
-        } catch {
-          alert(`차시 저장에 실패했습니다: ${response.statusText}`);
+      xhr.addEventListener('load', async () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          alert(editingLesson ? '차시가 수정되었습니다.' : '차시가 추가되었습니다.');
+          setShowLessonModal(false);
+          setLessonFormData({ order: 1, materials: '', description: '' });
+          setLessonPdfFile(null);
+          setUploadProgress(0);
+          loadCourses();
+        } else {
+          try {
+            const errorData = JSON.parse(xhr.responseText);
+            alert(`차시 저장에 실패했습니다: ${errorData.message || '알 수 없는 오류'}`);
+          } catch {
+            alert(`차시 저장에 실패했습니다: ${xhr.statusText}`);
+          }
         }
-      }
+        setIsUploading(false);
+      });
+
+      xhr.addEventListener('error', () => {
+        console.error('❌ 업로드 실패:', xhr.statusText);
+        alert('차시 저장 중 오류가 발생했습니다.');
+        setIsUploading(false);
+        setUploadProgress(0);
+      });
+
+      xhr.addEventListener('abort', () => {
+        console.error('❌ 업로드 취소됨');
+        alert('업로드가 취소되었습니다.');
+        setIsUploading(false);
+        setUploadProgress(0);
+      });
+
+      // 타임아웃 설정 (5분)
+      xhr.timeout = 5 * 60 * 1000;
+      xhr.addEventListener('timeout', () => {
+        console.error('❌ 업로드 타임아웃');
+        alert('업로드 시간이 초과되었습니다. 파일 크기를 확인해주세요.');
+        setIsUploading(false);
+        setUploadProgress(0);
+      });
+
+      xhr.open(method, url);
+      xhr.setRequestHeader('Accept', 'application/json');
+      xhr.withCredentials = true;
+      xhr.send(formData);
     } catch (error) {
-      console.error('차시 저장 실패:', error);
-      alert('차시 저장 중 오류가 발생했습니다: ' + (error instanceof Error ? error.message : '알 수 없는 오류'));
+      console.error('❌ 차시 저장 실패:', error);
+      const errorMsg = error instanceof Error ? error.message : '알 수 없는 오류';
+      alert('차시 저장 중 오류가 발생했습니다: ' + errorMsg);
+      setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -718,23 +769,57 @@ export default function CoursesPage() {
                   type="file"
                   accept=".pdf"
                   onChange={(e) => setLessonPdfFile(e.target.files?.[0] || null)}
+                  disabled={isUploading}
                 />
+                {lessonPdfFile && (
+                  <p style={{ fontSize: '12px', color: '#666', margin: '8px 0 0 0' }}>
+                    선택된 파일: {lessonPdfFile.name} ({(lessonPdfFile.size / (1024 * 1024)).toFixed(2)}MB)
+                  </p>
+                )}
               </div>
+              {isUploading && (
+                <div className={styles.formGroup}>
+                  <label>업로드 진행률</label>
+                  <div style={{ width: '100%', height: '24px', backgroundColor: '#e0e0e0', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        width: `${uploadProgress}%`,
+                        height: '100%',
+                        backgroundColor: '#04AD74',
+                        transition: 'width 0.3s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#fff',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                      }}
+                    >
+                      {uploadProgress > 10 && `${uploadProgress}%`}
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className={styles.formActions}>
                 <button
                   className={styles.cancelBtn}
                   onClick={() => setShowLessonModal(false)}
                   type="button"
+                  disabled={isUploading}
                 >
                   취소
                 </button>
-                <button className={styles.saveBtn} onClick={() => {
-                  const expandedId = expandedCourseId;
-                  if (expandedId) {
-                    handleSaveLesson(expandedId);
-                  }
-                }}>
-                  저장
+                <button
+                  className={styles.saveBtn}
+                  onClick={() => {
+                    const expandedId = expandedCourseId;
+                    if (expandedId) {
+                      handleSaveLesson(expandedId);
+                    }
+                  }}
+                  disabled={isUploading}
+                >
+                  {isUploading ? `업로드 중... ${uploadProgress}%` : '저장'}
                 </button>
               </div>
             </div>
