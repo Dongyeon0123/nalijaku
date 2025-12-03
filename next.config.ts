@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
           source: '/api/:path*',
           destination: 'https://api.nallijaku.com/api/:path*',
         },
+        {
+          source: '/auth/:path*',
+          destination: 'https://api.nallijaku.com/auth/:path*',
+        },
       ],
     };
   },
