@@ -75,7 +75,7 @@ export default function InstructorsManagementPage() {
       region: instructor.region,
       subtitle: instructor.subtitle,
       imageUrl: instructor.imageUrl,
-      profileDescription: (instructor as any).profileDescription || '',
+      profileDescription: (instructor as Instructor & { profileDescription?: string }).profileDescription || '',
       education: instructor.education || '',
       certificates: instructor.certificates || '',
       experience: instructor.experience || '',

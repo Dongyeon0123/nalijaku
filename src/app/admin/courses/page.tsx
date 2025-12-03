@@ -141,7 +141,7 @@ export default function CoursesPage() {
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [isDragging, dragOffset]);
+  }, [isDragging, dragOffset, handleMouseMove, handleMouseUp]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
