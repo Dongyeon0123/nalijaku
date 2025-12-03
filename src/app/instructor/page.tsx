@@ -85,12 +85,12 @@ export default function InstructorPage() {
                 // result가 배열이거나 result.data가 배열인 경우 처리
                 let instructorData: Instructor[] = Array.isArray(result) ? result : (Array.isArray(result.data) ? result.data : []);
 
-                // 이미지 경로 변환
+                // 이미지 경로 전체 URL로 변환
                 instructorData = instructorData.map((instructor: Instructor) => ({
                     ...instructor,
-                    imageUrl: instructor.imageUrl.includes('강사소개')
-                        ? instructor.imageUrl.replace('강사소개', 'instructor')
-                        : instructor.imageUrl
+                    imageUrl: instructor.imageUrl.startsWith('http')
+                        ? instructor.imageUrl
+                        : `https://api.nallijaku.com${instructor.imageUrl}`
                 }));
 
                 console.log('📍 변환된 강사 데이터:', instructorData);
@@ -273,11 +273,15 @@ export default function InstructorPage() {
 
                         <div style={{ display: 'flex', gap: '24px', marginBottom: '32px' }}>
                             <img
-                                src={selectedInstructor.imageUrl.includes('강사소개')
-                                    ? selectedInstructor.imageUrl.replace('강사소개', 'instructor')
-                                    : selectedInstructor.imageUrl}
+                                src={selectedInstructor.imageUrl.startsWith('http')
+                                    ? selectedInstructor.imageUrl
+                                    : `https://api.nallijaku.com${selectedInstructor.imageUrl}`}
                                 alt={selectedInstructor.name}
                                 style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover' }}
+                                onError={(e) => {
+                                    console.error('이미지 로드 실패:', selectedInstructor.imageUrl);
+                                    (e.target as HTMLImageElement).src = '/placeholder.png';
+                                }}
                             />
                             <div>
                                 <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#04AD74', fontWeight: '600' }}>{selectedInstructor.region}</p>
