@@ -10,10 +10,11 @@ interface Instructor {
   region: string;
   subtitle: string;
   imageUrl: string;
-  education?: string;
-  certificates?: string;
-  experience?: string;
-  awards?: string;
+  profileDescription?: string;
+  education?: string | Array<{ school: string; major: string; degree: string; graduationYear: number }>;
+  certificates?: string | Array<{ name: string; issuer: string; issueDate: string }>;
+  experience?: string | Array<{ company: string; position: string; startDate: string; endDate: string; description: string }>;
+  awards?: string | Array<{ name: string; issuer: string; awardDate: string; description: string }>;
 }
 
 export default function InstructorsManagementPage() {
@@ -27,10 +28,10 @@ export default function InstructorsManagementPage() {
     subtitle: '',
     imageUrl: '',
     profileDescription: '',
-    education: '',
-    certificates: '',
-    experience: '',
-    awards: ''
+    education: [] as Array<{ school: string; major: string; degree: string; graduationYear: number }>,
+    certificates: [] as Array<{ name: string; issuer: string; issueDate: string }>,
+    experience: [] as Array<{ company: string; position: string; startDate: string; endDate: string; description: string }>,
+    awards: [] as Array<{ name: string; issuer: string; awardDate: string; description: string }>
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -45,6 +46,17 @@ export default function InstructorsManagementPage() {
       if (response.ok) {
         const result = await response.json();
         const data = Array.isArray(result) ? result : (Array.isArray(result.data) ? result.data : []);
+        console.log('📥 로드된 강사 목록:', data);
+        data.forEach((instructor: Instructor, idx: number) => {
+          console.log(`강사 ${idx + 1}:`, {
+            name: instructor.name,
+            profileDescription: instructor.profileDescription,
+            education: instructor.education,
+            certificates: instructor.certificates,
+            experience: instructor.experience,
+            awards: instructor.awards
+          });
+        });
         setInstructors(data);
       }
     } catch (error) {
@@ -69,17 +81,22 @@ export default function InstructorsManagementPage() {
   };
 
   const handleEditClick = (instructor: Instructor) => {
+    console.log('수정할 강사 데이터:', instructor);
+
     setEditingInstructor(instructor);
+    const profileDesc = (instructor as Instructor & { profileDescription?: string }).profileDescription || '';
+    console.log('로드된 소개말:', profileDesc);
+
     setFormData({
       name: instructor.name,
       region: instructor.region,
       subtitle: instructor.subtitle,
       imageUrl: instructor.imageUrl,
-      profileDescription: (instructor as Instructor & { profileDescription?: string }).profileDescription || '',
-      education: instructor.education || '',
-      certificates: instructor.certificates || '',
-      experience: instructor.experience || '',
-      awards: instructor.awards || ''
+      profileDescription: profileDesc,
+      education: (Array.isArray(instructor.education) ? instructor.education : []) as Array<{ school: string; major: string; degree: string; graduationYear: number }>,
+      certificates: (Array.isArray(instructor.certificates) ? instructor.certificates : []) as Array<{ name: string; issuer: string; issueDate: string }>,
+      experience: (Array.isArray(instructor.experience) ? instructor.experience : []) as Array<{ company: string; position: string; startDate: string; endDate: string; description: string }>,
+      awards: (Array.isArray(instructor.awards) ? instructor.awards : []) as Array<{ name: string; issuer: string; awardDate: string; description: string }>
     });
     setImageFile(null);
     setShowModal(true);
@@ -94,10 +111,10 @@ export default function InstructorsManagementPage() {
       subtitle: '',
       imageUrl: '',
       profileDescription: '',
-      education: '',
-      certificates: '',
-      experience: '',
-      awards: ''
+      education: [],
+      certificates: [],
+      experience: [],
+      awards: []
     });
     setImageFile(null);
   };
@@ -108,8 +125,8 @@ export default function InstructorsManagementPage() {
     }
 
     try {
-      console.log('🗑️ 강사 삭제 요청:', instructor.id);
-      
+      console.log('강사 삭제 요청:', instructor.id);
+
       const response = await fetch(`${API_BASE_URL}/api/instructors/${instructor.id}`, {
         method: 'DELETE'
       });
@@ -118,24 +135,24 @@ export default function InstructorsManagementPage() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ 강사 삭제 성공:', result);
+        console.log('강사 삭제 성공:', result);
         alert('강사가 삭제되었습니다.');
         fetchInstructors();
       } else {
         const errorText = await response.text();
-        console.error('❌ 강사 삭제 실패:', response.status);
-        console.error('📝 에러 응답:', errorText);
+        console.error('강사 삭제 실패:', response.status);
+        console.error('에러 응답:', errorText);
         alert(`강사 삭제에 실패했습니다. (${response.status})`);
       }
     } catch (error) {
-      console.error('❌ 강사 삭제 중 오류:', error);
+      console.error('강사 삭제 중 오류:', error);
       alert('강사 삭제 중 오류가 발생했습니다.');
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       // 신규 등록 시 필수 필드 검증
       if (!editingInstructor && (!formData.name || !formData.region || !formData.subtitle || !imageFile)) {
@@ -148,18 +165,25 @@ export default function InstructorsManagementPage() {
       submitData.append('region', formData.region);
       submitData.append('subtitle', formData.subtitle);
       submitData.append('profileDescription', formData.profileDescription || '');
-      submitData.append('education', formData.education || '');
-      submitData.append('certificates', formData.certificates || '');
-      submitData.append('experience', formData.experience || '');
-      submitData.append('awards', formData.awards || '');
-      
+      // 배열을 JSON 문자열로 변환
+      submitData.append('education', JSON.stringify(formData.education || []));
+      submitData.append('certificates', JSON.stringify(formData.certificates || []));
+      submitData.append('experience', JSON.stringify(formData.experience || []));
+      submitData.append('awards', JSON.stringify(formData.awards || []));
+
       if (imageFile) {
         submitData.append('image', imageFile);
       }
 
+      // FormData 내용 로깅
+      console.log('📋 FormData 내용:');
+      for (const [key, value] of submitData.entries()) {
+        console.log(`  ${key}:`, value);
+      }
+
       const isEditing = !!editingInstructor;
       const method = isEditing ? 'PUT' : 'POST';
-      const url = isEditing 
+      const url = isEditing
         ? `${API_BASE_URL}/api/instructors/${editingInstructor.id}`
         : `${API_BASE_URL}/api/instructors`;
 
@@ -170,13 +194,15 @@ export default function InstructorsManagementPage() {
       console.log('  - 지역:', formData.region);
       console.log('  - 부제목:', formData.subtitle);
       console.log('  - 소개말:', formData.profileDescription || '(없음)');
-      console.log('  - 학력:', formData.education || '(없음)');
-      console.log('  - 자격증:', formData.certificates || '(없음)');
-      console.log('  - 경력:', formData.experience || '(없음)');
-      console.log('  - 수상:', formData.awards || '(없음)');
+      console.log('  - 학력:', JSON.stringify(formData.education));
+      console.log('  - 자격증:', JSON.stringify(formData.certificates));
+      console.log('  - 경력:', JSON.stringify(formData.experience));
+      console.log('  - 수상:', JSON.stringify(formData.awards));
       if (imageFile) {
         console.log('  - 이미지:', imageFile.name, `(${(imageFile.size / 1024).toFixed(2)}KB)`);
       }
+
+      console.log('🚀 요청 전송 중...');
 
       const response = await fetch(url, {
         method,
@@ -184,10 +210,18 @@ export default function InstructorsManagementPage() {
       });
 
       console.log('📊 응답 상태:', response.status, response.statusText);
+      console.log('✅ 응답 수신 완료');
 
       if (response.ok) {
         const result = await response.json();
         console.log(`✅ 강사 ${isEditing ? '수정' : '등록'} 성공:`, result);
+        console.log('📋 전체 응답:', JSON.stringify(result, null, 2));
+        console.log('📋 data 내용:', JSON.stringify(result.data, null, 2));
+        console.log('📝 profileDescription:', result.data?.profileDescription);
+        console.log('🎓 education:', result.data?.education);
+        console.log('📜 certificates:', result.data?.certificates);
+        console.log('💼 experience:', result.data?.experience);
+        console.log('🏆 awards:', result.data?.awards);
         alert(`강사가 ${isEditing ? '수정' : '등록'}되었습니다.`);
         handleCloseModal();
         fetchInstructors();
@@ -209,7 +243,7 @@ export default function InstructorsManagementPage() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>강사 관리</h1>
-        <button 
+        <button
           onClick={() => setShowModal(true)}
           className={styles.addButton}
         >
@@ -238,7 +272,7 @@ export default function InstructorsManagementPage() {
                   <td>{instructor.region}</td>
                   <td>{instructor.subtitle}</td>
                   <td>
-                    <img 
+                    <img
                       src={instructor.imageUrl.startsWith('http')
                         ? instructor.imageUrl
                         : `https://api.nallijaku.com${instructor.imageUrl}`}
@@ -251,13 +285,13 @@ export default function InstructorsManagementPage() {
                     />
                   </td>
                   <td>
-                    <button 
+                    <button
                       className={styles.editButton}
                       onClick={() => handleEditClick(instructor)}
                     >
                       수정
                     </button>
-                    <button 
+                    <button
                       className={styles.deleteButton}
                       onClick={() => handleDeleteClick(instructor)}
                     >
@@ -277,7 +311,7 @@ export default function InstructorsManagementPage() {
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
               <h2>{editingInstructor ? '강사 수정' : '강사 등록'}</h2>
-              <button 
+              <button
                 onClick={handleCloseModal}
                 className={styles.closeButton}
               >
@@ -382,61 +416,315 @@ export default function InstructorsManagementPage() {
 
               <div className={styles.formGroup}>
                 <label>학력</label>
-                <textarea
-                  name="education"
-                  value={formData.education}
-                  onChange={(e) => setFormData(prev => ({ ...prev, education: e.target.value }))}
-                  placeholder="예: 서울대학교 항공우주공학과 졸업"
-                  rows={2}
-                  style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '8px', fontFamily: 'inherit', fontSize: '14px', resize: 'vertical' }}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {Array.isArray(formData.education) && formData.education.map((edu, idx) => (
+                    <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                        <input
+                          type="text"
+                          value={edu.school}
+                          onChange={(e) => {
+                            const newEducation = [...formData.education];
+                            newEducation[idx].school = e.target.value;
+                            setFormData(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          placeholder="학교명"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                        <input
+                          type="text"
+                          value={edu.major}
+                          onChange={(e) => {
+                            const newEducation = [...formData.education];
+                            newEducation[idx].major = e.target.value;
+                            setFormData(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          placeholder="전공"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                        <input
+                          type="text"
+                          value={edu.degree}
+                          onChange={(e) => {
+                            const newEducation = [...formData.education];
+                            newEducation[idx].degree = e.target.value;
+                            setFormData(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          placeholder="학위"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                        <input
+                          type="number"
+                          value={edu.graduationYear}
+                          onChange={(e) => {
+                            const newEducation = [...formData.education];
+                            newEducation[idx].graduationYear = parseInt(e.target.value) || 0;
+                            setFormData(prev => ({ ...prev, education: newEducation }));
+                          }}
+                          placeholder="졸업년도"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newEducation = formData.education.filter((_, i) => i !== idx);
+                          setFormData(prev => ({ ...prev, education: newEducation }));
+                        }}
+                        style={{ width: '100%', padding: '6px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, education: [...prev.education, { school: '', major: '', degree: '', graduationYear: new Date().getFullYear() }] }))}
+                    style={{ padding: '8px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', alignSelf: 'flex-start' }}
+                  >
+                    + 추가
+                  </button>
+                </div>
               </div>
 
               <div className={styles.formGroup}>
                 <label>자격증</label>
-                <textarea
-                  name="certificates"
-                  value={formData.certificates}
-                  onChange={(e) => setFormData(prev => ({ ...prev, certificates: e.target.value }))}
-                  placeholder="예: 드론조종사 자격증, 항공촬영 전문가"
-                  rows={2}
-                  style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '8px', fontFamily: 'inherit', fontSize: '14px', resize: 'vertical' }}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {Array.isArray(formData.certificates) && formData.certificates.map((cert, idx) => (
+                    <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                        <input
+                          type="text"
+                          value={cert.name}
+                          onChange={(e) => {
+                            const newCerts = [...formData.certificates];
+                            newCerts[idx].name = e.target.value;
+                            setFormData(prev => ({ ...prev, certificates: newCerts }));
+                          }}
+                          placeholder="자격증명"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                        <input
+                          type="text"
+                          value={cert.issuer}
+                          onChange={(e) => {
+                            const newCerts = [...formData.certificates];
+                            newCerts[idx].issuer = e.target.value;
+                            setFormData(prev => ({ ...prev, certificates: newCerts }));
+                          }}
+                          placeholder="발급기관"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                      </div>
+                      <div style={{ marginBottom: '8px' }}>
+                        <input
+                          type="date"
+                          value={cert.issueDate}
+                          onChange={(e) => {
+                            const newCerts = [...formData.certificates];
+                            newCerts[idx].issueDate = e.target.value;
+                            setFormData(prev => ({ ...prev, certificates: newCerts }));
+                          }}
+                          style={{ width: '100%', padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newCerts = formData.certificates.filter((_, i) => i !== idx);
+                          setFormData(prev => ({ ...prev, certificates: newCerts }));
+                        }}
+                        style={{ width: '100%', padding: '6px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, certificates: [...prev.certificates, { name: '', issuer: '', issueDate: '' }] }))}
+                    style={{ padding: '8px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', alignSelf: 'flex-start' }}
+                  >
+                    + 추가
+                  </button>
+                </div>
               </div>
 
               <div className={styles.formGroup}>
                 <label>경력</label>
-                <textarea
-                  name="experience"
-                  value={formData.experience}
-                  onChange={(e) => setFormData(prev => ({ ...prev, experience: e.target.value }))}
-                  placeholder="예: 드론 교육 10년, 항공촬영 전문가"
-                  rows={2}
-                  style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '8px', fontFamily: 'inherit', fontSize: '14px', resize: 'vertical' }}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {Array.isArray(formData.experience) && formData.experience.map((exp, idx) => (
+                    <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                        <input
+                          type="text"
+                          value={exp.company}
+                          onChange={(e) => {
+                            const newExp = [...formData.experience];
+                            newExp[idx].company = e.target.value;
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                          }}
+                          placeholder="회사명"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                        <input
+                          type="text"
+                          value={exp.position}
+                          onChange={(e) => {
+                            const newExp = [...formData.experience];
+                            newExp[idx].position = e.target.value;
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                          }}
+                          placeholder="직책"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                        <input
+                          type="date"
+                          value={exp.startDate}
+                          onChange={(e) => {
+                            const newExp = [...formData.experience];
+                            newExp[idx].startDate = e.target.value;
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                          }}
+                          placeholder="시작일"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                        <input
+                          type="date"
+                          value={exp.endDate}
+                          onChange={(e) => {
+                            const newExp = [...formData.experience];
+                            newExp[idx].endDate = e.target.value;
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                          }}
+                          placeholder="종료일"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                      </div>
+                      <div style={{ marginBottom: '8px' }}>
+                        <textarea
+                          value={exp.description}
+                          onChange={(e) => {
+                            const newExp = [...formData.experience];
+                            newExp[idx].description = e.target.value;
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                          }}
+                          placeholder="경력 설명"
+                          rows={2}
+                          style={{ width: '100%', padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px', fontFamily: 'inherit', resize: 'vertical' }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newExp = formData.experience.filter((_, i) => i !== idx);
+                          setFormData(prev => ({ ...prev, experience: newExp }));
+                        }}
+                        style={{ width: '100%', padding: '6px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, experience: [...prev.experience, { company: '', position: '', startDate: '', endDate: '', description: '' }] }))}
+                    style={{ padding: '8px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', alignSelf: 'flex-start' }}
+                  >
+                    + 추가
+                  </button>
+                </div>
               </div>
 
               <div className={styles.formGroup}>
                 <label>수상</label>
-                <textarea
-                  name="awards"
-                  value={formData.awards}
-                  onChange={(e) => setFormData(prev => ({ ...prev, awards: e.target.value }))}
-                  placeholder="예: 2023년 드론 교육 우수상, 2022년 혁신 강사상"
-                  rows={2}
-                  style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '8px', fontFamily: 'inherit', fontSize: '14px', resize: 'vertical' }}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {Array.isArray(formData.awards) && formData.awards.map((award, idx) => (
+                    <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                        <input
+                          type="text"
+                          value={award.name}
+                          onChange={(e) => {
+                            const newAwards = [...formData.awards];
+                            newAwards[idx].name = e.target.value;
+                            setFormData(prev => ({ ...prev, awards: newAwards }));
+                          }}
+                          placeholder="수상명"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                        <input
+                          type="text"
+                          value={award.issuer}
+                          onChange={(e) => {
+                            const newAwards = [...formData.awards];
+                            newAwards[idx].issuer = e.target.value;
+                            setFormData(prev => ({ ...prev, awards: newAwards }));
+                          }}
+                          placeholder="수여기관"
+                          style={{ padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                      </div>
+                      <div style={{ marginBottom: '8px' }}>
+                        <input
+                          type="date"
+                          value={award.awardDate}
+                          onChange={(e) => {
+                            const newAwards = [...formData.awards];
+                            newAwards[idx].awardDate = e.target.value;
+                            setFormData(prev => ({ ...prev, awards: newAwards }));
+                          }}
+                          style={{ width: '100%', padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px' }}
+                        />
+                      </div>
+                      <div style={{ marginBottom: '8px' }}>
+                        <textarea
+                          value={award.description}
+                          onChange={(e) => {
+                            const newAwards = [...formData.awards];
+                            newAwards[idx].description = e.target.value;
+                            setFormData(prev => ({ ...prev, awards: newAwards }));
+                          }}
+                          placeholder="수상 설명"
+                          rows={2}
+                          style={{ width: '100%', padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px', fontFamily: 'inherit', resize: 'vertical' }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newAwards = formData.awards.filter((_, i) => i !== idx);
+                          setFormData(prev => ({ ...prev, awards: newAwards }));
+                        }}
+                        style={{ width: '100%', padding: '6px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, awards: [...prev.awards, { name: '', issuer: '', awardDate: '', description: '' }] }))}
+                    style={{ padding: '8px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', alignSelf: 'flex-start' }}
+                  >
+                    + 추가
+                  </button>
+                </div>
               </div>
 
               <div className={styles.formActions}>
-                <button 
+                <button
                   type="button"
                   onClick={handleCloseModal}
                   className={styles.cancelButton}
                 >
                   취소
                 </button>
-                <button 
+                <button
                   type="submit"
                   className={styles.submitButton}
                 >

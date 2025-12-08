@@ -303,9 +303,15 @@ export default function InstructorPage() {
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                         {selectedInstructor.education.map((edu, idx) => (
                                             <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{edu.school}</p>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{edu.major} ({edu.degree})</p>
-                                                <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{edu.graduationYear}년</p>
+                                                {typeof edu === 'string' ? (
+                                                    <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{edu}</p>
+                                                ) : (
+                                                    <>
+                                                        <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{edu.school}</p>
+                                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{edu.major} ({edu.degree})</p>
+                                                        <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{edu.graduationYear}년</p>
+                                                    </>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -321,9 +327,15 @@ export default function InstructorPage() {
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                         {selectedInstructor.certificates.map((cert, idx) => (
                                             <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{cert.name}</p>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{cert.issuer}</p>
-                                                <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{cert.issueDate}</p>
+                                                {typeof cert === 'string' ? (
+                                                    <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{cert}</p>
+                                                ) : (
+                                                    <>
+                                                        <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{cert.name}</p>
+                                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{cert.issuer}</p>
+                                                        <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{cert.issueDate}</p>
+                                                    </>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -339,10 +351,16 @@ export default function InstructorPage() {
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                         {selectedInstructor.experience.map((exp, idx) => (
                                             <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{exp.company}</p>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{exp.position}</p>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>{exp.startDate} ~ {exp.endDate}</p>
-                                                <p style={{ margin: 0, fontSize: '13px', color: '#565D6D' }}>{exp.description}</p>
+                                                {typeof exp === 'string' ? (
+                                                    <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{exp}</p>
+                                                ) : (
+                                                    <>
+                                                        <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{exp.company}</p>
+                                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{exp.position}</p>
+                                                        <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>{exp.startDate} ~ {exp.endDate}</p>
+                                                        <p style={{ margin: 0, fontSize: '13px', color: '#565D6D' }}>{exp.description}</p>
+                                                    </>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -358,10 +376,16 @@ export default function InstructorPage() {
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                         {selectedInstructor.awards.map((award, idx) => (
                                             <div key={idx} style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{award.name}</p>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{award.issuer}</p>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>{award.awardDate}</p>
-                                                <p style={{ margin: 0, fontSize: '13px', color: '#565D6D' }}>{award.description}</p>
+                                                {typeof award === 'string' ? (
+                                                    <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{award}</p>
+                                                ) : (
+                                                    <>
+                                                        <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{award.name}</p>
+                                                        <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#565D6D' }}>{award.issuer}</p>
+                                                        <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>{award.awardDate}</p>
+                                                        <p style={{ margin: 0, fontSize: '13px', color: '#565D6D' }}>{award.description}</p>
+                                                    </>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
