@@ -153,7 +153,11 @@ const UsersPage = () => {
                   <td>{user.username}</td>
                   <td>{user.email}</td>
                   <td>{user.organization}</td>
-                  <td><span className={`${styles.role} ${styles[user.role.toLowerCase()]}`}>{user.role}</span></td>
+                  <td>
+                    <span className={`${styles.role} ${styles[user.role?.toLowerCase() || 'user']}`}>
+                      {user.role || 'USER'}
+                    </span>
+                  </td>
                   <td>{user.phone}</td>
                   <td>{user.droneExperience ? '있음' : '없음'}</td>
                   <td>{new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
