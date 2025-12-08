@@ -1,7 +1,7 @@
 // API 기본 URL - 환경에 따라 다름
 // 개발: 프록시 사용 (CORS 우회)
 // 프로덕션: 직접 호출
-export const API_BASE_URL = process.env.NODE_ENV === 'development' ? '' : 'https://api.nallijaku.com/';
+export const API_BASE_URL = process.env.NODE_ENV === 'development' ? '' : 'https://api.nallijaku.com';
 
 // API 설정 로그 출력
 console.log('🔧 API 설정 정보:');

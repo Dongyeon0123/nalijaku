@@ -29,7 +29,7 @@ const UsersPage = () => {
         
         // 먼저 사용자 목록 API 시도
         try {
-          const usersUrl = `${API_BASE_URL}${API_ENDPOINTS.SYSTEM.USERS}`.replace(/\/+/g, '/');
+          const usersUrl = API_BASE_URL ? `${API_BASE_URL}${API_ENDPOINTS.SYSTEM.USERS}` : API_ENDPOINTS.SYSTEM.USERS;
           console.log('사용자 목록 API URL:', usersUrl);
           const response = await fetch(usersUrl);
           console.log('사용자 목록 API 응답 상태:', response.status);
@@ -56,7 +56,7 @@ const UsersPage = () => {
         
         // 사용자 목록 API가 실패하면 사용자 수 API로 폴백
         console.log('사용자 목록 API 실패, 사용자 수 API로 폴백 시도');
-        const countUrl = `${API_BASE_URL}${API_ENDPOINTS.SYSTEM.USER_COUNT}`.replace(/\/+/g, '/');
+        const countUrl = API_BASE_URL ? `${API_BASE_URL}${API_ENDPOINTS.SYSTEM.USER_COUNT}` : API_ENDPOINTS.SYSTEM.USER_COUNT;
         console.log('사용자 수 API URL:', countUrl);
         const countResponse = await fetch(countUrl);
         console.log('사용자 수 API 응답 상태:', countResponse.status);
