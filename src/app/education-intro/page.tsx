@@ -81,11 +81,84 @@ function EducationIntroContent() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 여기에 폼 제출 로직을 추가할 수 있습니다
-    console.log('교육 도입 신청:', formData);
-    alert('교육 도입 신청이 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
+    
+    if (!formData.privacyAgreement) {
+      alert('개인정보 수집 및 이용에 동의해주세요.');
+      return;
+    }
+
+    try {
+      const payload = {
+        schoolName: formData.schoolName,
+        contactPerson: formData.contactPerson,
+        phone: formData.phone,
+        email: formData.email,
+        studentCount: parseInt(formData.studentCount),
+        budget: formData.budget,
+        educationRegion: formData.educationRegion,
+        grade: formData.grade,
+        preferredDate: formData.preferredDate,
+        additionalInfo: formData.inquiryMessage,
+        services: [
+          formData.purchaseInquiry && 'purchaseInquiry',
+          formData.schoolVisit && 'schoolVisit',
+          formData.careerExperience && 'careerExperience',
+          formData.boothEntrustment && 'boothEntrustment',
+          formData.other && (formData.otherText || 'other')
+        ].filter(Boolean),
+        selectedCourses: cartItems.map(item => ({
+          id: item.id,
+          title: item.title,
+          instructor: item.instructor,
+          category: item.category
+        }))
+      };
+
+      const response = await fetch('/api/education-inquiries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('교육 도입 신청 성공:', result);
+        alert('교육 도입 신청이 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
+        // 폼 초기화
+        setFormData({
+          schoolName: '',
+          contactPerson: '',
+          phone: '',
+          email: '',
+          studentCount: '',
+          budget: '',
+          educationRegion: '',
+          grade: '',
+          preferredDate: '',
+          message: '',
+          inquiryMessage: '',
+          purchaseInquiry: false,
+          schoolVisit: false,
+          careerExperience: false,
+          boothEntrustment: false,
+          other: false,
+          otherText: '',
+          privacyAgreement: false
+        });
+        setCartItems([]);
+      } else {
+        const errorText = await response.text();
+        console.error('신청 실패:', response.status, errorText);
+        alert('신청 중 오류가 발생했습니다. 백엔드 서버를 확인해주세요.');
+      }
+    } catch (error) {
+      console.error('교육 도입 신청 오류:', error);
+      alert('신청 중 오류가 발생했습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
+    }
   };
 
   return (

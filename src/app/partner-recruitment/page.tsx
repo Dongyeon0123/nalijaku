@@ -49,29 +49,78 @@ export default function EducationIntroPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.privacyAgreement) {
+      alert('개인정보 수집 및 이용에 동의해주세요.');
+      return;
+    }
+
     try {
-      // 실제로는 API 호출을 하여 데이터를 서버로 전송
+      // Next.js 프록시를 통해 백엔드 API 호출
       const response = await fetch('/api/partner-applications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
-          submittedAt: new Date().toISOString(),
-          status: 'pending'
+          contactPerson: formData.contactPerson,
+          phone: formData.phone,
+          email: formData.email,
+          location: formData.location,
+          experience: formData.experience,
+          practicalCert: formData.practicalCert,
+          class1Cert: formData.class1Cert,
+          class2Cert: formData.class2Cert,
+          class3Cert: formData.class3Cert,
+          instructorCert: formData.instructorCert,
+          other: formData.other,
+          otherText: formData.otherText
         }),
       });
 
       if (response.ok) {
-        console.log('파트너 모집 신청 데이터:', formData);
+        const result = await response.json();
+        console.log('파트너 모집 신청 성공:', result);
         alert('파트너 모집 신청이 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
+        
+        // 폼 초기화
+        setFormData({
+          schoolName: '',
+          contactPerson: '',
+          phone: '',
+          email: '',
+          location: '',
+          experience: '',
+          practicalCert: false,
+          class1Cert: false,
+          class2Cert: false,
+          class3Cert: false,
+          instructorCert: false,
+          other: false,
+          otherText: '',
+          privacyAgreement: false
+        });
       } else {
-        throw new Error('신청 처리 중 오류가 발생했습니다.');
+        const errorText = await response.text();
+        console.error('신청 실패:', response.status, errorText);
+        console.error('전송한 데이터:', {
+          contactPerson: formData.contactPerson,
+          phone: formData.phone,
+          email: formData.email,
+          location: formData.location,
+          experience: formData.experience,
+          practicalCert: formData.practicalCert,
+          class1Cert: formData.class1Cert,
+          class2Cert: formData.class2Cert,
+          class3Cert: formData.class3Cert,
+          instructorCert: formData.instructorCert,
+          other: formData.other,
+          otherText: formData.otherText
+        });
+        alert(`신청 처리 중 오류가 발생했습니다.\n\n백엔드 에러: ${errorText}\n\n백엔드 개발자에게 문의해주세요.`);
       }
     } catch (error) {
       console.error('Error submitting application:', error);
-      alert('신청 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+      alert('신청 처리 중 오류가 발생했습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
     }
   };
 
