@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
 import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
@@ -52,7 +52,7 @@ interface PartnerApplication {
   updatedAt?: string;
 }
 
-export default function ContentManagementPage() {
+function ContentManagementPageContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab') as 'education' | 'partner' | null;
   const [activeTab, setActiveTab] = useState<'education' | 'partner'>(tabParam || 'education');
@@ -520,5 +520,26 @@ export default function ContentManagementPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ContentManagementPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <div style={{ 
+          width: '40px', 
+          height: '40px', 
+          border: '4px solid #e5e7eb', 
+          borderTop: '4px solid #04AD74', 
+          borderRadius: '50%', 
+          animation: 'spin 1s linear infinite',
+          margin: '0 auto 1rem'
+        }}></div>
+        <p>로딩 중...</p>
+      </div>
+    }>
+      <ContentManagementPageContent />
+    </Suspense>
   );
 }
