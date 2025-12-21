@@ -4,7 +4,6 @@ import React from 'react';
 import Image from 'next/image';
 import { IoHomeOutline, IoBusinessOutline, IoPeopleOutline, IoCallOutline, IoMenuOutline, IoBookOutline ,IoHelpOutline, IoHeartOutline, IoNewspaperOutline, IoPersonOutline } from 'react-icons/io5';
 import styles from '@/styles/SidebarNav.module.css';
-import { checkAdminStatus } from '@/services/authService';
 
 export default function SidebarNav() {
   const [activeSection, setActiveSection] = React.useState('home');
@@ -79,20 +78,24 @@ export default function SidebarNav() {
 
   // 관리자 상태 확인
   React.useEffect(() => {
-    const savedUserInfo = localStorage.getItem('userInfo');
-    if (savedUserInfo) {
+    const savedUser = localStorage.getItem('user') || localStorage.getItem('userInfo');
+    if (savedUser) {
       try {
-        const userData = JSON.parse(savedUserInfo);
-        if (userData.username) {
-          checkAdminStatus(userData.username)
-            .then(adminResult => {
-              setIsAdmin(adminResult.data.isAdmin);
-            })
-            .catch(error => {
-              console.log('관리자 권한 확인 실패:', error);
-              setIsAdmin(false);
-            });
+        const userData = JSON.parse(savedUser);
+        // user 객체에서 직접 role 확인
+        if (userData.role === 'ADMIN') {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
         }
+      } catch (error) {
+        console.log('사용자 정보 파싱 실패:', error);
+        setIsAdmin(false);
+      }
+    } else {
+      setIsAdmin(false);
+    }
+  }, []);
       } catch (error) {
         console.error('사용자 정보 파싱 오류:', error);
       }
