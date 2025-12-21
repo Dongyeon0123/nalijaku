@@ -20,6 +20,8 @@ const UsersPage = () => {
   const [userCount, setUserCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -162,7 +164,15 @@ const UsersPage = () => {
                   <td>{user.droneExperience ? '있음' : '없음'}</td>
                   <td>{new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
                   <td>
-                    <button className={styles.manageButton}>관리</button>
+                    <button 
+                      className={styles.manageButton}
+                      onClick={() => {
+                        setSelectedUser(user);
+                        setShowModal(true);
+                      }}
+                    >
+                      관리
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -170,6 +180,66 @@ const UsersPage = () => {
           </table>
         )}
       </div>
+
+      {/* 사용자 관리 모달 */}
+      {showModal && selectedUser && (
+        <div className={styles.modal} onClick={() => setShowModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>사용자 정보</h2>
+              <button className={styles.closeButton} onClick={() => setShowModal(false)}>×</button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.detailGrid}>
+                <div className={styles.detailItem}>
+                  <label>사용자명:</label>
+                  <span>{selectedUser.username}</span>
+                </div>
+                <div className={styles.detailItem}>
+                  <label>이메일:</label>
+                  <span>{selectedUser.email}</span>
+                </div>
+                <div className={styles.detailItem}>
+                  <label>조직:</label>
+                  <span>{selectedUser.organization || '-'}</span>
+                </div>
+                <div className={styles.detailItem}>
+                  <label>전화번호:</label>
+                  <span>{selectedUser.phone || '-'}</span>
+                </div>
+                <div className={styles.detailItem}>
+                  <label>역할:</label>
+                  <span className={`${styles.roleBadge} ${styles[selectedUser.role?.toLowerCase() || 'general']}`}>
+                    {selectedUser.role || 'GENERAL'}
+                  </span>
+                </div>
+                <div className={styles.detailItem}>
+                  <label>드론 경험:</label>
+                  <span>{selectedUser.droneExperience ? '있음' : '없음'}</span>
+                </div>
+                <div className={styles.detailItem}>
+                  <label>가입일:</label>
+                  <span>{new Date(selectedUser.createdAt).toLocaleDateString('ko-KR')}</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button className={styles.deleteButton} onClick={() => {
+                if (confirm('정말 이 사용자를 삭제하시겠습니까?')) {
+                  // TODO: 삭제 API 호출
+                  alert('삭제 기능은 백엔드 API 구현 후 사용 가능합니다.');
+                  setShowModal(false);
+                }
+              }}>
+                삭제
+              </button>
+              <button className={styles.closeModalButton} onClick={() => setShowModal(false)}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
