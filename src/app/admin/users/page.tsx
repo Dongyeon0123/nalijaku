@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
-import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
+import api from '@/lib/axios';
 
 interface User {
   id: number;
@@ -31,56 +31,42 @@ const UsersPage = () => {
         
         // 먼저 사용자 목록 API 시도
         try {
-          const usersUrl = API_BASE_URL ? `${API_BASE_URL}${API_ENDPOINTS.SYSTEM.USERS}` : API_ENDPOINTS.SYSTEM.USERS;
-          console.log('사용자 목록 API URL:', usersUrl);
-          const response = await fetch(usersUrl);
-          console.log('사용자 목록 API 응답 상태:', response.status);
+          console.log('사용자 목록 API URL:', '/api/users');
+          const response = await api.get('/api/users');
+          console.log('사용자 목록 API 응답:', response.data);
           
-          if (response.ok) {
-            const data = await response.json();
-            console.log('사용자 목록 API 응답 데이터:', data);
-            
-            if (data.success && data.data) {
-              setUsers(data.data);
-              setUserCount(data.count || data.data.length);
-            } else if (Array.isArray(data)) {
-              setUsers(data);
-              setUserCount(data.length);
-            } else {
-              setUsers([]);
-              setUserCount(0);
-            }
-            return;
+          const data = response.data;
+          if (data.success && data.data) {
+            setUsers(data.data);
+            setUserCount(data.count || data.data.length);
+          } else if (Array.isArray(data)) {
+            setUsers(data);
+            setUserCount(data.length);
+          } else {
+            setUsers([]);
+            setUserCount(0);
           }
-        } catch (listError) {
+          return;
+        } catch (listError: any) {
           console.log('사용자 목록 API 실패, 사용자 수 API로 폴백:', listError);
         }
         
         // 사용자 목록 API가 실패하면 사용자 수 API로 폴백
         console.log('사용자 목록 API 실패, 사용자 수 API로 폴백 시도');
-        const countUrl = API_BASE_URL ? `${API_BASE_URL}${API_ENDPOINTS.SYSTEM.USER_COUNT}` : API_ENDPOINTS.SYSTEM.USER_COUNT;
-        console.log('사용자 수 API URL:', countUrl);
-        const countResponse = await fetch(countUrl);
-        console.log('사용자 수 API 응답 상태:', countResponse.status);
+        console.log('사용자 수 API URL:', '/api/users/count');
+        const countResponse = await api.get('/api/users/count');
+        console.log('사용자 수 API 응답:', countResponse.data);
         
-        if (!countResponse.ok) {
-          throw new Error(`사용자 정보를 불러올 수 없습니다: ${countResponse.status}`);
-        }
-        
-        const countData = await countResponse.json();
-        console.log('사용자 수 API 응답 데이터:', countData);
+        const countData = countResponse.data;
         
         // 사용자 수만 있는 경우, 빈 배열로 설정 (임시 데이터 생성하지 않음)
         console.log(`사용자 수 ${countData.count}명 확인됨, 사용자 목록은 빈 배열로 설정`);
         setUserCount(countData.count || 0);
         setUsers([]);
-      } catch (error) {
+      } catch (error: any) {
         console.error('사용자 목록 로드 에러:', error);
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError('사용자 목록을 불러오는 중 오류가 발생했습니다.');
-        }
+        const errorMsg = error.response?.data?.message || error.message || '사용자 정보를 불러올 수 없습니다';
+        setError(errorMsg);
       } finally {
         setLoading(false);
       }
@@ -161,7 +147,11 @@ const UsersPage = () => {
                     </span>
                   </td>
                   <td>{user.phone}</td>
-                  <td>{user.droneExperience ? '있음' : '없음'}</td>
+                  <td>
+                    <span className={`${styles.experienceBadge} ${user.droneExperience ? styles.hasExperience : styles.noExperience}`}>
+                      {user.droneExperience ? '있음' : '없음'}
+                    </span>
+                  </td>
                   <td>{new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
                   <td>
                     <button 
@@ -215,7 +205,9 @@ const UsersPage = () => {
                 </div>
                 <div className={styles.detailItem}>
                   <label>드론 경험:</label>
-                  <span>{selectedUser.droneExperience ? '있음' : '없음'}</span>
+                  <span className={`${styles.experienceBadge} ${selectedUser.droneExperience ? styles.hasExperience : styles.noExperience}`}>
+                    {selectedUser.droneExperience ? '있음' : '없음'}
+                  </span>
                 </div>
                 <div className={styles.detailItem}>
                   <label>가입일:</label>

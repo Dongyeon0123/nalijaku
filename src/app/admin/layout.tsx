@@ -16,8 +16,8 @@ export default function AdminLayout({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = () => {
-      const userStr = localStorage.getItem('userInfo');
+    const checkAuth = async () => {
+      const userStr = localStorage.getItem('user') || localStorage.getItem('userInfo');
       
       if (!userStr) {
         alert('로그인이 필요합니다.');
@@ -37,8 +37,8 @@ export default function AdminLayout({
 
         setIsAuthorized(true);
       } catch (error) {
-        console.error('인증 정보 파싱 실패:', error);
-        alert('인증 정보가 올바르지 않습니다.');
+        console.error('인증 정보 확인 실패:', error);
+        alert('인증 정보가 올바르지 않습니다. 다시 로그인해주세요.');
         router.push('/');
       } finally {
         setIsLoading(false);

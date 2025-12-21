@@ -3,7 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
-import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
+import api from '@/lib/axios';
 
 interface EducationApplication {
   id: number;
@@ -68,10 +68,10 @@ function ContentManagementPageContent() {
     try {
       setLoading(true);
 
-      // 교육 도입 신청 데이터 로드
-      const educationResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.EDUCATION.INQUIRY}`);
-      if (educationResponse.ok) {
-        const educationData = await educationResponse.json();
+      // 교육 도입 신청 데이터 로드 (인증 필요)
+      try {
+        const educationResponse = await api.get('/api/education-inquiries');
+        const educationData = educationResponse.data;
         console.log('📚 교육 도입 신청 원본 데이터:', educationData);
         
         // 백엔드 응답 구조 확인
@@ -79,14 +79,17 @@ function ContentManagementPageContent() {
         console.log('📚 파싱된 교육 신청 데이터:', applications);
         
         setEducationApplications(applications);
-      } else {
-        console.error('교육 도입 신청 로드 실패:', educationResponse.status);
+      } catch (error: any) {
+        console.error('교육 도입 신청 로드 실패:', error);
+        if (error.response?.status === 403) {
+          alert('교육 도입 신청 목록을 조회할 권한이 없습니다.');
+        }
       }
 
-      // 파트너 모집 신청 데이터 로드
-      const partnerResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PARTNER.APPLICATION}`);
-      if (partnerResponse.ok) {
-        const partnerData = await partnerResponse.json();
+      // 파트너 모집 신청 데이터 로드 (인증 필요)
+      try {
+        const partnerResponse = await api.get('/api/partner-applications');
+        const partnerData = partnerResponse.data;
         console.log('🤝 파트너 모집 원본 데이터:', partnerData);
         
         // 백엔드 응답 구조 확인
@@ -94,8 +97,11 @@ function ContentManagementPageContent() {
         console.log('🤝 파싱된 파트너 데이터:', applications);
         
         setPartnerApplications(applications);
-      } else {
-        console.error('파트너 모집 신청 로드 실패:', partnerResponse.status);
+      } catch (error: any) {
+        console.error('파트너 모집 신청 로드 실패:', error);
+        if (error.response?.status === 403) {
+          alert('파트너 모집 신청 목록을 조회할 권한이 없습니다.');
+        }
       }
     } catch (error) {
       console.error('Error loading applications:', error);
@@ -112,41 +118,29 @@ function ContentManagementPageContent() {
   const handleStatusChange = async (id: number | string, status: 'completed' | 'in_progress' | 'pending') => {
     try {
       let endpoint: string;
-      let method: string;
 
       if (activeTab === 'education') {
-        // 교육 도입 신청: PUT 사용, query parameter로 status 전달
-        endpoint = `${API_BASE_URL}${API_ENDPOINTS.EDUCATION.INQUIRY}/${id}/status?status=${status}`;
-        method = 'PUT';
+        endpoint = `/api/education-inquiries/${id}/status?status=${status}`;
       } else {
-        // 파트너 신청: PUT 사용, query parameter로 status 전달
-        endpoint = `${API_BASE_URL}${API_ENDPOINTS.PARTNER.APPLICATION}/${id}/status?status=${status}`;
-        method = 'PUT';
+        endpoint = `/api/partner-applications/${id}/status?status=${status}`;
       }
 
-      console.log('🔄 상태 변경 요청:', { id, status, endpoint, method });
+      console.log('🔄 상태 변경 요청:', { id, status, endpoint });
 
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      await api.put(endpoint);
 
-      if (response.ok) {
-        console.log(`✅ Application ${id} status changed to ${status}`);
-        alert('상태가 변경되었습니다.');
-        
-        // 데이터 다시 로드
-        await loadApplications();
-      } else {
-        const errorText = await response.text();
-        console.error('❌ Failed to update status:', errorText);
-        alert('상태 변경에 실패했습니다.');
-      }
-    } catch (error) {
+      console.log(`✅ Application ${id} status changed to ${status}`);
+      alert('상태가 변경되었습니다.');
+      
+      // 데이터 다시 로드
+      await loadApplications();
+    } catch (error: any) {
       console.error('❌ Error updating status:', error);
-      alert('상태 변경 중 오류가 발생했습니다.');
+      if (error.response?.status === 403) {
+        alert('상태를 변경할 권한이 없습니다.');
+      } else {
+        alert('상태 변경 중 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -159,34 +153,27 @@ function ContentManagementPageContent() {
       let endpoint: string;
 
       if (activeTab === 'education') {
-        endpoint = `${API_BASE_URL}${API_ENDPOINTS.EDUCATION.INQUIRY}/${id}`;
+        endpoint = `/api/education-inquiries/${id}`;
       } else {
-        endpoint = `${API_BASE_URL}${API_ENDPOINTS.PARTNER.APPLICATION}/${id}`;
+        endpoint = `/api/partner-applications/${id}`;
       }
 
       console.log('🗑️ 삭제 요청:', { id, endpoint });
 
-      const response = await fetch(endpoint, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      await api.delete(endpoint);
 
-      if (response.ok) {
-        console.log(`✅ Application ${id} deleted`);
-        alert('삭제되었습니다.');
-        
-        // 데이터 다시 로드
-        await loadApplications();
-      } else {
-        const errorText = await response.text();
-        console.error('❌ Failed to delete:', errorText);
-        alert('삭제에 실패했습니다.');
-      }
-    } catch (error) {
+      console.log(`✅ Application ${id} deleted`);
+      alert('삭제되었습니다.');
+      
+      // 데이터 다시 로드
+      await loadApplications();
+    } catch (error: any) {
       console.error('❌ Error deleting:', error);
-      alert('삭제 중 오류가 발생했습니다.');
+      if (error.response?.status === 403) {
+        alert('삭제할 권한이 없습니다.');
+      } else {
+        alert('삭제 중 오류가 발생했습니다.');
+      }
     }
   };
 

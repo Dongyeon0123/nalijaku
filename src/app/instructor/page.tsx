@@ -4,7 +4,7 @@ import React from 'react';
 import Header from '@/components/Header';
 import Image from 'next/image';
 import styles from './page.module.css';
-import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
+import api from '@/lib/axios';
 
 interface Education {
     school: string;
@@ -70,17 +70,15 @@ export default function InstructorPage() {
                 setError(null);
 
                 const endpoint = selectedRegion === '전체'
-                    ? API_ENDPOINTS.INSTRUCTORS.LIST
-                    : API_ENDPOINTS.INSTRUCTORS.BY_REGION(selectedRegion);
+                    ? '/api/instructors'
+                    : `/api/instructors/region/${selectedRegion}`;
 
-                const response = await fetch(`${API_BASE_URL}${endpoint}`);
+                // Axios 사용 (인증 토큰 자동 포함)
+                const response = await api.get(endpoint);
 
-                if (!response.ok) {
-                    throw new Error('강사 정보를 불러올 수 없습니다');
-                }
+                console.log('📚 강사 데이터:', response.data);
 
-                const result = await response.json();
-                console.log('📚 강사 데이터:', result);
+                const result = response.data;
 
                 // result가 배열이거나 result.data가 배열인 경우 처리
                 let instructorData: Instructor[] = Array.isArray(result) ? result : (Array.isArray(result.data) ? result.data : []);
@@ -95,9 +93,14 @@ export default function InstructorPage() {
 
                 console.log('📍 변환된 강사 데이터:', instructorData);
                 setInstructors(instructorData);
-            } catch (err) {
+            } catch (err: any) {
                 console.error('강사 데이터 로드 실패:', err);
-                setError('강사 정보를 불러올 수 없습니다');
+                if (err.response?.status === 401) {
+                    alert('로그인이 필요한 페이지입니다.');
+                    window.location.href = '/';
+                } else {
+                    setError('강사 정보를 불러올 수 없습니다');
+                }
             } finally {
                 setLoading(false);
                 console.log('⏹️ 로딩 완료');
@@ -198,12 +201,10 @@ export default function InstructorPage() {
                                             <button
                                                 onClick={async () => {
                                                     try {
-                                                        const response = await fetch(`${API_BASE_URL}/api/instructors/${instructor.id}`);
-                                                        if (response.ok) {
-                                                            const detailData = await response.json();
-                                                            setSelectedInstructor(detailData);
-                                                            setShowModal(true);
-                                                        }
+                                                        const response = await api.get(`/api/instructors/${instructor.id}`);
+                                                        const detailData = response.data;
+                                                        setSelectedInstructor(detailData);
+                                                        setShowModal(true);
                                                     } catch (err) {
                                                         console.error('강사 상세 정보 로드 실패:', err);
                                                         setSelectedInstructor(instructor);

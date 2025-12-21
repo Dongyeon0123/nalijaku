@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
-import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
+import api from '@/lib/axios';
 
 interface Lesson {
   id: number;
@@ -71,39 +71,39 @@ export default function CoursesPage() {
       setLoading(true);
       console.log('🔄 강좌 목록 새로고침 중...');
 
-      // 백엔드에서 강좌 목록 가져오기
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.LIST}`);
+      // Axios 사용 (인증 토큰 자동 포함)
+      const response = await api.get('/api/resources');
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('✅ 강좌 목록 로드 성공:', result);
+      console.log('✅ 강좌 목록 로드 성공:', response.data);
 
-        if (result.success && result.data) {
-          setCourses(result.data);
+      const result = response.data;
+      if (result.success && result.data) {
+        setCourses(result.data);
 
-          // 각 강좌의 차시 정보 로깅
-          result.data.forEach((course: Course) => {
-            if (course.lessons && course.lessons.length > 0) {
-              console.log(`📚 강좌 "${course.title}" 차시 목록:`, course.lessons);
-              course.lessons.forEach((lesson: Lesson) => {
-                console.log(`  - ${lesson.order}차시:`, {
-                  materials: lesson.materials,
-                  description: lesson.description,
-                  pdfUrl: lesson.pdfUrl || '없음',
-                });
+        // 각 강좌의 차시 정보 로깅
+        result.data.forEach((course: Course) => {
+          if (course.lessons && course.lessons.length > 0) {
+            console.log(`📚 강좌 "${course.title}" 차시 목록:`, course.lessons);
+            course.lessons.forEach((lesson: Lesson) => {
+              console.log(`  - ${lesson.order}차시:`, {
+                materials: lesson.materials,
+                description: lesson.description,
+                pdfUrl: lesson.pdfUrl || '없음',
               });
-            }
-          });
+            });
+          }
+        });
 
-          // 카테고리 추출
-          const categorySet = new Set<string>(result.data.map((c: Course) => c.category));
-          setCategories(Array.from(categorySet).sort());
-        }
-      } else {
-        console.error('❌ 강좌 목록 로드 실패:', response.status, response.statusText);
+        // 카테고리 추출
+        const categorySet = new Set<string>(result.data.map((c: Course) => c.category));
+        setCategories(Array.from(categorySet).sort());
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ 강좌 로드 실패:', error);
+      if (error.response?.status === 401) {
+        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        window.location.href = '/';
+      }
     } finally {
       setLoading(false);
     }
@@ -198,16 +198,10 @@ export default function CoursesPage() {
   const handleDeleteCourse = async (id: number) => {
     if (confirm('정말 삭제하시겠습니까?')) {
       try {
-        // 백엔드에서 강좌 삭제
-        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.DETAIL(id)}`, {
-          method: 'DELETE',
-        });
-        if (response.ok) {
-          setCourses(courses.filter(c => c.id !== id));
-          alert('강좌가 삭제되었습니다.');
-        } else {
-          alert('강좌 삭제에 실패했습니다.');
-        }
+        // Axios 사용 (인증 토큰 자동 포함)
+        await api.delete(`/api/resources/${id}`);
+        setCourses(courses.filter(c => c.id !== id));
+        alert('강좌가 삭제되었습니다.');
       } catch (error) {
         console.error('강좌 삭제 실패:', error);
         alert('강좌 삭제에 실패했습니다.');
@@ -262,14 +256,14 @@ export default function CoursesPage() {
       }
 
       const method = editingLesson ? 'PUT' : 'POST';
-      const endpoint = editingLesson
-        ? API_ENDPOINTS.RESOURCES.LESSONS.DETAIL(courseId, editingLesson.order)
-        : API_ENDPOINTS.RESOURCES.LESSONS.LIST(courseId);
-      const url = `${API_BASE_URL}${endpoint}`;
+      const url = editingLesson
+        ? `/api/resources/${courseId}/lessons/${editingLesson.order}`
+        : `/api/resources/${courseId}/lessons`;
+      const fullUrl = `${process.env.NEXT_PUBLIC_API_URL || 'https://api.nallijaku.com'}${url}`;
 
       console.log('📤 차시 저장 요청:');
       console.log('  - 메서드:', method);
-      console.log('  - URL:', url);
+      console.log('  - URL:', fullUrl);
       console.log('  - 강좌 ID:', courseId);
       console.log('  - 편집 모드:', editingLesson ? '수정' : '신규');
 
@@ -345,8 +339,15 @@ export default function CoursesPage() {
         setUploadProgress(0);
       });
 
-      xhr.open(method, url);
+      xhr.open(method, fullUrl);
       xhr.setRequestHeader('Accept', 'application/json');
+      
+      // 인증 토큰 추가
+      const accessToken = localStorage.getItem('accessToken');
+      if (accessToken) {
+        xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+      }
+      
       xhr.withCredentials = true;
       xhr.send(formData);
     } catch (error) {
@@ -362,23 +363,14 @@ export default function CoursesPage() {
   const handleDeleteLesson = async (courseId: number, order: number) => {
     if (confirm('정말 삭제하시겠습니까?')) {
       try {
-        const endpoint = API_ENDPOINTS.RESOURCES.LESSONS.DETAIL(courseId, order);
-        const url = `${API_BASE_URL}${endpoint}`;
-
-        const response = await fetch(url, {
-          method: 'DELETE',
-        });
-
-        if (response.ok) {
-          alert('차시가 삭제되었습니다.');
-          loadCourses();
-        } else {
-          const errorData = await response.json();
-          alert(`차시 삭제에 실패했습니다: ${errorData.message || '알 수 없는 오류'}`);
-        }
-      } catch (error) {
+        // Axios 사용 (인증 토큰 자동 포함)
+        await api.delete(`/api/resources/${courseId}/lessons/${order}`);
+        alert('차시가 삭제되었습니다.');
+        loadCourses();
+      } catch (error: any) {
         console.error('차시 삭제 실패:', error);
-        alert('차시 삭제 중 오류가 발생했습니다: ' + (error instanceof Error ? error.message : '알 수 없는 오류'));
+        const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
+        alert(`차시 삭제 중 오류가 발생했습니다: ${errorMsg}`);
       }
     }
   };
@@ -395,19 +387,13 @@ export default function CoursesPage() {
         const uploadFormData = new FormData();
         uploadFormData.append('file', imageFile);
 
-        const uploadResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.UPLOAD_IMAGE}`, {
-          method: 'POST',
-          body: uploadFormData,
+        // Axios 사용 (인증 토큰 자동 포함)
+        const uploadResponse = await api.post('/api/resources/upload-image', uploadFormData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
         });
 
-        if (uploadResponse.ok) {
-          const uploadResult = await uploadResponse.json();
-          imageUrl = uploadResult.filePath || uploadResult.data?.filePath || uploadResult.url || uploadResult.data?.url;
-        } else {
-          alert('이미지 업로드에 실패했습니다.');
-          setUploading(false);
-          return;
-        }
+        const uploadResult = uploadResponse.data;
+        imageUrl = uploadResult.filePath || uploadResult.data?.filePath || uploadResult.url || uploadResult.data?.url;
       } else if (!imageUrl && editingCourse) {
         // 수정할 때 이미지가 없으면 기존 이미지 유지
         imageUrl = editingCourse.image;
@@ -435,49 +421,28 @@ export default function CoursesPage() {
       console.log('📤 요청 데이터:', requestData);
 
       if (editingCourse) {
-        // 수정
-        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.DETAIL(editingCourse.id)}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestData),
-        });
-
-        const responseData = await response.json();
-        console.log('API 응답:', responseData);
-
-        if (response.ok) {
-          alert('강좌가 수정되었습니다.');
-          loadCourses();
-          setShowModal(false);
-          setImageFile(null);
-          setImagePreview('');
-        } else {
-          alert(`강좌 수정에 실패했습니다: ${responseData.message || responseData.error || '알 수 없는 오류'}`);
-        }
+        // 수정 - Axios 사용
+        const response = await api.put(`/api/resources/${editingCourse.id}`, requestData);
+        console.log('API 응답:', response.data);
+        alert('강좌가 수정되었습니다.');
+        loadCourses();
+        setShowModal(false);
+        setImageFile(null);
+        setImagePreview('');
       } else {
-        // 추가
-        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.RESOURCES.LIST}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestData),
-        });
-
-        const responseData = await response.json();
-        console.log('API 응답:', responseData);
-
-        if (response.ok) {
-          alert('강좌가 추가되었습니다.');
-          loadCourses();
-          setShowModal(false);
-          setImageFile(null);
-          setImagePreview('');
-        } else {
-          alert(`강좌 추가에 실패했습니다: ${responseData.message || responseData.error || '알 수 없는 오류'}`);
-        }
+        // 추가 - Axios 사용
+        const response = await api.post('/api/resources', requestData);
+        console.log('API 응답:', response.data);
+        alert('강좌가 추가되었습니다.');
+        loadCourses();
+        setShowModal(false);
+        setImageFile(null);
+        setImagePreview('');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('강좌 저장 실패:', error);
-      alert('강좌 저장에 실패했습니다: ' + (error instanceof Error ? error.message : '알 수 없는 오류'));
+      const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message || '알 수 없는 오류';
+      alert(`강좌 저장에 실패했습니다: ${errorMsg}`);
     } finally {
       setUploading(false);
     }
@@ -699,7 +664,7 @@ export default function CoursesPage() {
                 {imagePreview && (
                   <div style={{ marginBottom: '10px' }}>
                     <img
-                      src={imagePreview.startsWith('data:') ? imagePreview : `${API_BASE_URL}${imagePreview}`}
+                      src={imagePreview.startsWith('data:') ? imagePreview : (imagePreview.startsWith('http') ? imagePreview : `https://api.nallijaku.com${imagePreview}`)}
                       alt="미리보기"
                       style={{
                         maxWidth: '200px',

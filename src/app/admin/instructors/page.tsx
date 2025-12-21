@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
-import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
+import api from '@/lib/axios';
 
 interface Instructor {
   id: number;
@@ -42,23 +42,22 @@ export default function InstructorsManagementPage() {
   const fetchInstructors = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.INSTRUCTORS.LIST}`);
-      if (response.ok) {
-        const result = await response.json();
-        const data = Array.isArray(result) ? result : (Array.isArray(result.data) ? result.data : []);
-        console.log('📥 로드된 강사 목록:', data);
-        data.forEach((instructor: Instructor, idx: number) => {
-          console.log(`강사 ${idx + 1}:`, {
-            name: instructor.name,
-            profileDescription: instructor.profileDescription,
-            education: instructor.education,
-            certificates: instructor.certificates,
-            experience: instructor.experience,
-            awards: instructor.awards
-          });
+      // Axios 사용 (인증 토큰 자동 포함)
+      const response = await api.get('/api/instructors');
+      const result = response.data;
+      const data = Array.isArray(result) ? result : (Array.isArray(result.data) ? result.data : []);
+      console.log('📥 로드된 강사 목록:', data);
+      data.forEach((instructor: Instructor, idx: number) => {
+        console.log(`강사 ${idx + 1}:`, {
+          name: instructor.name,
+          profileDescription: instructor.profileDescription,
+          education: instructor.education,
+          certificates: instructor.certificates,
+          experience: instructor.experience,
+          awards: instructor.awards
         });
-        setInstructors(data);
-      }
+      });
+      setInstructors(data);
     } catch (error) {
       console.error('강사 목록 로드 실패:', error);
     } finally {
@@ -127,26 +126,16 @@ export default function InstructorsManagementPage() {
     try {
       console.log('강사 삭제 요청:', instructor.id);
 
-      const response = await fetch(`${API_BASE_URL}/api/instructors/${instructor.id}`, {
-        method: 'DELETE'
-      });
+      // Axios 사용 (인증 토큰 자동 포함)
+      await api.delete(`/api/instructors/${instructor.id}`);
 
-      console.log('📊 응답 상태:', response.status, response.statusText);
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('강사 삭제 성공:', result);
-        alert('강사가 삭제되었습니다.');
-        fetchInstructors();
-      } else {
-        const errorText = await response.text();
-        console.error('강사 삭제 실패:', response.status);
-        console.error('에러 응답:', errorText);
-        alert(`강사 삭제에 실패했습니다. (${response.status})`);
-      }
-    } catch (error) {
+      console.log('강사 삭제 성공');
+      alert('강사가 삭제되었습니다.');
+      fetchInstructors();
+    } catch (error: any) {
       console.error('강사 삭제 중 오류:', error);
-      alert('강사 삭제 중 오류가 발생했습니다.');
+      const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
+      alert(`강사 삭제 중 오류가 발생했습니다: ${errorMsg}`);
     }
   };
 
@@ -184,8 +173,8 @@ export default function InstructorsManagementPage() {
       const isEditing = !!editingInstructor;
       const method = isEditing ? 'PUT' : 'POST';
       const url = isEditing
-        ? `${API_BASE_URL}/api/instructors/${editingInstructor.id}`
-        : `${API_BASE_URL}/api/instructors`;
+        ? `/api/instructors/${editingInstructor.id}`
+        : `/api/instructors`;
 
       console.log(`📤 강사 ${isEditing ? '수정' : '등록'} 요청:`);
       console.log('  - 메서드:', method);
@@ -204,20 +193,19 @@ export default function InstructorsManagementPage() {
 
       console.log('🚀 요청 전송 중...');
 
-      const response = await fetch(url, {
-        method,
-        body: submitData
-      });
+      // Axios 사용 (인증 토큰 자동 포함)
+      const response = isEditing 
+        ? await api.put(url, submitData, { headers: { 'Content-Type': 'multipart/form-data' } })
+        : await api.post(url, submitData, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-      console.log('📊 응답 상태:', response.status, response.statusText);
+      console.log('📊 응답 상태:', response.status);
       console.log('✅ 응답 수신 완료');
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log(`✅ 강사 ${isEditing ? '수정' : '등록'} 성공:`, result);
-        console.log('📋 전체 응답:', JSON.stringify(result, null, 2));
-        console.log('📋 data 내용:', JSON.stringify(result.data, null, 2));
-        console.log('📝 profileDescription:', result.data?.profileDescription);
+      const result = response.data;
+      console.log(`✅ 강사 ${isEditing ? '수정' : '등록'} 성공:`, result);
+      console.log('📋 전체 응답:', JSON.stringify(result, null, 2));
+      console.log('📋 data 내용:', JSON.stringify(result.data, null, 2));
+      console.log('📝 profileDescription:', result.data?.profileDescription);
         console.log('🎓 education:', result.data?.education);
         console.log('📜 certificates:', result.data?.certificates);
         console.log('💼 experience:', result.data?.experience);
@@ -225,17 +213,12 @@ export default function InstructorsManagementPage() {
         alert(`강사가 ${isEditing ? '수정' : '등록'}되었습니다.`);
         handleCloseModal();
         fetchInstructors();
-      } else {
-        const errorText = await response.text();
-        console.error(`❌ 강사 ${isEditing ? '수정' : '등록'} 실패:`, response.status);
-        console.error('📝 에러 응답:', errorText);
-        alert(`강사 ${isEditing ? '수정' : '등록'}에 실패했습니다. (${response.status})`);
+      } catch (error: any) {
+        console.error('❌ 강사 처리 중 오류:', error);
+        const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
+        alert(`강사 처리 중 오류가 발생했습니다: ${errorMsg}`);
       }
-    } catch (error) {
-      console.error('❌ 강사 처리 중 오류:', error);
-      alert('강사 처리 중 오류가 발생했습니다.');
-    }
-  };
+    };
 
   const regions = ['서울', '경기', '충북', '충남', '강원', '전북', '전남', '경북', '경남', '제주', '수원'];
 

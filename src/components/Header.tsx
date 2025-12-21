@@ -8,7 +8,7 @@ import styles from '@/styles/Header.module.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SignupData, LoginData } from '@/types/auth';
-import { signup, login, checkServerHealth, getUserCount, checkAdminStatus } from '@/services/authService';
+import { signup, login, logoutUser, checkAdminStatus } from '@/services/authService';
 import { validateSignupStep1, validateSignupStep2, validateSignupStep3 } from '@/utils/validation';
 
 interface HeaderProps {
@@ -81,11 +81,6 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
     setErrorMessage('');
 
     try {
-      // 먼저 서버 상태 확인
-      console.log('🔍 서버 상태 확인 중...');
-      await checkServerHealth();
-      await getUserCount();
-
       // role 매핑 (프론트엔드 값 → 백엔드 enum 값)
       const roleMapping: { [key: string]: string } = {
         '1': 'GENERAL',
@@ -98,8 +93,8 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       const signupData = {
         ...signupForm,
         organization: affiliation,
-        role: roleMapping[role] || 'GENERAL', // 매핑된 role 사용, 없으면 GENERAL
-        termsAgreed: ageCheck && termsCheck // 두 체크박스 모두 체크되어야 true
+        role: roleMapping[role] || 'GENERAL',
+        termsAgreed: ageCheck && termsCheck
       };
 
       const result = await signup(signupData);
@@ -134,43 +129,26 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
     try {
       const result = await login(loginForm);
 
-      if (result.success) {
-        // 로그인 상태 업데이트
+      if (result.success && result.data) {
         console.log('로그인 응답 데이터:', result.data);
-        console.log('사용자 role:', result.data?.role);
+        
+        // 새로운 응답 구조: { accessToken, refreshToken, user }
+        const { user } = result.data as { user: { username: string; role: string; email?: string; id?: number } };
+        
+        if (user) {
+          const userData: { username: string; role: string } = {
+            username: user.username,
+            role: user.role || 'GENERAL'
+          };
 
-        const userData: { username: string; token?: string; role?: string } = {
-          username: loginForm.username,
-          token: result.data?.token,
-          role: result.data?.role || 'GENERAL' // 백엔드에서 role 정보 받기
-        };
+          console.log('저장할 userData:', userData);
+          setIsLoggedIn(true);
+          setUserInfo(userData);
 
-        console.log('저장할 userData:', userData);
-        setIsLoggedIn(true);
-        setUserInfo(userData);
-
-        // localStorage에 사용자 정보 저장
-        localStorage.setItem('userInfo', JSON.stringify(userData));
-
-        // 관리자 권한 확인
-        try {
-          const adminResult = await checkAdminStatus(loginForm.username);
-          setIsAdmin(adminResult.data.isAdmin);
-          console.log('관리자 권한 확인 결과:', adminResult.data.isAdmin);
-          
-          // 관리자인 경우 localStorage 업데이트
-          if (adminResult.data.isAdmin) {
-            const updatedUserData = {
-              ...userData,
-              role: 'ADMIN'
-            };
-            setUserInfo(updatedUserData);
-            localStorage.setItem('userInfo', JSON.stringify(updatedUserData));
-            console.log('localStorage에 ADMIN role 저장됨');
-          }
-        } catch (error) {
-          console.log('관리자 권한 확인 실패:', error);
-          setIsAdmin(false);
+          // role이 ADMIN인지 확인
+          const isAdminUser = user.role === 'ADMIN';
+          setIsAdmin(isAdminUser);
+          console.log('관리자 권한:', isAdminUser);
         }
 
         setSuccessMessage('로그인되었습니다!');
@@ -195,19 +173,16 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
   // 로그아웃 처리
   const handleLogout = async () => {
     try {
-      // 로그아웃 API 호출 (선택사항)
-      // await logout();
-
       // 현재 페이지가 resources인지 확인
       const isOnResourcesPage = window.location.pathname === '/resources';
+
+      // 로그아웃 API 호출
+      await logoutUser();
 
       // 로그인 상태 초기화
       setIsLoggedIn(false);
       setUserInfo(null);
       setIsAdmin(false);
-
-      // localStorage에서 사용자 정보 삭제
-      localStorage.removeItem('userInfo');
 
       // 로그아웃 성공 모달 표시
       setShowLogoutSuccessModal(true);
@@ -355,27 +330,27 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
     setIsMounted(true);
 
     // 페이지 로드 시 로그인 상태 확인
-    const savedUserInfo = localStorage.getItem('userInfo');
-    if (savedUserInfo) {
+    const savedUser = localStorage.getItem('user');
+    const savedUserInfo = localStorage.getItem('userInfo'); // 하위 호환성
+    
+    if (savedUser || savedUserInfo) {
       try {
-        const userData = JSON.parse(savedUserInfo);
+        // 새로운 user 객체 우선, 없으면 기존 userInfo 사용
+        const userData = savedUser ? JSON.parse(savedUser) : JSON.parse(savedUserInfo!);
+        
         setIsLoggedIn(true);
-        setUserInfo(userData);
+        setUserInfo({
+          username: userData.username,
+          role: userData.role || 'GENERAL'
+        });
 
-        // 저장된 사용자의 관리자 권한 확인
-        if (userData.username) {
-          checkAdminStatus(userData.username)
-            .then(adminResult => {
-              setIsAdmin(adminResult.data.isAdmin);
-              console.log('🔐 저장된 사용자 관리자 권한 확인 결과:', adminResult.data.isAdmin);
-            })
-            .catch(error => {
-              console.log('❌ 저장된 사용자 관리자 권한 확인 실패:', error);
-              setIsAdmin(false);
-            });
-        }
+        // role이 ADMIN인지 확인
+        const isAdminUser = userData.role === 'ADMIN';
+        setIsAdmin(isAdminUser);
+        console.log('🔐 저장된 사용자 권한:', userData.role, '관리자:', isAdminUser);
       } catch (error) {
         console.error('저장된 사용자 정보 파싱 오류:', error);
+        localStorage.removeItem('user');
         localStorage.removeItem('userInfo');
       }
     }

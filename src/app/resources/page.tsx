@@ -9,7 +9,7 @@ import { FiSearch } from 'react-icons/fi';
 import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
 import { IoCartOutline } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
-import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
+import api from '@/lib/axios';
 
 interface Material {
   id: number;
@@ -47,8 +47,9 @@ export default function ResourcesPage() {
 
   // 로그인 상태 확인
   React.useEffect(() => {
-    const savedUserInfo = localStorage.getItem('userInfo');
-    if (!savedUserInfo) {
+    const savedUser = localStorage.getItem('user') || localStorage.getItem('userInfo');
+    if (!savedUser) {
+      alert('로그인이 필요한 페이지입니다.');
       window.location.href = '/';
     }
   }, []);
@@ -60,22 +61,14 @@ export default function ResourcesPage() {
         setLoading(true);
         setError(null);
 
-        const apiUrl = `${API_BASE_URL}${API_ENDPOINTS.RESOURCES.LIST}`;
-        console.log('📡 학습자료 API 호출:', apiUrl);
+        console.log('📡 학습자료 API 호출');
 
-        const response = await fetch(apiUrl);
+        // Axios 사용 (인증 토큰 자동 포함)
+        const response = await api.get('/api/resources');
 
-        console.log('📊 API 응답 상태:', response.status, response.statusText);
+        console.log('✅ 학습자료 로드 성공:', response.data);
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('❌ API 에러 응답:', errorText);
-          throw new Error(`학습자료를 불러올 수 없습니다 (${response.status})`);
-        }
-
-        const result = await response.json();
-
-        console.log('✅ 학습자료 로드 성공:', result);
+        const result = response.data;
 
         if (result.success && result.data) {
           setMaterialsData(result.data);
@@ -94,9 +87,15 @@ export default function ResourcesPage() {
           console.warn('⚠️ 예상치 못한 API 응답 형식:', result);
           setError('학습자료 데이터 형식이 올바르지 않습니다.');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('❌ 학습자료 로드 실패:', err);
-        setError('학습자료를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
+        if (err.response?.status === 401) {
+          alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+          localStorage.clear();
+          window.location.href = '/';
+        } else {
+          setError('학습자료를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
+        }
       } finally {
         setLoading(false);
       }
@@ -204,7 +203,7 @@ export default function ResourcesPage() {
                   >
                     <div className={styles.imageContainer}>
                       <img
-                        src={material.image.startsWith('http') ? material.image : `${API_BASE_URL}${material.image}`}
+                        src={material.image.startsWith('http') ? material.image : `https://api.nallijaku.com${material.image}`}
                         alt={material.alt}
                         className={styles.materialImage}
                         onError={(e) => {

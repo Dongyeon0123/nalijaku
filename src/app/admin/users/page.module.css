@@ -278,3 +278,25 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
 }
+
+/* 드론 경험 배지 */
+.experienceBadge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white !important;
+    border: none !important;
+    background: none !important;
+}
+
+.hasExperience {
+    background: linear-gradient(135deg, #3498db, #2980b9) !important;
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+}
+
+.noExperience {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+    box-shadow: 0 2px 4px rgba(149, 165, 166, 0.3);
+}

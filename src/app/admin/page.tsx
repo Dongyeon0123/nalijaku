@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
-import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
+import api from '@/lib/axios';
 
 interface RecentActivity {
   id: string;
@@ -31,11 +31,10 @@ export default function AdminPage() {
         
         const allActivities: RecentActivity[] = [];
 
-        // 교육 도입 신청 통계
-        const educationResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.EDUCATION.INQUIRY}`);
-        if (educationResponse.ok) {
-          const educationData = await educationResponse.json();
-          // 백엔드 응답: { success: true, data: [...] }
+        // 교육 도입 신청 통계 - Axios 사용
+        try {
+          const educationResponse = await api.get('/api/education-inquiries');
+          const educationData = educationResponse.data;
           const applications = educationData.data || [];
           setStats(prev => ({
             ...prev,
@@ -46,7 +45,7 @@ export default function AdminPage() {
           const educationActivities: RecentActivity[] = applications
             .slice(0, 3)
             .map((app: any, index: number) => ({
-              id: `education-${app.id}-${index}-${Math.random().toString(36).substr(2, 9)}`,
+              id: `education-${app.id}-${index}-${Math.random().toString(36).substring(2, 11)}`,
               type: 'education' as const,
               message: `새로운 교육 도입 신청이 접수되었습니다. (${app.organizationName || app.schoolName})`,
               timestamp: app.createdAt || app.submittedAt,
@@ -54,13 +53,14 @@ export default function AdminPage() {
             }));
           
           allActivities.push(...educationActivities);
+        } catch (error) {
+          console.error('교육 신청 통계 로드 실패:', error);
         }
 
-        // 파트너 모집 신청 통계
-        const partnerResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PARTNER.APPLICATION}`);
-        if (partnerResponse.ok) {
-          const partnerData = await partnerResponse.json();
-          // 백엔드 응답: { success: true, applications: [...] } 또는 { success: true, data: [...] }
+        // 파트너 모집 신청 통계 - Axios 사용
+        try {
+          const partnerResponse = await api.get('/api/partner-applications');
+          const partnerData = partnerResponse.data;
           const applications = partnerData.applications || partnerData.data || [];
           setStats(prev => ({
             ...prev,
@@ -71,7 +71,7 @@ export default function AdminPage() {
           const partnerActivities: RecentActivity[] = applications
             .slice(0, 3)
             .map((app: any, index: number) => ({
-              id: `partner-${app.id}-${index}-${Math.random().toString(36).substr(2, 9)}`,
+              id: `partner-${app.id}-${index}-${Math.random().toString(36).substring(2, 11)}`,
               type: 'partner' as const,
               message: `파트너 모집 신청이 접수되었습니다. (${app.applicantName || app.contactPerson})`,
               timestamp: app.createdAt || app.submittedAt,
@@ -79,20 +79,23 @@ export default function AdminPage() {
             }));
           
           allActivities.push(...partnerActivities);
+        } catch (error) {
+          console.error('파트너 신청 통계 로드 실패:', error);
         }
         
         // 모든 활동을 한 번에 설정
         setRecentActivities(allActivities);
 
-        // 총 사용자 수
-        const usersResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SYSTEM.USER_COUNT}`);
-        if (usersResponse.ok) {
-          const usersData = await usersResponse.json();
-          // 백엔드 응답: { success: true, count: 1234 } 또는 { success: true, data: { count: 1234 } }
+        // 총 사용자 수 - Axios 사용
+        try {
+          const usersResponse = await api.get('/api/users/count');
+          const usersData = usersResponse.data;
           setStats(prev => ({
             ...prev,
             totalUsers: usersData.count || usersData.data?.count || 0
           }));
+        } catch (error) {
+          console.error('사용자 수 로드 실패:', error);
         }
 
       } catch (error) {

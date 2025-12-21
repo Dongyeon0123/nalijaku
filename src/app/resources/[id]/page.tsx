@@ -6,6 +6,7 @@ import Image from 'next/image';
 import baseStyles from '../../education-intro/page.module.css';
 import styles from './page.module.css';
 import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
+import api from '@/lib/axios';
 
 
 interface MaterialDetailProps {
@@ -48,10 +49,13 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
 
   // 로그인 상태 확인
   React.useEffect(() => {
-    const savedUserInfo = localStorage.getItem('userInfo');
-    if (!savedUserInfo) {
+    const savedUser = localStorage.getItem('user') || localStorage.getItem('userInfo');
+    if (!savedUser) {
       // 로그인하지 않은 사용자는 홈페이지로 리다이렉트
+      console.log('❌ 로그인 정보 없음, 홈으로 리다이렉트');
       window.location.href = '/';
+    } else {
+      console.log('✅ 로그인 확인됨:', savedUser);
     }
   }, []);
 
@@ -60,33 +64,31 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
     const fetchMaterial = async () => {
       try {
         setLoading(true);
-        const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.nallijaku.com').replace(/\/$/, '');
-        const url = `${API_BASE_URL}/api/resources/${resolvedParams.id}`;
         
-        console.log('📡 학습자료 API 호출:', url);
+        console.log('📡 학습자료 API 호출:', `/api/resources/${resolvedParams.id}`);
         
-        const response = await fetch(url);
+        // Axios 사용 (인증 토큰 자동 포함)
+        const response = await api.get(`/api/resources/${resolvedParams.id}`);
         
-        if (response.ok) {
-          const result = await response.json();
-          console.log('📚 학습자료 데이터:', result);
-          
-          // 응답 형식에 따라 처리
-          const materialData = result.success ? result.data : result.data || result;
-          console.log('✅ 처리된 자료 데이터:', materialData);
-          
-          setMaterial(materialData);
-          
-          // 첫 번째 차시 선택
-          if (materialData.lessons && materialData.lessons.length > 0) {
-            console.log('📖 차시 목록:', materialData.lessons);
-            setSelectedLesson(materialData.lessons[0].id);
-          }
-        } else {
-          console.error('❌ 학습자료 로드 실패:', response.status, response.statusText);
+        console.log('📚 학습자료 데이터:', response.data);
+        
+        // 응답 형식에 따라 처리
+        const materialData = response.data.success ? response.data.data : response.data.data || response.data;
+        console.log('✅ 처리된 자료 데이터:', materialData);
+        
+        setMaterial(materialData);
+        
+        // 첫 번째 차시 선택
+        if (materialData.lessons && materialData.lessons.length > 0) {
+          console.log('📖 차시 목록:', materialData.lessons);
+          setSelectedLesson(materialData.lessons[0].id);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ 학습자료 로드 중 오류:', error);
+        if (error.response?.status === 401) {
+          alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+          window.location.href = '/';
+        }
       } finally {
         setLoading(false);
       }

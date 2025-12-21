@@ -13,10 +13,12 @@ console.log('🔑 NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
 export const API_ENDPOINTS = {
   // 인증
   AUTH: {
-    SIGNUP: '/auth/signup',
-    LOGIN: '/auth/login',
-    LOGOUT: '/auth/logout',
-    REFRESH: '/auth/refresh',
+    SIGNUP: '/api/auth/signup',
+    LOGIN: '/api/auth/login',
+    LOGOUT: '/api/auth/logout',
+    REFRESH: '/api/auth/refresh',
+    ME: '/api/auth/me',
+    CHECK_ADMIN: (username: string) => `/api/auth/check-admin/${username}`,
   },
 
   // 학습자료
@@ -66,7 +68,45 @@ export const getDefaultHeaders = () => ({
 });
 
 // API 요청 헤더 (인증 토큰 포함)
-export const getAuthHeaders = (token?: string) => ({
-  'Content-Type': 'application/json',
-  ...(token && { Authorization: `Bearer ${token}` }),
-});
+export const getAuthHeaders = (token?: string) => {
+  // localStorage에서 토큰 가져오기 (token 파라미터가 없는 경우)
+  const authToken = token || (typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null);
+  
+  return {
+    'Content-Type': 'application/json',
+    ...(authToken && { Authorization: `Bearer ${authToken}` }),
+  };
+};
+
+// 토큰 저장
+export const saveTokens = (accessToken: string, refreshToken?: string) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('accessToken', accessToken);
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken);
+    }
+  }
+};
+
+// 토큰 가져오기
+export const getAccessToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('accessToken');
+  }
+  return null;
+};
+
+export const getRefreshToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('refreshToken');
+  }
+  return null;
+};
+
+// 토큰 삭제
+export const clearTokens = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+  }
+};
