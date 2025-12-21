@@ -150,6 +150,46 @@ function ContentManagementPageContent() {
     }
   };
 
+  const handleDelete = async (id: number | string) => {
+    if (!confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      return;
+    }
+
+    try {
+      let endpoint: string;
+
+      if (activeTab === 'education') {
+        endpoint = `${API_BASE_URL}${API_ENDPOINTS.EDUCATION.INQUIRY}/${id}`;
+      } else {
+        endpoint = `${API_BASE_URL}${API_ENDPOINTS.PARTNER.APPLICATION}/${id}`;
+      }
+
+      console.log('🗑️ 삭제 요청:', { id, endpoint });
+
+      const response = await fetch(endpoint, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        console.log(`✅ Application ${id} deleted`);
+        alert('삭제되었습니다.');
+        
+        // 데이터 다시 로드
+        await loadApplications();
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Failed to delete:', errorText);
+        alert('삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('❌ Error deleting:', error);
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     // 대소문자 모두 처리
     const normalizedStatus = status.toLowerCase();
@@ -488,32 +528,43 @@ function ContentManagementPageContent() {
             </div>
 
             <div className={styles.modalFooter}>
+              <div style={{ display: 'flex', gap: '0.75rem', flex: 1 }}>
+                <button
+                  className={styles.completeButton}
+                  onClick={() => {
+                    handleStatusChange(selectedApplication.id, 'completed');
+                    setSelectedApplication(null);
+                  }}
+                >
+                  완료
+                </button>
+                <button
+                  className={styles.progressButton}
+                  onClick={() => {
+                    handleStatusChange(selectedApplication.id, 'in_progress');
+                    setSelectedApplication(null);
+                  }}
+                >
+                  진행중
+                </button>
+                <button
+                  className={styles.pendingButton}
+                  onClick={() => {
+                    handleStatusChange(selectedApplication.id, 'pending');
+                    setSelectedApplication(null);
+                  }}
+                >
+                  확인 전
+                </button>
+              </div>
               <button
-                className={styles.completeButton}
+                className={styles.deleteButton}
                 onClick={() => {
-                  handleStatusChange(selectedApplication.id, 'completed');
+                  handleDelete(selectedApplication.id);
                   setSelectedApplication(null);
                 }}
               >
-                완료
-              </button>
-              <button
-                className={styles.progressButton}
-                onClick={() => {
-                  handleStatusChange(selectedApplication.id, 'in_progress');
-                  setSelectedApplication(null);
-                }}
-              >
-                진행중
-              </button>
-              <button
-                className={styles.pendingButton}
-                onClick={() => {
-                  handleStatusChange(selectedApplication.id, 'pending');
-                  setSelectedApplication(null);
-                }}
-              >
-                확인 전
+                삭제
               </button>
             </div>
           </div>

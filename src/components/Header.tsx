@@ -136,8 +136,8 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
 
       if (result.success) {
         // 로그인 상태 업데이트
-        console.log('🔍 로그인 응답 데이터:', result.data);
-        console.log('🔍 사용자 role:', result.data?.role);
+        console.log('로그인 응답 데이터:', result.data);
+        console.log('사용자 role:', result.data?.role);
 
         const userData: { username: string; token?: string; role?: string } = {
           username: loginForm.username,
@@ -145,7 +145,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
           role: result.data?.role || 'GENERAL' // 백엔드에서 role 정보 받기
         };
 
-        console.log('🔍 저장할 userData:', userData);
+        console.log('저장할 userData:', userData);
         setIsLoggedIn(true);
         setUserInfo(userData);
 
@@ -156,9 +156,20 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
         try {
           const adminResult = await checkAdminStatus(loginForm.username);
           setIsAdmin(adminResult.data.isAdmin);
-          console.log('🔐 관리자 권한 확인 결과:', adminResult.data.isAdmin);
+          console.log('관리자 권한 확인 결과:', adminResult.data.isAdmin);
+          
+          // 관리자인 경우 localStorage 업데이트
+          if (adminResult.data.isAdmin) {
+            const updatedUserData = {
+              ...userData,
+              role: 'ADMIN'
+            };
+            setUserInfo(updatedUserData);
+            localStorage.setItem('userInfo', JSON.stringify(updatedUserData));
+            console.log('localStorage에 ADMIN role 저장됨');
+          }
         } catch (error) {
-          console.log('❌ 관리자 권한 확인 실패:', error);
+          console.log('관리자 권한 확인 실패:', error);
           setIsAdmin(false);
         }
 

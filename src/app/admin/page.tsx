@@ -24,9 +24,12 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    
     const loadStats = async () => {
       try {
         setLoading(true);
+        
+        const allActivities: RecentActivity[] = [];
 
         // 교육 도입 신청 통계
         const educationResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.EDUCATION.INQUIRY}`);
@@ -42,23 +45,23 @@ export default function AdminPage() {
           // 최근 활동 추가 (교육 신청)
           const educationActivities: RecentActivity[] = applications
             .slice(0, 3)
-            .map((app: any) => ({
-              id: app.id,
+            .map((app: any, index: number) => ({
+              id: `education-${app.id}-${index}-${Math.random().toString(36).substr(2, 9)}`,
               type: 'education' as const,
-              message: `새로운 교육 도입 신청이 접수되었습니다. (${app.schoolName})`,
-              timestamp: app.submittedAt,
+              message: `새로운 교육 도입 신청이 접수되었습니다. (${app.organizationName || app.schoolName})`,
+              timestamp: app.createdAt || app.submittedAt,
               icon: '📝'
             }));
           
-          setRecentActivities(prev => [...prev, ...educationActivities]);
+          allActivities.push(...educationActivities);
         }
 
         // 파트너 모집 신청 통계
         const partnerResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PARTNER.APPLICATION}`);
         if (partnerResponse.ok) {
           const partnerData = await partnerResponse.json();
-          // 백엔드 응답: { success: true, applications: [...] }
-          const applications = partnerData.applications || [];
+          // 백엔드 응답: { success: true, applications: [...] } 또는 { success: true, data: [...] }
+          const applications = partnerData.applications || partnerData.data || [];
           setStats(prev => ({
             ...prev,
             partnerApplications: applications.length
@@ -67,16 +70,19 @@ export default function AdminPage() {
           // 최근 활동 추가 (파트너 신청)
           const partnerActivities: RecentActivity[] = applications
             .slice(0, 3)
-            .map((app: any) => ({
-              id: app.id,
+            .map((app: any, index: number) => ({
+              id: `partner-${app.id}-${index}-${Math.random().toString(36).substr(2, 9)}`,
               type: 'partner' as const,
-              message: `파트너 모집 신청이 접수되었습니다. (${app.contactPerson})`,
-              timestamp: app.submittedAt,
+              message: `파트너 모집 신청이 접수되었습니다. (${app.applicantName || app.contactPerson})`,
+              timestamp: app.createdAt || app.submittedAt,
               icon: '🤝'
             }));
           
-          setRecentActivities(prev => [...prev, ...partnerActivities]);
+          allActivities.push(...partnerActivities);
         }
+        
+        // 모든 활동을 한 번에 설정
+        setRecentActivities(allActivities);
 
         // 총 사용자 수
         const usersResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SYSTEM.USER_COUNT}`);
@@ -132,10 +138,10 @@ export default function AdminPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>관리자 대시보드</h1>
-        <p>날리자쿠 관리자 페이지에 오신 것을 환영합니다.</p>
-      </div>
+        <div className={styles.header}>
+          <h1>관리자 대시보드</h1>
+          <p>날리자쿠 관리자 페이지에 오신 것을 환영합니다.</p>
+        </div>
       
       <div className={styles.dashboardGrid}>
         <div 

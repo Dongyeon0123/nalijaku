@@ -262,7 +262,8 @@
 
 .completeButton,
 .progressButton,
-.pendingButton {
+.pendingButton,
+.deleteButton {
   border: none;
   padding: 0.875rem 1.75rem;
   border-radius: 8px;
@@ -304,6 +305,17 @@
   background: linear-gradient(135deg, #d97706, #b45309);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.deleteButton {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.deleteButton:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
 .loadingContainer {
