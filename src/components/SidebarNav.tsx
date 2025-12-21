@@ -77,6 +77,7 @@ export default function SidebarNav() {
   };
 
   // 관리자 상태 확인
+  // 관리자 상태 확인
   React.useEffect(() => {
     const savedUser = localStorage.getItem('user') || localStorage.getItem('userInfo');
     if (savedUser) {
@@ -94,11 +95,6 @@ export default function SidebarNav() {
       }
     } else {
       setIsAdmin(false);
-    }
-  }, []);
-      } catch (error) {
-        console.error('사용자 정보 파싱 오류:', error);
-      }
     }
   }, []);
 
