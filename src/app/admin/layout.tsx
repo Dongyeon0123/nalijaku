@@ -53,11 +53,11 @@ export default function AdminLayout({
     if (isAuthorized) {
       document.body.style.margin = '0';
       document.body.style.padding = '0';
-      document.body.style.overflow = 'hidden';
+      // overflow: hidden 제거 - 스크롤 가능하게
     }
     
     return () => {
-      document.body.style.overflow = '';
+      // cleanup
     };
   }, [isAuthorized]);
 
