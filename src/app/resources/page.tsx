@@ -63,6 +63,15 @@ export default function ResourcesPage() {
 
         console.log('📡 학습자료 API 호출');
 
+        // 영어 → 한글 매핑
+        const categoryToKorean: { [key: string]: string } = {
+          'ALL': '전체',
+          'STARTUP': '창업',
+          'DRONE': '드론',
+          'AI': 'AI',
+          'ENVIRONMENT': '환경'
+        };
+
         // Axios 사용 (인증 토큰 자동 포함)
         const response = await api.get('/api/resources');
 
@@ -71,21 +80,41 @@ export default function ResourcesPage() {
         const result = response.data;
 
         if (result.success && result.data) {
-          setMaterialsData(result.data);
-
-          // 카테고리 추출
-          const categorySet = new Set<string>(result.data.map((m: Material) => m.category));
-          const uniqueCategories: string[] = ['전체', ...Array.from(categorySet)];
-          setCategories(uniqueCategories);
+          // 카테고리를 한글로 변환
+          const materialsWithKoreanCategory = result.data.map((material: Material) => ({
+            ...material,
+            category: categoryToKorean[material.category] || material.category
+          }));
+          setMaterialsData(materialsWithKoreanCategory);
         } else if (result.data && Array.isArray(result.data)) {
           // success 필드가 없어도 data가 배열이면 처리
-          setMaterialsData(result.data);
-          const categorySet = new Set<string>(result.data.map((m: Material) => m.category));
-          const uniqueCategories: string[] = ['전체', ...Array.from(categorySet)];
-          setCategories(uniqueCategories);
+          const materialsWithKoreanCategory = result.data.map((material: Material) => ({
+            ...material,
+            category: categoryToKorean[material.category] || material.category
+          }));
+          setMaterialsData(materialsWithKoreanCategory);
         } else {
           console.warn('⚠️ 예상치 못한 API 응답 형식:', result);
           setError('학습자료 데이터 형식이 올바르지 않습니다.');
+        }
+
+        // 카테고리는 별도 API에서 가져오기
+        try {
+          const categoriesResponse = await api.get('/api/resources/categories');
+          console.log('✅ 카테고리 로드 성공:', categoriesResponse.data);
+          
+          if (Array.isArray(categoriesResponse.data)) {
+            setCategories(categoriesResponse.data);
+          } else if (categoriesResponse.data.data && Array.isArray(categoriesResponse.data.data)) {
+            setCategories(categoriesResponse.data.data);
+          } else {
+            // 카테고리 API 실패 시 기본값
+            setCategories(['전체', '창업', '드론', 'AI', '환경']);
+          }
+        } catch (categoryError) {
+          console.error('❌ 카테고리 로드 실패:', categoryError);
+          // 카테고리 API 실패 시 기본값
+          setCategories(['전체', '창업', '드론', 'AI', '환경']);
         }
       } catch (err: any) {
         console.error('❌ 학습자료 로드 실패:', err);

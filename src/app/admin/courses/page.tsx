@@ -71,6 +71,15 @@ export default function CoursesPage() {
       setLoading(true);
       console.log('🔄 강좌 목록 새로고침 중...');
 
+      // 영어 → 한글 매핑
+      const categoryToKorean: { [key: string]: string } = {
+        'ALL': '전체',
+        'STARTUP': '창업',
+        'DRONE': '드론',
+        'AI': 'AI',
+        'ENVIRONMENT': '환경'
+      };
+
       // Axios 사용 (인증 토큰 자동 포함)
       const response = await api.get('/api/resources');
 
@@ -78,10 +87,16 @@ export default function CoursesPage() {
 
       const result = response.data;
       if (result.success && result.data) {
-        setCourses(result.data);
+        // 카테고리를 한글로 변환
+        const coursesWithKoreanCategory = result.data.map((course: Course) => ({
+          ...course,
+          category: categoryToKorean[course.category] || course.category
+        }));
+        
+        setCourses(coursesWithKoreanCategory);
 
         // 각 강좌의 차시 정보 로깅
-        result.data.forEach((course: Course) => {
+        coursesWithKoreanCategory.forEach((course: Course) => {
           if (course.lessons && course.lessons.length > 0) {
             console.log(`📚 강좌 "${course.title}" 차시 목록:`, course.lessons);
             course.lessons.forEach((lesson: Lesson) => {
@@ -93,10 +108,29 @@ export default function CoursesPage() {
             });
           }
         });
+      }
 
-        // 카테고리 추출
-        const categorySet = new Set<string>(result.data.map((c: Course) => c.category));
-        setCategories(Array.from(categorySet).sort());
+      // 카테고리는 별도 API에서 가져오기
+      try {
+        const categoriesResponse = await api.get('/api/resources/categories');
+        console.log('✅ 카테고리 로드 성공:', categoriesResponse.data);
+        
+        if (Array.isArray(categoriesResponse.data)) {
+          // "전체" 제외하고 나머지만 사용
+          const filteredCategories = categoriesResponse.data.filter((cat: string) => cat !== '전체');
+          setCategories(filteredCategories);
+        } else if (categoriesResponse.data.data && Array.isArray(categoriesResponse.data.data)) {
+          // "전체" 제외하고 나머지만 사용
+          const filteredCategories = categoriesResponse.data.data.filter((cat: string) => cat !== '전체');
+          setCategories(filteredCategories);
+        } else {
+          // 카테고리 API 실패 시 기본값 ("전체" 제외)
+          setCategories(['창업', '드론', 'AI', '환경']);
+        }
+      } catch (categoryError) {
+        console.error('❌ 카테고리 로드 실패:', categoryError);
+        // 카테고리 API 실패 시 기본값 ("전체" 제외)
+        setCategories(['창업', '드론', 'AI', '환경']);
       }
     } catch (error: any) {
       console.error('❌ 강좌 로드 실패:', error);
@@ -379,69 +413,99 @@ export default function CoursesPage() {
     try {
       setUploading(true);
 
-      // 이미지 처리
-      let imageUrl = formData.image;
-
-      if (imageFile) {
-        // 새 이미지 파일이 있으면 업로드
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', imageFile);
-
-        // Axios 사용 (인증 토큰 자동 포함)
-        const uploadResponse = await api.post('/api/resources/upload-image', uploadFormData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-
-        const uploadResult = uploadResponse.data;
-        imageUrl = uploadResult.filePath || uploadResult.data?.filePath || uploadResult.url || uploadResult.data?.url;
-      } else if (!imageUrl && editingCourse) {
-        // 수정할 때 이미지가 없으면 기존 이미지 유지
-        imageUrl = editingCourse.image;
-      } else if (!imageUrl && !editingCourse) {
-        // 새로 추가할 때 이미지가 없으면 오류
-        alert('이미지를 선택하거나 URL을 입력해주세요.');
-        setUploading(false);
-        return;
-      }
-
-      // JSON 형식으로 요청 데이터 생성
-      const requestData = {
-        category: formData.category,
-        title: formData.title,
-        subtitle: formData.subtitle,
-        description: formData.description,
-        instructor: formData.instructor,
-        price: formData.price,
-        duration: formData.duration,
-        level: formData.level,
-        alt: formData.alt,
-        image: imageUrl,
+      // 카테고리 한글 → 영어 매핑
+      const categoryMap: { [key: string]: string } = {
+        '전체': 'ALL',
+        '창업': 'STARTUP',
+        '드론': 'DRONE',
+        'AI': 'AI',
+        '환경': 'ENVIRONMENT'
       };
 
-      console.log('📤 요청 데이터:', requestData);
+      const englishCategory = categoryMap[formData.category] || formData.category;
 
       if (editingCourse) {
-        // 수정 - Axios 사용
+        // 수정 - JSON 형식으로 전송 (기존 방식 유지)
+        let imageUrl = formData.image;
+
+        if (imageFile) {
+          // 새 이미지 파일이 있으면 업로드
+          const uploadFormData = new FormData();
+          uploadFormData.append('file', imageFile);
+
+          const uploadResponse = await api.post('/api/resources/upload-image', uploadFormData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+
+          const uploadResult = uploadResponse.data;
+          imageUrl = uploadResult.filePath || uploadResult.data?.filePath || uploadResult.url || uploadResult.data?.url;
+        } else if (!imageUrl) {
+          imageUrl = editingCourse.image;
+        }
+
+        const requestData = {
+          category: englishCategory,
+          title: formData.title,
+          subtitle: formData.subtitle,
+          description: formData.description,
+          instructor: formData.instructor,
+          price: Number(formData.price) || 0,
+          duration: formData.duration,
+          level: formData.level,
+          alt: formData.alt,
+          image: imageUrl,
+        };
+
+        console.log('📤 수정 요청 데이터:', requestData);
         const response = await api.put(`/api/resources/${editingCourse.id}`, requestData);
         console.log('API 응답:', response.data);
         alert('강좌가 수정되었습니다.');
-        loadCourses();
-        setShowModal(false);
-        setImageFile(null);
-        setImagePreview('');
       } else {
-        // 추가 - Axios 사용
-        const response = await api.post('/api/resources', requestData);
+        // 추가 - multipart/form-data 형식으로 전송
+        if (!imageFile && !formData.image) {
+          alert('이미지를 선택하거나 URL을 입력해주세요.');
+          setUploading(false);
+          return;
+        }
+
+        const multipartFormData = new FormData();
+        multipartFormData.append('category', formData.category); // 한글 카테고리 그대로 전송
+        multipartFormData.append('title', formData.title);
+        multipartFormData.append('subtitle', formData.subtitle);
+        multipartFormData.append('description', formData.description || '');
+        multipartFormData.append('instructor', formData.instructor);
+        multipartFormData.append('price', String(Number(formData.price) || 0));
+        multipartFormData.append('duration', formData.duration || '');
+        multipartFormData.append('level', formData.level || '');
+        multipartFormData.append('alt', formData.alt || '');
+        
+        if (imageFile) {
+          multipartFormData.append('file', imageFile);
+        } else if (formData.image) {
+          multipartFormData.append('imageUrl', formData.image);
+        }
+
+        console.log('📤 추가 요청 (multipart/form-data)');
+        const response = await api.post('/api/resources', multipartFormData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
         console.log('API 응답:', response.data);
         alert('강좌가 추가되었습니다.');
-        loadCourses();
-        setShowModal(false);
-        setImageFile(null);
-        setImagePreview('');
       }
+
+      loadCourses();
+      setShowModal(false);
+      setImageFile(null);
+      setImagePreview('');
     } catch (error: any) {
       console.error('강좌 저장 실패:', error);
+      console.error('에러 응답:', error.response?.data);
       const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message || '알 수 없는 오류';
+      
+      if (error.response?.data) {
+        console.error('상세 에러:', JSON.stringify(error.response.data, null, 2));
+      }
+      
       alert(`강좌 저장에 실패했습니다: ${errorMsg}`);
     } finally {
       setUploading(false);
