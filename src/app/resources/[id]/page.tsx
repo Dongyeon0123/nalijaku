@@ -76,6 +76,19 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
         const materialData = response.data.success ? response.data.data : response.data.data || response.data;
         console.log('✅ 처리된 자료 데이터:', materialData);
         
+        // 카테고리 영어 → 한글 변환
+        const categoryToKorean: { [key: string]: string } = {
+          'ALL': '전체',
+          'STARTUP': '창업',
+          'DRONE': '드론',
+          'AI': 'AI',
+          'ENVIRONMENT': '환경'
+        };
+        
+        if (materialData.category) {
+          materialData.category = categoryToKorean[materialData.category] || materialData.category;
+        }
+        
         setMaterial(materialData);
         
         // 첫 번째 차시 선택
