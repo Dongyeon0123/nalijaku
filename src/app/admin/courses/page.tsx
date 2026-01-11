@@ -11,6 +11,7 @@ interface Lesson {
   materials: string;
   description: string;
   pdfUrl?: string;
+  type?: string; // 이론, 실습, 게임
 }
 
 interface Course {
@@ -45,7 +46,7 @@ export default function CoursesPage() {
   const [expandedCourseId, setExpandedCourseId] = useState<number | null>(null);
   const [showLessonModal, setShowLessonModal] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
-  const [lessonFormData, setLessonFormData] = useState({ order: 1, materials: '', description: '' });
+  const [lessonFormData, setLessonFormData] = useState({ order: 1, materials: '', description: '', type: '이론' });
   const [lessonPdfFile, setLessonPdfFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -246,7 +247,7 @@ export default function CoursesPage() {
   // 차시 추가 모달 열기
   const handleAddLesson = () => {
     setEditingLesson(null);
-    setLessonFormData({ order: 1, materials: '', description: '' });
+    setLessonFormData({ order: 1, materials: '', description: '', type: '이론' });
     setLessonPdfFile(null);
     setShowLessonModal(true);
   };
@@ -273,10 +274,12 @@ export default function CoursesPage() {
       formData.append('order', lessonFormData.order.toString());
       formData.append('materials', lessonFormData.materials);
       formData.append('description', lessonFormData.description);
+      formData.append('type', lessonFormData.type || '이론');
 
       console.log('📋 FormData 구성:');
       console.log('  - order:', lessonFormData.order);
       console.log('  - materials:', lessonFormData.materials);
+      console.log('  - type:', lessonFormData.type);
       console.log('  - description:', lessonFormData.description);
 
       if (lessonPdfFile) {
@@ -313,37 +316,37 @@ export default function CoursesPage() {
       });
 
       xhr.addEventListener('load', async () => {
-        console.log('✅ 업로드 완료');
-        console.log('📊 응답 상태:', xhr.status, xhr.statusText);
-        console.log('📝 응답 본문:', xhr.responseText);
-        console.log('📋 응답 헤더:', {
+        console.log('업로드 완료');
+        console.log('응답 상태:', xhr.status, xhr.statusText);
+        console.log('응답 본문:', xhr.responseText);
+        console.log('응답 헤더:', {
           'Content-Type': xhr.getResponseHeader('Content-Type'),
         });
 
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
             const responseData = JSON.parse(xhr.responseText);
-            console.log('✅ 파싱된 응답 데이터:', responseData);
-            console.log('📄 저장된 PDF URL:', responseData.pdfUrl || responseData.data?.pdfUrl || '없음');
+            console.log('파싱된 응답 데이터:', responseData);
+            console.log('저장된 PDF URL:', responseData.pdfUrl || responseData.data?.pdfUrl || '없음');
 
             alert(editingLesson ? '차시가 수정되었습니다.' : '차시가 추가되었습니다.');
             setShowLessonModal(false);
-            setLessonFormData({ order: 1, materials: '', description: '' });
+            setLessonFormData({ order: 1, materials: '', description: '', type: '이론' });
             setLessonPdfFile(null);
             setUploadProgress(0);
             loadCourses();
           } catch (parseError) {
-            console.error('❌ 응답 파싱 실패:', parseError);
+            console.error('응답 파싱 실패:', parseError);
             alert('차시가 저장되었으나 응답 처리 중 오류가 발생했습니다.');
             loadCourses();
           }
         } else {
           try {
             const errorData = JSON.parse(xhr.responseText);
-            console.error('❌ 백엔드 에러:', errorData);
+            console.error('백엔드 에러:', errorData);
             alert(`차시 저장에 실패했습니다: ${errorData.message || '알 수 없는 오류'}`);
           } catch {
-            console.error('❌ 응답 파싱 실패:', xhr.statusText);
+            console.error('응답 파싱 실패:', xhr.statusText);
             alert(`차시 저장에 실패했습니다: ${xhr.statusText}`);
           }
         }
@@ -596,28 +599,49 @@ export default function CoursesPage() {
                             <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>차시 관리</h4>
                             {course.lessons && course.lessons.length > 0 ? (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {course.lessons.map((lesson, idx) => (
-                                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
-                                    <div>
-                                      <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>{lesson.order}차시</p>
-                                      <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#565D6D' }}>준비물: {lesson.materials}</p>
-                                      {lesson.description && <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{lesson.description}</p>}
+                                {course.lessons.map((lesson, idx) => {
+                                  const typeColors: { [key: string]: { bg: string; text: string } } = {
+                                    '이론': { bg: '#E1BEE7', text: '#6A1B9A' },
+                                    '실습': { bg: '#C8E6C9', text: '#2E7D32' },
+                                    '게임': { bg: '#FFF9C4', text: '#F57F17' }
+                                  };
+                                  const typeColor = typeColors[lesson.type || '이론'] || typeColors['이론'];
+                                  
+                                  return (
+                                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e0e0e0', position: 'relative' }}>
+                                      <div style={{ flex: 1 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                          <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{lesson.order}차시</p>
+                                          <span style={{ 
+                                            padding: '2px 8px', 
+                                            backgroundColor: typeColor.bg, 
+                                            color: typeColor.text, 
+                                            borderRadius: '4px', 
+                                            fontSize: '11px', 
+                                            fontWeight: '600' 
+                                          }}>
+                                            {lesson.type || '이론'}
+                                          </span>
+                                        </div>
+                                        <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#565D6D' }}>준비물: {lesson.materials}</p>
+                                        {lesson.description && <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{lesson.description}</p>}
+                                      </div>
+                                      <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button
+                                          onClick={() => {
+                                            setEditingLesson(lesson);
+                                            setLessonFormData({ order: lesson.order, materials: lesson.materials, description: lesson.description, type: lesson.type || '이론' });
+                                            setLessonPdfFile(null);
+                                            setShowLessonModal(true);
+                                          }}
+                                          style={{ padding: '6px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>수정</button>
+                                        <button
+                                          onClick={() => handleDeleteLesson(course.id, lesson.order)}
+                                          style={{ padding: '6px 12px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>삭제</button>
+                                      </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '8px' }}>
-                                      <button
-                                        onClick={() => {
-                                          setEditingLesson(lesson);
-                                          setLessonFormData({ order: lesson.order, materials: lesson.materials, description: lesson.description });
-                                          setLessonPdfFile(null);
-                                          setShowLessonModal(true);
-                                        }}
-                                        style={{ padding: '6px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>수정</button>
-                                      <button
-                                        onClick={() => handleDeleteLesson(course.id, lesson.order)}
-                                        style={{ padding: '6px 12px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>삭제</button>
-                                    </div>
-                                  </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             ) : (
                               <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>등록된 차시가 없습니다.</p>
@@ -830,6 +854,18 @@ export default function CoursesPage() {
                   onChange={(e) => setLessonFormData({ ...lessonFormData, order: parseInt(e.target.value) })}
                   placeholder="차시 번호를 입력하세요"
                 />
+              </div>
+              <div className={styles.formGroup}>
+                <label>차시 타입</label>
+                <select
+                  value={lessonFormData.type}
+                  onChange={(e) => setLessonFormData({ ...lessonFormData, type: e.target.value })}
+                  style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                >
+                  <option value="이론">이론</option>
+                  <option value="실습">실습</option>
+                  <option value="게임">게임</option>
+                </select>
               </div>
               <div className={styles.formGroup}>
                 <label>준비물</label>

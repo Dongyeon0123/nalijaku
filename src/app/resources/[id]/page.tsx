@@ -21,6 +21,7 @@ interface Lesson {
   materials: string;
   description: string;
   pdfUrl?: string;
+  type?: string; // 이론, 실습, 게임
 }
 
 interface Material {
@@ -147,23 +148,47 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                   {material.lessons && material.lessons.length > 0 && (
                     <div className={styles.lessonsContainer}>
                       <div className={styles.lessonsList}>
-                        {material.lessons.map((lesson) => (
-                          <div 
-                            key={lesson.id} 
-                            className={`${styles.lessonItem} ${selectedLesson === lesson.id ? styles.selected : ''}`} 
-                            onClick={() => handleLessonClick(lesson)}
-                          >
-                            <div className={styles.lessonLeft}>
-                              <h4 className={styles.lessonTitle}>{lesson.order}차시</h4>
-                            </div>
-                            <div className={styles.lessonRight}>
-                              <div className={styles.lessonMaterials}>
-                                <strong>준비물:</strong> {lesson.materials}
+                        {material.lessons.map((lesson) => {
+                          const typeColors: { [key: string]: { bg: string; text: string } } = {
+                            '이론': { bg: '#E1BEE7', text: '#6A1B9A' },
+                            '실습': { bg: '#C8E6C9', text: '#2E7D32' },
+                            '게임': { bg: '#FFF9C4', text: '#F57F17' }
+                          };
+                          const typeColor = typeColors[lesson.type || '이론'] || typeColors['이론'];
+                          
+                          return (
+                            <div 
+                              key={lesson.id} 
+                              className={`${styles.lessonItem} ${selectedLesson === lesson.id ? styles.selected : ''}`} 
+                              onClick={() => handleLessonClick(lesson)}
+                              style={{ position: 'relative' }}
+                            >
+                              <span style={{ 
+                                position: 'absolute',
+                                top: '12px',
+                                right: '16px',
+                                padding: '4px 10px', 
+                                backgroundColor: typeColor.bg, 
+                                color: typeColor.text, 
+                                borderRadius: '6px', 
+                                fontSize: '11px', 
+                                fontWeight: '600',
+                                zIndex: 1
+                              }}>
+                                {lesson.type || '이론'}
+                              </span>
+                              <div className={styles.lessonLeft}>
+                                <h4 className={styles.lessonTitle}>{lesson.order}차시</h4>
                               </div>
-                              <p className={styles.lessonShortDescription}><strong>설명:</strong> {lesson.description}</p>
+                              <div className={styles.lessonRight}>
+                                <div className={styles.lessonMaterials}>
+                                  <strong>준비물:</strong> {lesson.materials}
+                                </div>
+                                <p className={styles.lessonShortDescription}><strong>설명:</strong> {lesson.description}</p>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
