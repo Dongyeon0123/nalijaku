@@ -8,6 +8,7 @@ interface Instructor {
   id: number;
   name: string;
   region: string;
+  category?: string;
   subtitle: string;
   imageUrl: string;
   profileDescription?: string;
@@ -25,6 +26,7 @@ export default function InstructorsManagementPage() {
   const [formData, setFormData] = useState({
     name: '',
     region: '',
+    category: '',
     subtitle: '',
     imageUrl: '',
     profileDescription: '',
@@ -89,6 +91,7 @@ export default function InstructorsManagementPage() {
     setFormData({
       name: instructor.name,
       region: instructor.region,
+      category: instructor.category || '',
       subtitle: instructor.subtitle,
       imageUrl: instructor.imageUrl,
       profileDescription: profileDesc,
@@ -107,6 +110,7 @@ export default function InstructorsManagementPage() {
     setFormData({
       name: '',
       region: '',
+      category: '',
       subtitle: '',
       imageUrl: '',
       profileDescription: '',
@@ -165,7 +169,7 @@ export default function InstructorsManagementPage() {
       }
 
       // FormData 내용 로깅
-      console.log('📋 FormData 내용:');
+      console.log('FormData 내용:');
       for (const [key, value] of submitData.entries()) {
         console.log(`  ${key}:`, value);
       }
@@ -176,7 +180,7 @@ export default function InstructorsManagementPage() {
         ? `/api/instructors/${editingInstructor.id}`
         : `/api/instructors`;
 
-      console.log(`📤 강사 ${isEditing ? '수정' : '등록'} 요청:`);
+      console.log(`강사 ${isEditing ? '수정' : '등록'} 요청:`);
       console.log('  - 메서드:', method);
       console.log('  - URL:', url);
       console.log('  - 이름:', formData.name);
@@ -191,30 +195,30 @@ export default function InstructorsManagementPage() {
         console.log('  - 이미지:', imageFile.name, `(${(imageFile.size / 1024).toFixed(2)}KB)`);
       }
 
-      console.log('🚀 요청 전송 중...');
+      console.log('요청 전송 중...');
 
       // Axios 사용 (인증 토큰 자동 포함)
       const response = isEditing 
         ? await api.put(url, submitData, { headers: { 'Content-Type': 'multipart/form-data' } })
         : await api.post(url, submitData, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-      console.log('📊 응답 상태:', response.status);
-      console.log('✅ 응답 수신 완료');
+      console.log('응답 상태:', response.status);
+      console.log('응답 수신 완료');
 
       const result = response.data;
-      console.log(`✅ 강사 ${isEditing ? '수정' : '등록'} 성공:`, result);
-      console.log('📋 전체 응답:', JSON.stringify(result, null, 2));
-      console.log('📋 data 내용:', JSON.stringify(result.data, null, 2));
-      console.log('📝 profileDescription:', result.data?.profileDescription);
-        console.log('🎓 education:', result.data?.education);
-        console.log('📜 certificates:', result.data?.certificates);
+      console.log(`강사 ${isEditing ? '수정' : '등록'} 성공:`, result);
+      console.log('전체 응답:', JSON.stringify(result, null, 2));
+      console.log('data 내용:', JSON.stringify(result.data, null, 2));
+      console.log('profileDescription:', result.data?.profileDescription);
+        console.log('education:', result.data?.education);
+        console.log('certificates:', result.data?.certificates);
         console.log('💼 experience:', result.data?.experience);
-        console.log('🏆 awards:', result.data?.awards);
+        console.log('awards:', result.data?.awards);
         alert(`강사가 ${isEditing ? '수정' : '등록'}되었습니다.`);
         handleCloseModal();
         fetchInstructors();
       } catch (error: any) {
-        console.error('❌ 강사 처리 중 오류:', error);
+        console.error('강사 처리 중 오류:', error);
         const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
         alert(`강사 처리 중 오류가 발생했습니다: ${errorMsg}`);
       }
@@ -243,6 +247,7 @@ export default function InstructorsManagementPage() {
               <tr>
                 <th>이름</th>
                 <th>지역</th>
+                <th>카테고리</th>
                 <th>부제목</th>
                 <th>이미지</th>
                 <th>작업</th>
@@ -253,6 +258,7 @@ export default function InstructorsManagementPage() {
                 <tr key={instructor.id}>
                   <td>{instructor.name}</td>
                   <td>{instructor.region}</td>
+                  <td>{instructor.category || '-'}</td>
                   <td>{instructor.subtitle}</td>
                   <td>
                     <img
@@ -327,6 +333,22 @@ export default function InstructorsManagementPage() {
                   {regions.map(region => (
                     <option key={region} value={region}>{region}</option>
                   ))}
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>카테고리 *</label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">카테고리를 선택하세요</option>
+                  <option value="창업">창업</option>
+                  <option value="드론">드론</option>
+                  <option value="AI">AI</option>
+                  <option value="환경">환경</option>
                 </select>
               </div>
 

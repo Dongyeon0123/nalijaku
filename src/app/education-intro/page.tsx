@@ -111,7 +111,6 @@ function EducationIntroContent() {
         selectedCourses: cartItems.map(item => ({
           id: item.id,
           title: item.title,
-          instructor: item.instructor,
           category: item.category
         }))
       };
@@ -211,7 +210,6 @@ function EducationIntroContent() {
                           <div key={item.id} style={{ padding: '8px', backgroundColor: '#ffffff', borderRadius: '6px', border: '1px solid #e0e0e0', fontSize: '13px', color: '#606060', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                               <div style={{ fontWeight: '600', color: '#383838', marginBottom: '4px' }}>{item.title}</div>
-                              <div style={{ fontSize: '12px', color: '#04AD74' }}>{item.instructor}</div>
                             </div>
                             <button
                               onClick={() => handleRemoveItem(item.id)}

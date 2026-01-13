@@ -27,6 +27,7 @@ interface Lesson {
 interface Material {
   id: number;
   category: string;
+  subCategory?: string;
   image: string;
   alt: string;
   instructor: string;
@@ -135,9 +136,15 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                 <div className={styles.leftSection}>
                   <div className={styles.courseInfoContainer}>
                     <div className={styles.courseInfo}>
-                      <div className={styles.categoryTag}>{material.category}</div>
+                      <div className={styles.categoryTag}>
+                        {material.category}
+                        {material.subCategory && (
+                          <span style={{ marginLeft: '8px', fontSize: '13px', opacity: 0.9 }}>
+                            · {material.subCategory}
+                          </span>
+                        )}
+                      </div>
                       <div className={styles.materialTitle}>{material.title}</div>
-                      <div className={styles.instructorInfo}>{material.instructor}</div>
                       <div className={styles.materialDescription}>{material.description}</div>
                       <button className={styles.syllabusButton}>
                         강의 계획서

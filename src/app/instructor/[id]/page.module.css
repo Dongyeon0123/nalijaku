@@ -1,0 +1,337 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #ffffff;
+}
+
+.main {
+    flex: 1;
+    background: #ffffff;
+}
+
+.content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 24px 60px;
+}
+
+.loadingContainer,
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+}
+
+.loadingContainer p,
+.errorContainer p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.backButton {
+    padding: 10px 20px;
+    background-color: #f3f4f6;
+    color: #323742;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 32px;
+}
+
+.backButton:hover {
+    background-color: #e5e7eb;
+}
+
+.profileHeader {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    padding: 40px;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+    border-radius: 16px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 20px rgba(4, 173, 116, 0.1);
+}
+
+.profileImage {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #ffffff;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.profileInfo {
+    flex: 1;
+}
+
+.regionBadge {
+    display: inline-block;
+    padding: 6px 16px;
+    background-color: #04AD74;
+    color: #ffffff;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.instructorName {
+    font-size: 36px;
+    font-weight: 700;
+    color: #383838;
+    margin: 0 0 12px 0;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: #606060;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.descriptionSection {
+    padding: 32px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    margin-bottom: 40px;
+}
+
+.descriptionSection h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #383838;
+    margin: 0 0 16px 0;
+}
+
+.descriptionSection p {
+    font-size: 16px;
+    color: #565D6D;
+    line-height: 1.8;
+    margin: 0;
+}
+
+.detailSections {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-bottom: 40px;
+}
+
+.section {
+    padding: 32px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+}
+
+.section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #383838;
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #04AD74;
+}
+
+.itemList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.item {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border-left: 4px solid #04AD74;
+}
+
+.itemTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #383838;
+    margin: 0 0 8px 0;
+}
+
+.itemSubtitle {
+    font-size: 14px;
+    color: #565D6D;
+    margin: 0 0 6px 0;
+}
+
+.itemDate {
+    font-size: 13px;
+    color: #999;
+    margin: 0 0 8px 0;
+}
+
+.itemDescription {
+    font-size: 14px;
+    color: #565D6D;
+    margin: 8px 0 0 0;
+    line-height: 1.6;
+}
+
+.noData {
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    padding-top: 20px;
+}
+
+.primaryButton {
+    padding: 14px 32px;
+    background-color: #04AD74;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.primaryButton:hover {
+    background-color: #00A169;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(4, 173, 116, 0.3);
+}
+
+.secondaryButton {
+    padding: 14px 32px;
+    background-color: #f3f4f6;
+    color: #323742;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.secondaryButton:hover {
+    background-color: #e5e7eb;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .content {
+        padding: 60px 16px 40px;
+    }
+
+    .profileHeader {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+        gap: 20px;
+    }
+
+    .profileImage {
+        width: 140px;
+        height: 140px;
+    }
+
+    .instructorName {
+        font-size: 28px;
+    }
+
+    .subtitle {
+        font-size: 16px;
+    }
+
+    .descriptionSection {
+        padding: 24px;
+    }
+
+    .descriptionSection h2 {
+        font-size: 18px;
+    }
+
+    .descriptionSection p {
+        font-size: 14px;
+    }
+
+    .section {
+        padding: 24px;
+    }
+
+    .section h2 {
+        font-size: 20px;
+    }
+
+    .item {
+        padding: 16px;
+    }
+
+    .actionButtons {
+        flex-direction: column;
+    }
+
+    .primaryButton,
+    .secondaryButton {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 50px 12px 30px;
+    }
+
+    .profileHeader {
+        padding: 20px 16px;
+    }
+
+    .profileImage {
+        width: 120px;
+        height: 120px;
+    }
+
+    .instructorName {
+        font-size: 24px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    .section {
+        padding: 20px;
+    }
+
+    .section h2 {
+        font-size: 18px;
+    }
+
+    .item {
+        padding: 14px;
+    }
+
+    .itemTitle {
+        font-size: 15px;
+    }
+
+    .itemSubtitle {
+        font-size: 13px;
+    }
+}

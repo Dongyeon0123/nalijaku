@@ -209,7 +209,12 @@ export default function ClassroomPage() {
           <div className={styles.classroomsGrid}>
             {classrooms.length > 0 ? (
               classrooms.map((classroom) => (
-                <div key={classroom.id} className={styles.classroomCard}>
+                <div 
+                  key={classroom.id} 
+                  className={styles.classroomCard}
+                  onClick={() => window.location.href = `/resources/${classroom.id}`}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className={styles.cardHeader}>
                     <h3 className={styles.classroomTitle}>{classroom.title}</h3>
                     {getStatusBadge(classroom.status)}
@@ -222,19 +227,9 @@ export default function ClassroomPage() {
                       <FaUsers className={styles.icon} />
                       <span>{classroom.students}명</span>
                     </div>
-                    <div className={styles.infoItem}>
-                      <FaCalendar className={styles.icon} />
-                      <span>{classroom.startDate}</span>
-                    </div>
-                    <div className={styles.infoItem}>
-                      <FaClock className={styles.icon} />
-                      <span>{classroom.duration}</span>
-                    </div>
                   </div>
 
-                  <p className={styles.instructor}>강사: {classroom.instructor}</p>
-
-                  <div className={styles.actions}>
+                  <div className={styles.actions} onClick={(e) => e.stopPropagation()}>
                     <button
                       className={styles.editBtn}
                       onClick={() => handleEditClassroom(classroom)}

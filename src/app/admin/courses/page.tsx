@@ -17,6 +17,7 @@ interface Lesson {
 interface Course {
   id: number;
   category: string;
+  subCategory?: string; // 서브카테고리 추가
   image: string;
   alt: string;
   instructor: string;
@@ -50,8 +51,17 @@ export default function CoursesPage() {
   const [lessonPdfFile, setLessonPdfFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [categoryFormData, setCategoryFormData] = useState({ name: '', parentCategory: '' });
+  const [subCategories, setSubCategories] = useState<{ [key: string]: string[] }>({
+    '창업': ['배송', '물류', '마케팅'],
+    '드론': ['기초', '조종', '촬영', '항공법'],
+    'AI': ['머신러닝', '딥러닝', '데이터분석'],
+    '환경': ['재활용', '에너지', '생태계']
+  });
   const [formData, setFormData] = useState({
     category: '',
+    subCategory: '',
     image: '',
     alt: '',
     instructor: '',
@@ -198,6 +208,7 @@ export default function CoursesPage() {
     setImagePreview('');
     setFormData({
       category: '',
+      subCategory: '',
       image: '',
       alt: '',
       instructor: '',
@@ -217,6 +228,7 @@ export default function CoursesPage() {
     setImagePreview(course.image);
     setFormData({
       category: course.category,
+      subCategory: course.subCategory || '',
       image: course.image,
       alt: course.alt,
       instructor: course.instructor,
@@ -448,6 +460,7 @@ export default function CoursesPage() {
 
         const requestData = {
           category: englishCategory,
+          subCategory: formData.subCategory || '',
           title: formData.title,
           subtitle: formData.subtitle,
           description: formData.description,
@@ -473,6 +486,9 @@ export default function CoursesPage() {
 
         const multipartFormData = new FormData();
         multipartFormData.append('category', formData.category); // 한글 카테고리 그대로 전송
+        if (formData.subCategory) {
+          multipartFormData.append('subCategory', formData.subCategory);
+        }
         multipartFormData.append('title', formData.title);
         multipartFormData.append('subtitle', formData.subtitle);
         multipartFormData.append('description', formData.description || '');
@@ -538,9 +554,30 @@ export default function CoursesPage() {
             className={styles.searchInput}
           />
         </div>
-        <button className={styles.addButton} onClick={handleAddCourse}>
-          <FaPlus /> 강좌 추가
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            className={styles.categoryButton} 
+            onClick={() => setShowCategoryModal(true)}
+            style={{ 
+              backgroundColor: '#6366F1', 
+              color: 'white',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <FaPlus /> 카테고리 관리
+          </button>
+          <button className={styles.addButton} onClick={handleAddCourse}>
+            <FaPlus /> 강좌 추가
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -552,8 +589,8 @@ export default function CoursesPage() {
               <tr>
                 <th>ID</th>
                 <th>카테고리</th>
+                <th>서브카테고리</th>
                 <th>강좌명</th>
-                <th>강사</th>
                 <th>설명</th>
                 <th>작업</th>
               </tr>
@@ -565,8 +602,8 @@ export default function CoursesPage() {
                     <tr>
                       <td>{course.id}</td>
                       <td>{course.category}</td>
+                      <td>{course.subCategory || '-'}</td>
                       <td>{course.title}</td>
-                      <td>{course.instructor}</td>
                       <td>{course.subtitle}</td>
                       <td className={styles.actions}>
                         <button
@@ -693,7 +730,7 @@ export default function CoursesPage() {
                 <label>카테고리</label>
                 <select
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value, subCategory: '' })}
                 >
                   <option value="">선택하세요</option>
                   {categories.map((cat) => (
@@ -703,6 +740,22 @@ export default function CoursesPage() {
                   ))}
                 </select>
               </div>
+              {formData.category && subCategories[formData.category] && subCategories[formData.category].length > 0 && (
+                <div className={styles.formGroup}>
+                  <label>서브카테고리</label>
+                  <select
+                    value={formData.subCategory}
+                    onChange={(e) => setFormData({ ...formData, subCategory: e.target.value })}
+                  >
+                    <option value="">선택하세요 (선택사항)</option>
+                    {subCategories[formData.category].map((sub) => (
+                      <option key={sub} value={sub}>
+                        {sub}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div className={styles.formGroup}>
                 <label>강좌명</label>
                 <input
@@ -710,15 +763,6 @@ export default function CoursesPage() {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="강좌명을 입력하세요"
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>강사</label>
-                <input
-                  type="text"
-                  value={formData.instructor}
-                  onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
-                  placeholder="강사명을 입력하세요"
                 />
               </div>
               <div className={styles.formGroup}>
@@ -973,6 +1017,192 @@ export default function CoursesPage() {
                 >
                   {isUploading ? `업로드 중... ${uploadProgress}%` : '저장'}
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 카테고리 관리 모달 */}
+      {showCategoryModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent} style={{ maxWidth: '800px' }}>
+            <div className={styles.modalHeader}>
+              <h3>카테고리 관리</h3>
+              <button
+                className={styles.modalCloseBtn}
+                onClick={() => setShowCategoryModal(false)}
+                type="button"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              {/* 카테고리 추가 폼 */}
+              <div style={{ marginBottom: '30px', padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600', color: '#333' }}>새 카테고리 추가</h4>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                      카테고리 타입
+                    </label>
+                    <select
+                      value={categoryFormData.parentCategory}
+                      onChange={(e) => setCategoryFormData({ ...categoryFormData, parentCategory: e.target.value })}
+                      style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px' }}
+                    >
+                      <option value="">메인 카테고리</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}의 서브카테고리
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                      카테고리명
+                    </label>
+                    <input
+                      type="text"
+                      value={categoryFormData.name}
+                      onChange={(e) => setCategoryFormData({ ...categoryFormData, name: e.target.value })}
+                      placeholder="카테고리 이름 입력"
+                      style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px' }}
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (!categoryFormData.name) {
+                        alert('카테고리명을 입력해주세요.');
+                        return;
+                      }
+                      
+                      if (categoryFormData.parentCategory) {
+                        // 서브카테고리 추가
+                        const newSubCategories = { ...subCategories };
+                        if (!newSubCategories[categoryFormData.parentCategory]) {
+                          newSubCategories[categoryFormData.parentCategory] = [];
+                        }
+                        newSubCategories[categoryFormData.parentCategory].push(categoryFormData.name);
+                        setSubCategories(newSubCategories);
+                        alert(`"${categoryFormData.parentCategory}"의 서브카테고리 "${categoryFormData.name}"이(가) 추가되었습니다.`);
+                      } else {
+                        // 메인 카테고리 추가
+                        setCategories([...categories, categoryFormData.name]);
+                        alert(`메인 카테고리 "${categoryFormData.name}"이(가) 추가되었습니다.`);
+                      }
+                      
+                      setCategoryFormData({ name: '', parentCategory: '' });
+                    }}
+                    style={{
+                      padding: '9px 15px',
+                      backgroundColor: '#6366F1',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      marginLeft: '10px',
+                    }}
+                  >
+                    추가
+                  </button>
+                </div>
+              </div>
+
+              {/* 현재 카테고리 목록 */}
+              <div>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600', color: '#333' }}>현재 카테고리</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {categories.map((category) => (
+                    <div key={category} style={{ padding: '16px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <h5 style={{ margin: 0, fontSize: '15px', fontWeight: '600', color: '#333' }}>{category}</h5>
+                        <button
+                          onClick={() => {
+                            if (confirm(`"${category}" 카테고리를 삭제하시겠습니까?`)) {
+                              setCategories(categories.filter(c => c !== category));
+                              // 서브카테고리도 삭제
+                              const newSubCategories = { ...subCategories };
+                              delete newSubCategories[category];
+                              setSubCategories(newSubCategories);
+                              alert('카테고리가 삭제되었습니다.');
+                            }
+                          }}
+                          style={{
+                            padding: '4px 12px',
+                            backgroundColor: '#FFEBEE',
+                            color: '#D32F2F',
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                      
+                      {/* 서브카테고리 목록 */}
+                      {subCategories[category] && subCategories[category].length > 0 && (
+                        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #f0f0f0' }}>
+                          <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#666', fontWeight: '600' }}>서브카테고리:</p>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                            {subCategories[category].map((sub, idx) => (
+                              <div
+                                key={idx}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  padding: '4px 10px',
+                                  backgroundColor: '#E3F2FD',
+                                  color: '#1976D2',
+                                  borderRadius: '16px',
+                                  fontSize: '12px',
+                                  fontWeight: '600'
+                                }}
+                              >
+                                <span>{sub}</span>
+                                <button
+                                  onClick={() => {
+                                    if (confirm(`"${sub}" 서브카테고리를 삭제하시겠습니까?`)) {
+                                      const newSubCategories = { ...subCategories };
+                                      newSubCategories[category] = newSubCategories[category].filter(s => s !== sub);
+                                      setSubCategories(newSubCategories);
+                                      alert('서브카테고리가 삭제되었습니다.');
+                                    }
+                                  }}
+                                  style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#1976D2',
+                                    cursor: 'pointer',
+                                    padding: '0',
+                                    fontSize: '14px',
+                                    fontWeight: 'bold'
+                                  }}
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ marginTop: '20px', padding: '12px', backgroundColor: '#FFF9C4', borderRadius: '6px', border: '1px solid #FBC02D' }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#F57F17' }}>
+                  <span style={{fontSize: '18px'}}>💡</span> <strong>참고:</strong> 카테고리 타입에서 부카테고리를 넣고싶은 카테고리를 선택 후, 이름을 입력하고 추가하면 됨.
+                </p>
               </div>
             </div>
           </div>

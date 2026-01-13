@@ -14,6 +14,7 @@ import api from '@/lib/axios';
 interface Material {
   id: number;
   category: string;
+  subCategory?: string;
   image: string;
   alt: string;
   instructor: string;
@@ -32,10 +33,17 @@ interface CartItem extends Material {
 export default function ResourcesPage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = React.useState('전체');
+  const [selectedSubCategory, setSelectedSubCategory] = React.useState<string | null>(null);
   const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
   const [materialsData, setMaterialsData] = React.useState<Material[]>([]);
   const [categories, setCategories] = React.useState<string[]>([]);
+  const [subCategories, setSubCategories] = React.useState<{ [key: string]: string[] }>({
+    '창업': ['배송', '물류', '마케팅'],
+    '드론': ['기초', '조종', '촬영', '항공법'],
+    'AI': ['머신러닝', '딥러닝', '데이터분석'],
+    '환경': ['재활용', '에너지', '생태계']
+  });
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -134,12 +142,21 @@ export default function ResourcesPage() {
   }, []);
 
   // 필터링된 카드 데이터
-  const filteredMaterials = selectedCategory === '전체'
-    ? materialsData
-    : materialsData.filter(material => material.category === selectedCategory);
+  const filteredMaterials = materialsData.filter(material => {
+    // 카테고리 필터
+    if (selectedCategory !== '전체' && material.category !== selectedCategory) {
+      return false;
+    }
+    // 서브카테고리 필터
+    if (selectedSubCategory && material.subCategory !== selectedSubCategory) {
+      return false;
+    }
+    return true;
+  });
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
+    setSelectedSubCategory(null); // 카테고리 변경 시 서브카테고리 초기화
   };
 
   const handleMaterialClick = (materialId: number) => {
@@ -212,6 +229,56 @@ export default function ResourcesPage() {
             ))}
           </div>
 
+          {/* 서브카테고리 필터 */}
+          {selectedCategory !== '전체' && subCategories[selectedCategory] && (
+            <div style={{ 
+              display: 'flex', 
+              gap: '10px', 
+              flexWrap: 'wrap', 
+              marginTop: '20px',
+              marginBottom: '20px',
+              padding: '15px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '8px'
+            }}>
+              <button
+                onClick={() => setSelectedSubCategory(null)}
+                style={{
+                  padding: '8px 16px',
+                  border: selectedSubCategory === null ? '2px solid #04AD74' : '1px solid #ddd',
+                  backgroundColor: selectedSubCategory === null ? '#E8F5E9' : '#ffffff',
+                  color: selectedSubCategory === null ? '#04AD74' : '#666',
+                  borderRadius: '20px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                전체
+              </button>
+              {subCategories[selectedCategory].map((sub) => (
+                <button
+                  key={sub}
+                  onClick={() => setSelectedSubCategory(sub)}
+                  style={{
+                    padding: '8px 16px',
+                    border: selectedSubCategory === sub ? '2px solid #04AD74' : '1px solid #ddd',
+                    backgroundColor: selectedSubCategory === sub ? '#E8F5E9' : '#ffffff',
+                    color: selectedSubCategory === sub ? '#04AD74' : '#666',
+                    borderRadius: '20px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {sub}
+                </button>
+              ))}
+            </div>
+          )}
+
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
               <p>학습자료를 불러오는 중입니다...</p>
@@ -240,10 +307,16 @@ export default function ResourcesPage() {
                           (e.target as HTMLImageElement).src = '/placeholder.png';
                         }}
                       />
-                      <div className={styles.categoryTag}>{material.category}</div>
+                      <div className={styles.categoryTag}>
+                        {material.category}
+                        {material.subCategory && (
+                          <span style={{ marginLeft: '6px', fontSize: '11px', opacity: 0.9 }}>
+                            · {material.subCategory}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className={styles.materialContent}>
-                      <p className={styles.instructorInfo}>{material.instructor}</p>
                       <p className={styles.materialTitle}>{material.title}</p>
                       <p
                         className={styles.subtitle}
@@ -294,7 +367,6 @@ export default function ResourcesPage() {
                   <div key={item.id} className={styles.cartItem}>
                     <div className={styles.cartItemInfo}>
                       <h4>{item.title}</h4>
-                      <p>{item.instructor}</p>
                     </div>
                     <button
                       className={styles.removeBtn}
