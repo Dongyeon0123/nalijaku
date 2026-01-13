@@ -53,12 +53,7 @@ export default function CoursesPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [categoryFormData, setCategoryFormData] = useState({ name: '', parentCategory: '' });
-  const [subCategories, setSubCategories] = useState<{ [key: string]: string[] }>({
-    '창업': ['배송', '물류', '마케팅'],
-    '드론': ['기초', '조종', '촬영', '항공법'],
-    'AI': ['머신러닝', '딥러닝', '데이터분석'],
-    '환경': ['재활용', '에너지', '생태계']
-  });
+  const [subCategories, setSubCategories] = useState<{ [key: string]: string[] }>({});
   const [formData, setFormData] = useState({
     category: '',
     subCategory: '',
@@ -75,7 +70,25 @@ export default function CoursesPage() {
 
   useEffect(() => {
     loadCourses();
+    loadSubCategories();
   }, []);
+
+  const loadSubCategories = async () => {
+    try {
+      const response = await api.get('/api/resources/subcategories');
+      console.log('✅ 서브카테고리 로드 성공:', response.data);
+      
+      if (response.data.success && response.data.data) {
+        setSubCategories(response.data.data);
+      } else if (typeof response.data === 'object') {
+        setSubCategories(response.data);
+      }
+    } catch (error: any) {
+      console.warn('⚠️ 서브카테고리 로드 실패 (백엔드 API 미구현 가능성):', error.message);
+      // API 실패 시 빈 객체 유지 (정상 동작)
+      setSubCategories({});
+    }
+  };
 
   const loadCourses = async () => {
     try {
@@ -138,13 +151,27 @@ export default function CoursesPage() {
           // 카테고리 API 실패 시 기본값 ("전체" 제외)
           setCategories(['창업', '드론', 'AI', '환경']);
         }
+
+        // 서브카테고리 로드
+        try {
+          const subCategoriesResponse = await api.get('/api/categories/subcategories');
+          console.log('✅ 서브카테고리 로드 성공:', subCategoriesResponse.data);
+          
+          if (subCategoriesResponse.data) {
+            setSubCategories(subCategoriesResponse.data);
+          }
+        } catch (subCategoryError: any) {
+          console.warn('⚠️ 서브카테고리 로드 실패 (백엔드 API 미구현 가능성):', subCategoryError.message);
+          // 서브카테고리 API 실패 시 빈 객체 유지 (정상 동작)
+          setSubCategories({});
+        }
       } catch (categoryError) {
-        console.error('❌ 카테고리 로드 실패:', categoryError);
+        console.error('카테고리 로드 실패:', categoryError);
         // 카테고리 API 실패 시 기본값 ("전체" 제외)
         setCategories(['창업', '드론', 'AI', '환경']);
       }
     } catch (error: any) {
-      console.error('❌ 강좌 로드 실패:', error);
+      console.error('강좌 로드 실패:', error);
       if (error.response?.status === 401) {
         alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
         window.location.href = '/';
@@ -288,7 +315,7 @@ export default function CoursesPage() {
       formData.append('description', lessonFormData.description);
       formData.append('type', lessonFormData.type || '이론');
 
-      console.log('📋 FormData 구성:');
+      console.log('FormData 구성:');
       console.log('  - order:', lessonFormData.order);
       console.log('  - materials:', lessonFormData.materials);
       console.log('  - type:', lessonFormData.type);
@@ -296,12 +323,12 @@ export default function CoursesPage() {
 
       if (lessonPdfFile) {
         formData.append('pdfFile', lessonPdfFile);
-        console.log('📄 PDF 파일 정보:');
+        console.log('PDF 파일 정보:');
         console.log('  - 파일명:', lessonPdfFile.name);
         console.log('  - 파일 크기:', (lessonPdfFile.size / (1024 * 1024)).toFixed(2), 'MB');
         console.log('  - 파일 타입:', lessonPdfFile.type);
       } else {
-        console.log('⚠️ PDF 파일 없음');
+        console.log('PDF 파일 없음');
       }
 
       const method = editingLesson ? 'PUT' : 'POST';
@@ -310,7 +337,7 @@ export default function CoursesPage() {
         : `/api/resources/${courseId}/lessons`;
       const fullUrl = `${process.env.NEXT_PUBLIC_API_URL || 'https://api.nallijaku.com'}${url}`;
 
-      console.log('📤 차시 저장 요청:');
+      console.log('차시 저장 요청:');
       console.log('  - 메서드:', method);
       console.log('  - URL:', fullUrl);
       console.log('  - 강좌 ID:', courseId);
@@ -323,7 +350,7 @@ export default function CoursesPage() {
         if (e.lengthComputable) {
           const percentComplete = (e.loaded / e.total) * 100;
           setUploadProgress(Math.round(percentComplete));
-          console.log(`📊 업로드 진행률: ${Math.round(percentComplete)}%`);
+          console.log(`업로드 진행률: ${Math.round(percentComplete)}%`);
         }
       });
 
@@ -366,14 +393,14 @@ export default function CoursesPage() {
       });
 
       xhr.addEventListener('error', () => {
-        console.error('❌ 업로드 실패:', xhr.statusText);
+        console.error('업로드 실패:', xhr.statusText);
         alert('차시 저장 중 오류가 발생했습니다.');
         setIsUploading(false);
         setUploadProgress(0);
       });
 
       xhr.addEventListener('abort', () => {
-        console.error('❌ 업로드 취소됨');
+        console.error('업로드 취소됨');
         alert('업로드가 취소되었습니다.');
         setIsUploading(false);
         setUploadProgress(0);
@@ -382,7 +409,7 @@ export default function CoursesPage() {
       // 타임아웃 설정 (5분)
       xhr.timeout = 5 * 60 * 1000;
       xhr.addEventListener('timeout', () => {
-        console.error('❌ 업로드 타임아웃');
+        console.error('업로드 타임아웃');
         alert('업로드 시간이 초과되었습니다. 파일 크기를 확인해주세요.');
         setIsUploading(false);
         setUploadProgress(0);
@@ -400,7 +427,7 @@ export default function CoursesPage() {
       xhr.withCredentials = true;
       xhr.send(formData);
     } catch (error) {
-      console.error('❌ 차시 저장 실패:', error);
+      console.error('차시 저장 실패:', error);
       const errorMsg = error instanceof Error ? error.message : '알 수 없는 오류';
       alert('차시 저장 중 오류가 발생했습니다: ' + errorMsg);
       setIsUploading(false);
@@ -472,7 +499,7 @@ export default function CoursesPage() {
           image: imageUrl,
         };
 
-        console.log('📤 수정 요청 데이터:', requestData);
+        console.log('수정 요청 데이터:', requestData);
         const response = await api.put(`/api/resources/${editingCourse.id}`, requestData);
         console.log('API 응답:', response.data);
         alert('강좌가 수정되었습니다.');
@@ -504,7 +531,7 @@ export default function CoursesPage() {
           multipartFormData.append('imageUrl', formData.image);
         }
 
-        console.log('📤 추가 요청 (multipart/form-data)');
+        console.log('추가 요청 (multipart/form-data)');
         const response = await api.post('/api/resources', multipartFormData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -1072,28 +1099,42 @@ export default function CoursesPage() {
                     />
                   </div>
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (!categoryFormData.name) {
                         alert('카테고리명을 입력해주세요.');
                         return;
                       }
                       
-                      if (categoryFormData.parentCategory) {
-                        // 서브카테고리 추가
-                        const newSubCategories = { ...subCategories };
-                        if (!newSubCategories[categoryFormData.parentCategory]) {
-                          newSubCategories[categoryFormData.parentCategory] = [];
+                      try {
+                        if (categoryFormData.parentCategory) {
+                          // 서브카테고리 추가 API 호출
+                          await api.post('/api/admin/categories/subcategories', {
+                            parentCategory: categoryFormData.parentCategory,
+                            subCategory: categoryFormData.name
+                          });
+                          
+                          const newSubCategories = { ...subCategories };
+                          if (!newSubCategories[categoryFormData.parentCategory]) {
+                            newSubCategories[categoryFormData.parentCategory] = [];
+                          }
+                          newSubCategories[categoryFormData.parentCategory].push(categoryFormData.name);
+                          setSubCategories(newSubCategories);
+                          alert(`"${categoryFormData.parentCategory}"의 서브카테고리 "${categoryFormData.name}"이(가) 추가되었습니다.`);
+                        } else {
+                          // 메인 카테고리 추가 API 호출
+                          await api.post('/api/admin/categories', {
+                            name: categoryFormData.name
+                          });
+                          
+                          setCategories([...categories, categoryFormData.name]);
+                          alert(`메인 카테고리 "${categoryFormData.name}"이(가) 추가되었습니다.`);
                         }
-                        newSubCategories[categoryFormData.parentCategory].push(categoryFormData.name);
-                        setSubCategories(newSubCategories);
-                        alert(`"${categoryFormData.parentCategory}"의 서브카테고리 "${categoryFormData.name}"이(가) 추가되었습니다.`);
-                      } else {
-                        // 메인 카테고리 추가
-                        setCategories([...categories, categoryFormData.name]);
-                        alert(`메인 카테고리 "${categoryFormData.name}"이(가) 추가되었습니다.`);
+                        
+                        setCategoryFormData({ name: '', parentCategory: '' });
+                      } catch (error: any) {
+                        console.error('카테고리 추가 실패:', error);
+                        alert(error.response?.data?.message || '카테고리 추가에 실패했습니다.');
                       }
-                      
-                      setCategoryFormData({ name: '', parentCategory: '' });
                     }}
                     style={{
                       padding: '9px 15px',
@@ -1122,14 +1163,22 @@ export default function CoursesPage() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                         <h5 style={{ margin: 0, fontSize: '15px', fontWeight: '600', color: '#333' }}>{category}</h5>
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             if (confirm(`"${category}" 카테고리를 삭제하시겠습니까?`)) {
-                              setCategories(categories.filter(c => c !== category));
-                              // 서브카테고리도 삭제
-                              const newSubCategories = { ...subCategories };
-                              delete newSubCategories[category];
-                              setSubCategories(newSubCategories);
-                              alert('카테고리가 삭제되었습니다.');
+                              try {
+                                // 메인 카테고리 삭제 API 호출
+                                await api.delete(`/api/admin/categories/${encodeURIComponent(category)}`);
+                                
+                                setCategories(categories.filter(c => c !== category));
+                                // 서브카테고리도 삭제
+                                const newSubCategories = { ...subCategories };
+                                delete newSubCategories[category];
+                                setSubCategories(newSubCategories);
+                                alert('카테고리가 삭제되었습니다.');
+                              } catch (error: any) {
+                                console.error('카테고리 삭제 실패:', error);
+                                alert(error.response?.data?.message || '카테고리 삭제에 실패했습니다.');
+                              }
                             }
                           }}
                           style={{
@@ -1169,12 +1218,20 @@ export default function CoursesPage() {
                               >
                                 <span>{sub}</span>
                                 <button
-                                  onClick={() => {
+                                  onClick={async () => {
                                     if (confirm(`"${sub}" 서브카테고리를 삭제하시겠습니까?`)) {
-                                      const newSubCategories = { ...subCategories };
-                                      newSubCategories[category] = newSubCategories[category].filter(s => s !== sub);
-                                      setSubCategories(newSubCategories);
-                                      alert('서브카테고리가 삭제되었습니다.');
+                                      try {
+                                        // 서브카테고리 삭제 API 호출
+                                        await api.delete(`/api/admin/categories/${encodeURIComponent(category)}/subcategories/${encodeURIComponent(sub)}`);
+                                        
+                                        const newSubCategories = { ...subCategories };
+                                        newSubCategories[category] = newSubCategories[category].filter(s => s !== sub);
+                                        setSubCategories(newSubCategories);
+                                        alert('서브카테고리가 삭제되었습니다.');
+                                      } catch (error: any) {
+                                        console.error('서브카테고리 삭제 실패:', error);
+                                        alert(error.response?.data?.message || '서브카테고리 삭제에 실패했습니다.');
+                                      }
                                     }
                                   }}
                                   style={{
@@ -1201,7 +1258,7 @@ export default function CoursesPage() {
 
               <div style={{ marginTop: '20px', padding: '12px', backgroundColor: '#FFF9C4', borderRadius: '6px', border: '1px solid #FBC02D' }}>
                 <p style={{ margin: 0, fontSize: '14px', color: '#F57F17' }}>
-                  <span style={{fontSize: '18px'}}>💡</span> <strong>참고:</strong> 카테고리 타입에서 부카테고리를 넣고싶은 카테고리를 선택 후, 이름을 입력하고 추가하면 됨.
+                  <span style={{fontSize: '18px'}}>💡</span> <strong>참고:</strong> 카테고리 타입에서 서브 카테고리를 넣고싶은 카테고리를 선택 후, 이름을 입력하고 추가하면 됨.
                 </p>
               </div>
             </div>
