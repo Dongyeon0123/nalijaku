@@ -300,3 +300,116 @@
     background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
     box-shadow: 0 2px 4px rgba(149, 165, 166, 0.3);
 }
+
+/* 역할 변경 관련 스타일 */
+.roleSelect {
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.roleSelect:focus {
+    outline: none;
+    border-color: #04AD74;
+    box-shadow: 0 0 0 3px rgba(4, 173, 116, 0.1);
+}
+
+.editRoleButton {
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #04AD74, #00A169);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(4, 173, 116, 0.3);
+}
+
+.editRoleButton:hover {
+    background: linear-gradient(135deg, #00A169, #008f5d);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(4, 173, 116, 0.4);
+}
+
+.saveRoleButton {
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+}
+
+.saveRoleButton:hover {
+    background: linear-gradient(135deg, #2980b9, #21618c);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4);
+}
+
+.cancelRoleButton {
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(149, 165, 166, 0.3);
+}
+
+.cancelRoleButton:hover {
+    background: linear-gradient(135deg, #7f8c8d, #6c7a7b);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(149, 165, 166, 0.4);
+}
+
+/* INSTRUCTOR 역할 스타일 추가 */
+.role.instructor,
+.roleBadge.instructor {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;
+    box-shadow: 0 2px 8px rgba(155, 89, 182, 0.4);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .detailGrid {
+        grid-template-columns: 1fr;
+    }
+    
+    .modalContent {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .modalHeader {
+        padding: 1.5rem;
+    }
+    
+    .modalBody {
+        padding: 1.5rem;
+    }
+    
+    .modalFooter {
+        padding: 1rem 1.5rem;
+        flex-direction: column;
+    }
+    
+    .deleteButton,
+    .closeModalButton {
+        width: 100%;
+    }
+}

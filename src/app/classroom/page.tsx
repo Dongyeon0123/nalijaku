@@ -212,7 +212,7 @@ export default function ClassroomPage() {
                 <div 
                   key={classroom.id} 
                   className={styles.classroomCard}
-                  onClick={() => window.location.href = `/resources/${classroom.id}`}
+                  onClick={() => window.location.href = `/classroom/${classroom.id}`}
                   style={{ cursor: 'pointer' }}
                 >
                   <div className={styles.cardHeader}>

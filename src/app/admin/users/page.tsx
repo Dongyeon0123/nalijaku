@@ -22,6 +22,8 @@ const UsersPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [editingRole, setEditingRole] = useState(false);
+  const [newRole, setNewRole] = useState<string>('');
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -158,6 +160,8 @@ const UsersPage = () => {
                       className={styles.manageButton}
                       onClick={() => {
                         setSelectedUser(user);
+                        setNewRole(user.role || 'USER');
+                        setEditingRole(false);
                         setShowModal(true);
                       }}
                     >
@@ -199,9 +203,60 @@ const UsersPage = () => {
                 </div>
                 <div className={styles.detailItem}>
                   <label>역할:</label>
-                  <span className={`${styles.roleBadge} ${styles[selectedUser.role?.toLowerCase() || 'general']}`}>
-                    {selectedUser.role || 'GENERAL'}
-                  </span>
+                  {editingRole ? (
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <select 
+                        value={newRole}
+                        onChange={(e) => setNewRole(e.target.value)}
+                        className={styles.roleSelect}
+                      >
+                        <option value="USER">USER</option>
+                        <option value="INSTRUCTOR">INSTRUCTOR</option>
+                        <option value="ADMIN">ADMIN</option>
+                      </select>
+                      <button 
+                        className={styles.saveRoleButton}
+                        onClick={async () => {
+                          try {
+                            await api.put(`/api/users/${selectedUser.id}/role`, { role: newRole });
+                            // 사용자 목록 업데이트
+                            setUsers(users.map(u => 
+                              u.id === selectedUser.id ? { ...u, role: newRole } : u
+                            ));
+                            setSelectedUser({ ...selectedUser, role: newRole });
+                            setEditingRole(false);
+                            alert('역할이 변경되었습니다.');
+                          } catch (error: any) {
+                            console.error('역할 변경 실패:', error);
+                            alert(error.response?.data?.message || '역할 변경에 실패했습니다.');
+                          }
+                        }}
+                      >
+                        저장
+                      </button>
+                      <button 
+                        className={styles.cancelRoleButton}
+                        onClick={() => {
+                          setNewRole(selectedUser.role || 'USER');
+                          setEditingRole(false);
+                        }}
+                      >
+                        취소
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span className={`${styles.roleBadge} ${styles[selectedUser.role?.toLowerCase() || 'user']}`}>
+                        {selectedUser.role || 'USER'}
+                      </span>
+                      <button 
+                        className={styles.editRoleButton}
+                        onClick={() => setEditingRole(true)}
+                      >
+                        변경
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className={styles.detailItem}>
                   <label>드론 경험:</label>
