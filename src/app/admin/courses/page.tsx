@@ -40,6 +40,7 @@ export default function CoursesPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
+  const [categoryMap, setCategoryMap] = useState<{ [name: string]: number }>({}); // 이름 -> ID 매핑
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
@@ -75,11 +76,26 @@ export default function CoursesPage() {
 
   const loadSubCategories = async () => {
     try {
-      const response = await api.get('/api/resources/subcategories');
+      const response = await api.get('/api/categories/subcategories');
       console.log('✅ 서브카테고리 로드 성공:', response.data);
       
+      // 새로운 API 응답 형식 처리
       if (response.data.success && response.data.data) {
-        setSubCategories(response.data.data);
+        // 평면 구조를 계층 구조로 변환
+        const subCategoryMap: { [key: string]: string[] } = {};
+        
+        response.data.data.forEach((sub: any) => {
+          // parentId로 메인 카테고리 찾기 (나중에 카테고리 목록과 매칭)
+          const parentName = sub.parentName || ''; // 백엔드에서 parentName 제공 시
+          if (parentName && !subCategoryMap[parentName]) {
+            subCategoryMap[parentName] = [];
+          }
+          if (parentName) {
+            subCategoryMap[parentName].push(sub.name);
+          }
+        });
+        
+        setSubCategories(subCategoryMap);
       } else if (typeof response.data === 'object') {
         setSubCategories(response.data);
       }
@@ -136,39 +152,51 @@ export default function CoursesPage() {
 
       // 카테고리는 별도 API에서 가져오기
       try {
-        const categoriesResponse = await api.get('/api/resources/categories');
+        // 새로운 계층형 카테고리 API 사용
+        const categoriesResponse = await api.get('/api/categories');
         console.log('✅ 카테고리 로드 성공:', categoriesResponse.data);
         
-        if (Array.isArray(categoriesResponse.data)) {
-          // "전체" 제외하고 나머지만 사용
+        if (categoriesResponse.data.success && categoriesResponse.data.data?.categories) {
+          const categoryData = categoriesResponse.data.data.categories;
+          
+          // 메인 카테고리 추출 ("전체" 제외)
+          const mainCategories = categoryData
+            .filter((cat: any) => cat.name !== '전체')
+            .map((cat: any) => cat.name);
+          setCategories(mainCategories);
+          
+          // 카테고리 이름 -> ID 매핑 생성
+          const nameToIdMap: { [name: string]: number } = {};
+          categoryData.forEach((cat: any) => {
+            nameToIdMap[cat.name] = cat.id;
+          });
+          setCategoryMap(nameToIdMap);
+          
+          // 서브카테고리 맵 생성
+          const subCategoryMap: { [key: string]: string[] } = {};
+          categoryData.forEach((cat: any) => {
+            if (cat.subCategories && cat.subCategories.length > 0) {
+              subCategoryMap[cat.name] = cat.subCategories.map((sub: any) => sub.name);
+            }
+          });
+          console.log('📋 서브카테고리 맵 업데이트:', subCategoryMap);
+          setSubCategories(subCategoryMap);
+          
+        } else if (Array.isArray(categoriesResponse.data)) {
+          // 이전 형식 호환
           const filteredCategories = categoriesResponse.data.filter((cat: string) => cat !== '전체');
           setCategories(filteredCategories);
         } else if (categoriesResponse.data.data && Array.isArray(categoriesResponse.data.data)) {
-          // "전체" 제외하고 나머지만 사용
           const filteredCategories = categoriesResponse.data.data.filter((cat: string) => cat !== '전체');
           setCategories(filteredCategories);
         } else {
-          // 카테고리 API 실패 시 기본값 ("전체" 제외)
-          setCategories(['창업', '드론', 'AI', '환경']);
-        }
-
-        // 서브카테고리 로드
-        try {
-          const subCategoriesResponse = await api.get('/api/categories/subcategories');
-          console.log('✅ 서브카테고리 로드 성공:', subCategoriesResponse.data);
-          
-          if (subCategoriesResponse.data) {
-            setSubCategories(subCategoriesResponse.data);
-          }
-        } catch (subCategoryError: any) {
-          console.warn('⚠️ 서브카테고리 로드 실패 (백엔드 API 미구현 가능성):', subCategoryError.message);
-          // 서브카테고리 API 실패 시 빈 객체 유지 (정상 동작)
-          setSubCategories({});
+          // 카테고리 API 실패 시 빈 배열
+          setCategories([]);
         }
       } catch (categoryError) {
-        console.error('카테고리 로드 실패:', categoryError);
-        // 카테고리 API 실패 시 기본값 ("전체" 제외)
-        setCategories(['창업', '드론', 'AI', '환경']);
+        console.error('❌ 카테고리 로드 실패:', categoryError);
+        // 카테고리 API 실패 시 빈 배열
+        setCategories([]);
       }
     } catch (error: any) {
       console.error('강좌 로드 실패:', error);
@@ -1107,10 +1135,17 @@ export default function CoursesPage() {
                       
                       try {
                         if (categoryFormData.parentCategory) {
-                          // 서브카테고리 추가 API 호출
+                          // 서브카테고리 추가 API 호출 (parentId 사용)
+                          const parentId = categoryMap[categoryFormData.parentCategory];
+                          
+                          if (!parentId) {
+                            alert('상위 카테고리를 찾을 수 없습니다.');
+                            return;
+                          }
+                          
                           await api.post('/api/admin/categories/subcategories', {
-                            parentCategory: categoryFormData.parentCategory,
-                            subCategory: categoryFormData.name
+                            name: categoryFormData.name,
+                            parentId: parentId
                           });
                           
                           const newSubCategories = { ...subCategories };
@@ -1131,6 +1166,7 @@ export default function CoursesPage() {
                         }
                         
                         setCategoryFormData({ name: '', parentCategory: '' });
+                        loadCourses(); // 카테고리 다시 로드하여 ID 매핑 업데이트
                       } catch (error: any) {
                         console.error('카테고리 추가 실패:', error);
                         alert(error.response?.data?.message || '카테고리 추가에 실패했습니다.');
@@ -1169,12 +1205,9 @@ export default function CoursesPage() {
                                 // 메인 카테고리 삭제 API 호출
                                 await api.delete(`/api/admin/categories/${encodeURIComponent(category)}`);
                                 
-                                setCategories(categories.filter(c => c !== category));
-                                // 서브카테고리도 삭제
-                                const newSubCategories = { ...subCategories };
-                                delete newSubCategories[category];
-                                setSubCategories(newSubCategories);
                                 alert('카테고리가 삭제되었습니다.');
+                                // 카테고리 목록 다시 로드
+                                await loadCourses();
                               } catch (error: any) {
                                 console.error('카테고리 삭제 실패:', error);
                                 alert(error.response?.data?.message || '카테고리 삭제에 실패했습니다.');
@@ -1221,15 +1254,24 @@ export default function CoursesPage() {
                                   onClick={async () => {
                                     if (confirm(`"${sub}" 서브카테고리를 삭제하시겠습니까?`)) {
                                       try {
-                                        // 서브카테고리 삭제 API 호출
-                                        await api.delete(`/api/admin/categories/${encodeURIComponent(category)}/subcategories/${encodeURIComponent(sub)}`);
+                                        const deleteUrl = `/api/admin/categories/${encodeURIComponent(category)}/subcategories/${encodeURIComponent(sub)}`;
+                                        console.log('🗑️ 서브카테고리 삭제 요청:', deleteUrl);
+                                        console.log('  - 메인 카테고리:', category);
+                                        console.log('  - 서브카테고리:', sub);
                                         
-                                        const newSubCategories = { ...subCategories };
-                                        newSubCategories[category] = newSubCategories[category].filter(s => s !== sub);
-                                        setSubCategories(newSubCategories);
+                                        // 서브카테고리 삭제 API 호출
+                                        const response = await api.delete(deleteUrl);
+                                        console.log('✅ 서브카테고리 삭제 성공:', response.data);
+                                        
+                                        console.log('🔄 카테고리 목록 다시 로드 시작...');
+                                        await loadCourses();
+                                        console.log('🔄 카테고리 목록 다시 로드 완료!');
+                                        
                                         alert('서브카테고리가 삭제되었습니다.');
                                       } catch (error: any) {
-                                        console.error('서브카테고리 삭제 실패:', error);
+                                        console.error('❌ 서브카테고리 삭제 실패:', error);
+                                        console.error('  - 상태 코드:', error.response?.status);
+                                        console.error('  - 에러 메시지:', error.response?.data);
                                         alert(error.response?.data?.message || '서브카테고리 삭제에 실패했습니다.');
                                       }
                                     }

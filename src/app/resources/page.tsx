@@ -38,12 +38,7 @@ export default function ResourcesPage() {
   const [isCartOpen, setIsCartOpen] = React.useState(false);
   const [materialsData, setMaterialsData] = React.useState<Material[]>([]);
   const [categories, setCategories] = React.useState<string[]>([]);
-  const [subCategories, setSubCategories] = React.useState<{ [key: string]: string[] }>({
-    '창업': ['배송', '물류', '마케팅'],
-    '드론': ['기초', '조종', '촬영', '항공법'],
-    'AI': ['머신러닝', '딥러닝', '데이터분석'],
-    '환경': ['재활용', '에너지', '생태계']
-  });
+  const [subCategories, setSubCategories] = React.useState<{ [key: string]: string[] }>({});
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -108,10 +103,27 @@ export default function ResourcesPage() {
 
         // 카테고리는 별도 API에서 가져오기
         try {
-          const categoriesResponse = await api.get('/api/resources/categories');
+          // 새로운 계층형 카테고리 API 사용
+          const categoriesResponse = await api.get('/api/categories');
           console.log('✅ 카테고리 로드 성공:', categoriesResponse.data);
           
-          if (Array.isArray(categoriesResponse.data)) {
+          if (categoriesResponse.data.success && categoriesResponse.data.data?.categories) {
+            const categoryData = categoriesResponse.data.data.categories;
+            
+            // 메인 카테고리 추출
+            const mainCategories = categoryData.map((cat: any) => cat.name);
+            setCategories(mainCategories);
+            
+            // 서브카테고리 맵 생성
+            const subCategoryMap: { [key: string]: string[] } = {};
+            categoryData.forEach((cat: any) => {
+              if (cat.subCategories && cat.subCategories.length > 0) {
+                subCategoryMap[cat.name] = cat.subCategories.map((sub: any) => sub.name);
+              }
+            });
+            setSubCategories(subCategoryMap);
+            
+          } else if (Array.isArray(categoriesResponse.data)) {
             setCategories(categoriesResponse.data);
           } else if (categoriesResponse.data.data && Array.isArray(categoriesResponse.data.data)) {
             setCategories(categoriesResponse.data.data);
