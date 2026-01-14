@@ -285,49 +285,67 @@ export default function ResourcesPage() {
           ) : (
             <div className={styles.materialsGrid}>
               {filteredMaterials.length > 0 ? (
-                filteredMaterials.map((material) => (
-                  <div
-                    key={material.id}
-                    className={styles.materialItem}
-                    onClick={() => handleMaterialClick(material.id)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className={styles.imageContainer}>
-                      <img
-                        src={material.image.startsWith('http') ? material.image : `https://api.nallijaku.com${material.image}`}
-                        alt={material.alt}
-                        className={styles.materialImage}
-                        onError={(e) => {
-                          console.error('이미지 로드 실패:', material.image);
-                          (e.target as HTMLImageElement).src = '/placeholder.png';
-                        }}
-                      />
-                      <div className={styles.categoryTag}>
-                        {material.category}
-                        {material.subCategory && (
-                          <span style={{ marginLeft: '6px', fontSize: '11px', opacity: 0.9 }}>
-                            · {material.subCategory}
-                          </span>
-                        )}
+                filteredMaterials.map((material) => {
+                  // 카테고리별 색상 정의
+                  const categoryColors: { [key: string]: { bg: string; text: string } } = {
+                    '창업': { bg: '#E3F2FD', text: '#1976D2' },
+                    '드론': { bg: '#F3E5F5', text: '#7B1FA2' },
+                    'AI': { bg: '#FFF3E0', text: '#E65100' },
+                    '환경': { bg: '#E8F5E9', text: '#2E7D32' }
+                  };
+                  const categoryColor = categoryColors[material.category] || { bg: '#F5F5F5', text: '#666' };
+
+                  return (
+                    <div
+                      key={material.id}
+                      className={styles.materialItem}
+                      onClick={() => handleMaterialClick(material.id)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className={styles.imageContainer}>
+                        <img
+                          src={material.image.startsWith('http') ? material.image : `https://api.nallijaku.com${material.image}`}
+                          alt={material.alt}
+                          className={styles.materialImage}
+                          onError={(e) => {
+                            console.error('이미지 로드 실패:', material.image);
+                            (e.target as HTMLImageElement).src = '/placeholder.png';
+                          }}
+                        />
+                        <div 
+                          className={styles.categoryTag}
+                          style={{
+                            backgroundColor: categoryColor.bg,
+                            color: categoryColor.text,
+                            fontWeight: '600'
+                          }}
+                        >
+                          {material.category}
+                          {material.subCategory && (
+                            <span style={{ marginLeft: '4px' }}>
+                              - {material.subCategory}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className={styles.materialContent}>
+                        <p className={styles.materialTitle}>{material.title}</p>
+                        <p
+                          className={styles.subtitle}
+                          dangerouslySetInnerHTML={{ __html: material.subtitle }}
+                        />
+                        <button
+                          className={styles.addToCartButton}
+                          onClick={(e) => handleAddToCart(e, material.id)}
+                          aria-label="장바구니에 담기"
+                        >
+                          <IoCartOutline size={18} />
+                          장바구니 담기
+                        </button>
                       </div>
                     </div>
-                    <div className={styles.materialContent}>
-                      <p className={styles.materialTitle}>{material.title}</p>
-                      <p
-                        className={styles.subtitle}
-                        dangerouslySetInnerHTML={{ __html: material.subtitle }}
-                      />
-                      <button
-                        className={styles.addToCartButton}
-                        onClick={(e) => handleAddToCart(e, material.id)}
-                        aria-label="장바구니에 담기"
-                      >
-                        <IoCartOutline size={18} />
-                        장바구니 담기
-                      </button>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <div style={{ textAlign: 'center', padding: '40px', color: '#999', gridColumn: '1 / -1' }}>
                   <p>해당 카테고리의 학습자료가 없습니다.</p>

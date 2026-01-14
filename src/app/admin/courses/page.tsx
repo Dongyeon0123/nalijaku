@@ -8,7 +8,7 @@ import api from '@/lib/axios';
 interface Lesson {
   id: number;
   order: number;
-  materials: string;
+  title: string; // 차시 제목으로 변경
   description: string;
   pdfUrl?: string;
   type?: string; // 이론, 실습, 게임
@@ -48,7 +48,7 @@ export default function CoursesPage() {
   const [expandedCourseId, setExpandedCourseId] = useState<number | null>(null);
   const [showLessonModal, setShowLessonModal] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
-  const [lessonFormData, setLessonFormData] = useState({ order: 1, materials: '', description: '', type: '이론' });
+  const [lessonFormData, setLessonFormData] = useState({ order: 1, title: '', description: '', type: '이론' });
   const [lessonPdfFile, setLessonPdfFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -60,7 +60,6 @@ export default function CoursesPage() {
     subCategory: '',
     image: '',
     alt: '',
-    instructor: '',
     title: '',
     subtitle: '',
     description: '',
@@ -133,7 +132,7 @@ export default function CoursesPage() {
             console.log(`강좌 "${course.title}" 차시 목록:`, course.lessons);
             course.lessons.forEach((lesson: Lesson) => {
               console.log(`  - ${lesson.order}차시:`, {
-                materials: lesson.materials,
+                title: lesson.title,
                 description: lesson.description,
                 pdfUrl: lesson.pdfUrl || '없음',
               });
@@ -258,7 +257,6 @@ export default function CoursesPage() {
       subCategory: '',
       image: '',
       alt: '',
-      instructor: '',
       title: '',
       subtitle: '',
       description: '',
@@ -278,7 +276,6 @@ export default function CoursesPage() {
       subCategory: course.subCategory || '',
       image: course.image,
       alt: course.alt,
-      instructor: course.instructor,
       title: course.title,
       subtitle: course.subtitle,
       description: course.description || '',
@@ -306,7 +303,7 @@ export default function CoursesPage() {
   // 차시 추가 모달 열기
   const handleAddLesson = () => {
     setEditingLesson(null);
-    setLessonFormData({ order: 1, materials: '', description: '', type: '이론' });
+    setLessonFormData({ order: 1, title: '', description: '', type: '이론' });
     setLessonPdfFile(null);
     setShowLessonModal(true);
   };
@@ -314,8 +311,8 @@ export default function CoursesPage() {
   // 차시 저장
   const handleSaveLesson = async (courseId: number) => {
     try {
-      if (!lessonFormData.materials || !lessonFormData.description) {
-        alert('준비물과 설명을 입력해주세요.');
+      if (!lessonFormData.title || !lessonFormData.description) {
+        alert('차시 제목과 설명을 입력해주세요.');
         return;
       }
 
@@ -331,13 +328,14 @@ export default function CoursesPage() {
 
       const formData = new FormData();
       formData.append('order', lessonFormData.order.toString());
-      formData.append('materials', lessonFormData.materials);
+      formData.append('title', lessonFormData.title);
+      formData.append('materials', lessonFormData.title); // 백엔드 호환성을 위해 추가
       formData.append('description', lessonFormData.description);
       formData.append('type', lessonFormData.type || '이론');
 
       console.log('FormData 구성:');
       console.log('  - order:', lessonFormData.order);
-      console.log('  - materials:', lessonFormData.materials);
+      console.log('  - title:', lessonFormData.title);
       console.log('  - type:', lessonFormData.type);
       console.log('  - description:', lessonFormData.description);
 
@@ -390,7 +388,7 @@ export default function CoursesPage() {
 
             alert(editingLesson ? '차시가 수정되었습니다.' : '차시가 추가되었습니다.');
             setShowLessonModal(false);
-            setLessonFormData({ order: 1, materials: '', description: '', type: '이론' });
+            setLessonFormData({ order: 1, title: '', description: '', type: '이론' });
             setLessonPdfFile(null);
             setUploadProgress(0);
             loadCourses();
@@ -500,7 +498,7 @@ export default function CoursesPage() {
           title: formData.title,
           subtitle: formData.subtitle,
           description: formData.description,
-          instructor: formData.instructor,
+          instructor: '날리자쿠', // 기본값
           price: Number(formData.price) || 0,
           duration: formData.duration,
           level: formData.level,
@@ -522,8 +520,16 @@ export default function CoursesPage() {
           return;
         }
 
+        // 카테고리 ID 찾기
+        const categoryId = categoryMap[formData.category];
+        if (!categoryId) {
+          alert('카테고리를 선택해주세요.');
+          setUploading(false);
+          return;
+        }
+
         const multipartFormData = new FormData();
-        multipartFormData.append('category', formData.category); // 한글 카테고리 이름 그대로 전송
+        multipartFormData.append('categoryId', String(categoryId)); // 카테고리 ID 전송
         if (formData.subCategory) {
           multipartFormData.append('subCategory', formData.subCategory);
           console.log('서브카테고리 추가:', formData.subCategory);
@@ -531,10 +537,10 @@ export default function CoursesPage() {
         multipartFormData.append('title', formData.title);
         multipartFormData.append('subtitle', formData.subtitle);
         multipartFormData.append('description', formData.description || '');
-        multipartFormData.append('instructor', formData.instructor);
+        multipartFormData.append('instructor', '날리자쿠'); // 기본값
         multipartFormData.append('price', String(Number(formData.price) || 0));
-        multipartFormData.append('duration', formData.duration || '');
-        multipartFormData.append('level', formData.level || '');
+        multipartFormData.append('duration', formData.duration || '1시간');
+        multipartFormData.append('level', formData.level || '초급');
         multipartFormData.append('alt', formData.alt || '');
         
         if (imageFile) {
@@ -544,7 +550,8 @@ export default function CoursesPage() {
         }
 
         console.log('강좌 추가 요청 (multipart/form-data)');
-        console.log('  - 카테고리:', formData.category);
+        console.log('  - 카테고리 ID:', categoryId);
+        console.log('  - 카테고리 이름:', formData.category);
         console.log('  - 서브카테고리:', formData.subCategory || '(없음)');
         const response = await api.post('/api/resources', multipartFormData, {
           headers: { 'Content-Type': 'multipart/form-data' }
@@ -701,14 +708,14 @@ export default function CoursesPage() {
                                             {lesson.type || '이론'}
                                           </span>
                                         </div>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#565D6D' }}>준비물: {lesson.materials}</p>
+                                        <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#565D6D' }}>제목: {lesson.title}</p>
                                         {lesson.description && <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{lesson.description}</p>}
                                       </div>
                                       <div style={{ display: 'flex', gap: '8px' }}>
                                         <button
                                           onClick={() => {
                                             setEditingLesson(lesson);
-                                            setLessonFormData({ order: lesson.order, materials: lesson.materials, description: lesson.description, type: lesson.type || '이론' });
+                                            setLessonFormData({ order: lesson.order, title: lesson.title, description: lesson.description, type: lesson.type || '이론' });
                                             setLessonPdfFile(null);
                                             setShowLessonModal(true);
                                           }}
@@ -953,12 +960,12 @@ export default function CoursesPage() {
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label>준비물</label>
+                <label>차시 제목</label>
                 <input
                   type="text"
-                  value={lessonFormData.materials}
-                  onChange={(e) => setLessonFormData({ ...lessonFormData, materials: e.target.value })}
-                  placeholder="준비물을 입력하세요"
+                  value={lessonFormData.title}
+                  onChange={(e) => setLessonFormData({ ...lessonFormData, title: e.target.value })}
+                  placeholder="차시 제목을 입력하세요"
                 />
               </div>
               <div className={styles.formGroup}>

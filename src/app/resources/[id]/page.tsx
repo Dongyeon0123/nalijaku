@@ -189,9 +189,9 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                               </div>
                               <div className={styles.lessonRight}>
                                 <div className={styles.lessonMaterials}>
-                                  <strong>준비물:</strong> {lesson.materials}
+                                  <strong>{lesson.materials}</strong>
                                 </div>
-                                <p className={styles.lessonShortDescription}><strong>설명:</strong> {lesson.description}</p>
+                                <p className={styles.lessonShortDescription}>{lesson.description}</p>
                               </div>
                             </div>
                           );
