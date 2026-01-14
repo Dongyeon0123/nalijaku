@@ -688,7 +688,9 @@ export default function CoursesPage() {
                                   const typeColors: { [key: string]: { bg: string; text: string } } = {
                                     '이론': { bg: '#E1BEE7', text: '#6A1B9A' },
                                     '실습': { bg: '#C8E6C9', text: '#2E7D32' },
-                                    '게임': { bg: '#FFF9C4', text: '#F57F17' }
+                                    '게임': { bg: '#FFF9C4', text: '#F57F17' },
+                                    '토론': { bg: '#B3E5FC', text: '#01579B' },
+                                    '수료증': { bg: '#FFCDD2', text: '#C62828' }
                                   };
                                   const typeColor = typeColors[lesson.type || '이론'] || typeColors['이론'];
                                   
@@ -957,6 +959,8 @@ export default function CoursesPage() {
                   <option value="이론">이론</option>
                   <option value="실습">실습</option>
                   <option value="게임">게임</option>
+                  <option value="토론">토론</option>
+                  <option value="수료증">수료증</option>
                 </select>
               </div>
               <div className={styles.formGroup}>
