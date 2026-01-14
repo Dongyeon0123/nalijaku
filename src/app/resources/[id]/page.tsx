@@ -239,19 +239,6 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                       </div>
                     )}
                   </div>
-                  
-                  {/* 학습 버튼들 */}
-                  <div className={styles.learningButtons}>
-                    <button className={styles.lectureButton}>
-                      강의하기
-                    </button>
-                    <button className={styles.quizButton}>
-                      퀴즈하기
-                    </button>
-                    <button className={styles.practiceButton}>
-                      실습하기
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
