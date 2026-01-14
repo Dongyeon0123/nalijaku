@@ -77,7 +77,7 @@ export default function CoursesPage() {
   const loadSubCategories = async () => {
     try {
       const response = await api.get('/api/categories/subcategories');
-      console.log('✅ 서브카테고리 로드 성공:', response.data);
+      console.log('서브카테고리 로드 성공:', response.data);
       
       // 새로운 API 응답 형식 처리
       if (response.data.success && response.data.data) {
@@ -100,7 +100,7 @@ export default function CoursesPage() {
         setSubCategories(response.data);
       }
     } catch (error: any) {
-      console.warn('⚠️ 서브카테고리 로드 실패 (백엔드 API 미구현 가능성):', error.message);
+      console.warn('서브카테고리 로드 실패 (백엔드 API 미구현 가능성):', error.message);
       // API 실패 시 빈 객체 유지 (정상 동작)
       setSubCategories({});
     }
@@ -109,36 +109,28 @@ export default function CoursesPage() {
   const loadCourses = async () => {
     try {
       setLoading(true);
-      console.log('🔄 강좌 목록 새로고침 중...');
-
-      // 영어 → 한글 매핑
-      const categoryToKorean: { [key: string]: string } = {
-        'ALL': '전체',
-        'STARTUP': '창업',
-        'DRONE': '드론',
-        'AI': 'AI',
-        'ENVIRONMENT': '환경'
-      };
+      console.log('강좌 목록 새로고침 중...');
 
       // Axios 사용 (인증 토큰 자동 포함)
       const response = await api.get('/api/resources');
 
-      console.log('✅ 강좌 목록 로드 성공:', response.data);
+      console.log('강좌 목록 로드 성공:', response.data);
 
       const result = response.data;
       if (result.success && result.data) {
-        // 카테고리를 한글로 변환
-        const coursesWithKoreanCategory = result.data.map((course: Course) => ({
-          ...course,
-          category: categoryToKorean[course.category] || course.category
-        }));
-        
-        setCourses(coursesWithKoreanCategory);
+        // 백엔드가 이제 한글 카테고리를 반환하므로 변환 불필요
+        setCourses(result.data);
+
+        // 서브카테고리 디버깅
+        console.log('강좌별 서브카테고리 확인:');
+        result.data.forEach((course: Course) => {
+          console.log(`  - ${course.title}: subCategory = ${course.subCategory || '(없음)'}`);
+        });
 
         // 각 강좌의 차시 정보 로깅
-        coursesWithKoreanCategory.forEach((course: Course) => {
+        result.data.forEach((course: Course) => {
           if (course.lessons && course.lessons.length > 0) {
-            console.log(`📚 강좌 "${course.title}" 차시 목록:`, course.lessons);
+            console.log(`강좌 "${course.title}" 차시 목록:`, course.lessons);
             course.lessons.forEach((lesson: Lesson) => {
               console.log(`  - ${lesson.order}차시:`, {
                 materials: lesson.materials,
@@ -154,7 +146,7 @@ export default function CoursesPage() {
       try {
         // 새로운 계층형 카테고리 API 사용
         const categoriesResponse = await api.get('/api/categories');
-        console.log('✅ 카테고리 로드 성공:', categoriesResponse.data);
+        console.log('카테고리 로드 성공:', categoriesResponse.data);
         
         if (categoriesResponse.data.success && categoriesResponse.data.data?.categories) {
           const categoryData = categoriesResponse.data.data.categories;
@@ -179,7 +171,7 @@ export default function CoursesPage() {
               subCategoryMap[cat.name] = cat.subCategories.map((sub: any) => sub.name);
             }
           });
-          console.log('📋 서브카테고리 맵 업데이트:', subCategoryMap);
+          console.log('서브카테고리 맵 업데이트:', subCategoryMap);
           setSubCategories(subCategoryMap);
           
         } else if (Array.isArray(categoriesResponse.data)) {
@@ -194,7 +186,7 @@ export default function CoursesPage() {
           setCategories([]);
         }
       } catch (categoryError) {
-        console.error('❌ 카테고리 로드 실패:', categoryError);
+        console.error('카테고리 로드 실패:', categoryError);
         // 카테고리 API 실패 시 빈 배열
         setCategories([]);
       }
@@ -483,19 +475,8 @@ export default function CoursesPage() {
     try {
       setUploading(true);
 
-      // 카테고리 한글 → 영어 매핑
-      const categoryMap: { [key: string]: string } = {
-        '전체': 'ALL',
-        '창업': 'STARTUP',
-        '드론': 'DRONE',
-        'AI': 'AI',
-        '환경': 'ENVIRONMENT'
-      };
-
-      const englishCategory = categoryMap[formData.category] || formData.category;
-
       if (editingCourse) {
-        // 수정 - JSON 형식으로 전송 (기존 방식 유지)
+        // 수정 - JSON 형식으로 전송
         let imageUrl = formData.image;
 
         if (imageFile) {
@@ -514,8 +495,8 @@ export default function CoursesPage() {
         }
 
         const requestData = {
-          category: englishCategory,
-          subCategory: formData.subCategory || '',
+          category: formData.category, // 한글 카테고리 이름 그대로 전송
+          subCategory: formData.subCategory || null,
           title: formData.title,
           subtitle: formData.subtitle,
           description: formData.description,
@@ -527,9 +508,11 @@ export default function CoursesPage() {
           image: imageUrl,
         };
 
-        console.log('수정 요청 데이터:', requestData);
+        console.log('강좌 수정 요청 데이터:', requestData);
+        console.log('  - 카테고리:', requestData.category);
+        console.log('  - 서브카테고리:', requestData.subCategory || '(없음)');
         const response = await api.put(`/api/resources/${editingCourse.id}`, requestData);
-        console.log('API 응답:', response.data);
+        console.log('강좌 수정 API 응답:', response.data);
         alert('강좌가 수정되었습니다.');
       } else {
         // 추가 - multipart/form-data 형식으로 전송
@@ -540,9 +523,10 @@ export default function CoursesPage() {
         }
 
         const multipartFormData = new FormData();
-        multipartFormData.append('category', formData.category); // 한글 카테고리 그대로 전송
+        multipartFormData.append('category', formData.category); // 한글 카테고리 이름 그대로 전송
         if (formData.subCategory) {
           multipartFormData.append('subCategory', formData.subCategory);
+          console.log('서브카테고리 추가:', formData.subCategory);
         }
         multipartFormData.append('title', formData.title);
         multipartFormData.append('subtitle', formData.subtitle);
@@ -559,11 +543,13 @@ export default function CoursesPage() {
           multipartFormData.append('imageUrl', formData.image);
         }
 
-        console.log('추가 요청 (multipart/form-data)');
+        console.log('강좌 추가 요청 (multipart/form-data)');
+        console.log('  - 카테고리:', formData.category);
+        console.log('  - 서브카테고리:', formData.subCategory || '(없음)');
         const response = await api.post('/api/resources', multipartFormData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
-        console.log('API 응답:', response.data);
+        console.log('강좌 추가 API 응답:', response.data);
         alert('강좌가 추가되었습니다.');
       }
 
@@ -573,11 +559,11 @@ export default function CoursesPage() {
       setImagePreview('');
     } catch (error: any) {
       console.error('강좌 저장 실패:', error);
-      console.error('에러 응답:', error.response?.data);
+      console.error('  - 에러 응답:', error.response?.data);
       const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message || '알 수 없는 오류';
       
       if (error.response?.data) {
-        console.error('상세 에러:', JSON.stringify(error.response.data, null, 2));
+        console.error('  - 상세 에러:', JSON.stringify(error.response.data, null, 2));
       }
       
       alert(`강좌 저장에 실패했습니다: ${errorMsg}`);
