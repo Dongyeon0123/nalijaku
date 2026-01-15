@@ -13,6 +13,8 @@ interface User {
   phone: string;
   droneExperience: boolean;
   createdAt: string;
+  status?: string;
+  locked?: boolean;
 }
 
 const UsersPage = () => {
@@ -144,8 +146,8 @@ const UsersPage = () => {
                   <td>{user.email}</td>
                   <td>{user.organization}</td>
                   <td>
-                    <span className={`${styles.role} ${styles[user.role?.toLowerCase() || 'user']}`}>
-                      {user.role || 'USER'}
+                    <span className={`${styles.role} ${styles[user.role?.toLowerCase() || 'general']}`}>
+                      {user.role === 'GENERAL' ? '일반' : user.role === 'TEACHER' ? '강사' : user.role === 'ADMIN' ? '관리자' : user.role || 'GENERAL'}
                     </span>
                   </td>
                   <td>{user.phone}</td>
@@ -160,7 +162,7 @@ const UsersPage = () => {
                       className={styles.manageButton}
                       onClick={() => {
                         setSelectedUser(user);
-                        setNewRole(user.role || 'USER');
+                        setNewRole(user.role || 'GENERAL');
                         setEditingRole(false);
                         setShowModal(true);
                       }}
@@ -210,15 +212,25 @@ const UsersPage = () => {
                         onChange={(e) => setNewRole(e.target.value)}
                         className={styles.roleSelect}
                       >
-                        <option value="USER">USER</option>
-                        <option value="INSTRUCTOR">INSTRUCTOR</option>
-                        <option value="ADMIN">ADMIN</option>
+                        <option value="GENERAL">GENERAL (일반 사용자)</option>
+                        <option value="TEACHER">TEACHER (강사)</option>
+                        <option value="ADMIN">ADMIN (관리자)</option>
                       </select>
                       <button 
                         className={styles.saveRoleButton}
                         onClick={async () => {
                           try {
-                            await api.put(`/api/users/${selectedUser.id}/role`, { role: newRole });
+                            console.log('=== 역할 변경 요청 시작 ===');
+                            console.log('사용자 ID:', selectedUser.id);
+                            console.log('현재 역할:', selectedUser.role);
+                            console.log('새 역할:', newRole);
+                            console.log('요청 URL:', `/api/users/${selectedUser.id}/role`);
+                            console.log('요청 데이터:', { role: newRole });
+                            
+                            const response = await api.put(`/api/users/${selectedUser.id}/role`, { role: newRole });
+                            
+                            console.log('✅ 역할 변경 성공:', response.data);
+                            
                             // 사용자 목록 업데이트
                             setUsers(users.map(u => 
                               u.id === selectedUser.id ? { ...u, role: newRole } : u
@@ -227,8 +239,15 @@ const UsersPage = () => {
                             setEditingRole(false);
                             alert('역할이 변경되었습니다.');
                           } catch (error: any) {
-                            console.error('역할 변경 실패:', error);
-                            alert(error.response?.data?.message || '역할 변경에 실패했습니다.');
+                            console.error('❌ 역할 변경 실패');
+                            console.error('에러 상태:', error.response?.status);
+                            console.error('에러 메시지:', error.response?.data);
+                            console.error('전체 에러:', error);
+                            
+                            const errorMessage = error.response?.status === 500 
+                              ? `백엔드 서버 오류입니다.\n\n백엔드 개발자에게 다음을 확인하세요:\n1. PUT /api/users/${selectedUser.id}/role 엔드포인트가 구현되어 있는지\n2. 요청 본문 형식: { "role": "GENERAL|TEACHER|ADMIN" }\n3. 서버 로그에서 구체적인 오류 확인`
+                              : error.response?.data?.message || '역할 변경에 실패했습니다.';
+                            alert(errorMessage);
                           }
                         }}
                       >
@@ -237,7 +256,7 @@ const UsersPage = () => {
                       <button 
                         className={styles.cancelRoleButton}
                         onClick={() => {
-                          setNewRole(selectedUser.role || 'USER');
+                          setNewRole(selectedUser.role || 'GENERAL');
                           setEditingRole(false);
                         }}
                       >
@@ -246,8 +265,8 @@ const UsersPage = () => {
                     </div>
                   ) : (
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <span className={`${styles.roleBadge} ${styles[selectedUser.role?.toLowerCase() || 'user']}`}>
-                        {selectedUser.role || 'USER'}
+                      <span className={`${styles.roleBadge} ${styles[selectedUser.role?.toLowerCase() || 'general']}`}>
+                        {selectedUser.role === 'GENERAL' ? '일반' : selectedUser.role === 'TEACHER' ? '강사' : selectedUser.role === 'ADMIN' ? '관리자' : selectedUser.role || 'GENERAL'}
                       </span>
                       <button 
                         className={styles.editRoleButton}
@@ -271,13 +290,24 @@ const UsersPage = () => {
               </div>
             </div>
             <div className={styles.modalFooter}>
-              <button className={styles.deleteButton} onClick={() => {
-                if (confirm('정말 이 사용자를 삭제하시겠습니까?')) {
-                  // TODO: 삭제 API 호출
-                  alert('삭제 기능은 백엔드 API 구현 후 사용 가능합니다.');
-                  setShowModal(false);
-                }
-              }}>
+              <button 
+                className={styles.deleteButton} 
+                onClick={async () => {
+                  if (confirm(`정말 "${selectedUser.username}" 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+                    try {
+                      await api.delete(`/api/users/${selectedUser.id}`);
+                      // 사용자 목록에서 제거
+                      setUsers(users.filter(u => u.id !== selectedUser.id));
+                      setUserCount(userCount - 1);
+                      setShowModal(false);
+                      alert('사용자가 삭제되었습니다.');
+                    } catch (error: any) {
+                      console.error('사용자 삭제 실패:', error);
+                      alert(error.response?.data?.message || '사용자 삭제에 실패했습니다.');
+                    }
+                  }
+                }}
+              >
                 삭제
               </button>
               <button className={styles.closeModalButton} onClick={() => setShowModal(false)}>

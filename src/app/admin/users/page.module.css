@@ -377,7 +377,14 @@
     box-shadow: 0 4px 8px rgba(149, 165, 166, 0.4);
 }
 
-/* INSTRUCTOR 역할 스타일 추가 */
+/* TEACHER 역할 스타일 추가 */
+.role.teacher,
+.roleBadge.teacher {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;
+    box-shadow: 0 2px 8px rgba(155, 89, 182, 0.4);
+}
+
+/* INSTRUCTOR 역할 스타일 추가 (하위 호환성) */
 .role.instructor,
 .roleBadge.instructor {
     background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;
