@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
     domains: [],
     remotePatterns: [],
   },
+  
+  // 프로덕션 빌드 시 console.log 제거
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'], // error와 warn은 유지
+    } : false,
+  },
+  
   async rewrites() {
     // 환경 변수에서 API URL 가져오기 (없으면 로컬 백엔드 사용)
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';

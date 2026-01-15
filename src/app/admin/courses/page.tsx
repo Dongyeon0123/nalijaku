@@ -76,7 +76,6 @@ export default function CoursesPage() {
   const loadSubCategories = async () => {
     try {
       const response = await api.get('/api/categories/subcategories');
-      console.log('서브카테고리 로드 성공:', response.data);
       
       // 새로운 API 응답 형식 처리
       if (response.data.success && response.data.data) {
@@ -99,7 +98,6 @@ export default function CoursesPage() {
         setSubCategories(response.data);
       }
     } catch (error: any) {
-      console.warn('서브카테고리 로드 실패 (백엔드 API 미구현 가능성):', error.message);
       // API 실패 시 빈 객체 유지 (정상 동작)
       setSubCategories({});
     }
@@ -108,44 +106,20 @@ export default function CoursesPage() {
   const loadCourses = async () => {
     try {
       setLoading(true);
-      console.log('강좌 목록 새로고침 중...');
 
       // Axios 사용 (인증 토큰 자동 포함)
       const response = await api.get('/api/resources');
-
-      console.log('강좌 목록 로드 성공:', response.data);
 
       const result = response.data;
       if (result.success && result.data) {
         // 백엔드가 이제 한글 카테고리를 반환하므로 변환 불필요
         setCourses(result.data);
-
-        // 서브카테고리 디버깅
-        console.log('강좌별 서브카테고리 확인:');
-        result.data.forEach((course: Course) => {
-          console.log(`  - ${course.title}: subCategory = ${course.subCategory || '(없음)'}`);
-        });
-
-        // 각 강좌의 차시 정보 로깅
-        result.data.forEach((course: Course) => {
-          if (course.lessons && course.lessons.length > 0) {
-            console.log(`강좌 "${course.title}" 차시 목록:`, course.lessons);
-            course.lessons.forEach((lesson: Lesson) => {
-              console.log(`  - ${lesson.order}차시:`, {
-                title: lesson.title,
-                description: lesson.description,
-                pdfUrl: lesson.pdfUrl || '없음',
-              });
-            });
-          }
-        });
       }
 
       // 카테고리는 별도 API에서 가져오기
       try {
         // 새로운 계층형 카테고리 API 사용
         const categoriesResponse = await api.get('/api/categories');
-        console.log('카테고리 로드 성공:', categoriesResponse.data);
         
         if (categoriesResponse.data.success && categoriesResponse.data.data?.categories) {
           const categoryData = categoriesResponse.data.data.categories;
@@ -170,7 +144,6 @@ export default function CoursesPage() {
               subCategoryMap[cat.name] = cat.subCategories.map((sub: any) => sub.name);
             }
           });
-          console.log('서브카테고리 맵 업데이트:', subCategoryMap);
           setSubCategories(subCategoryMap);
           
         } else if (Array.isArray(categoriesResponse.data)) {
@@ -1296,31 +1269,26 @@ export default function CoursesPage() {
                                   onClick={async () => {
                                     if (confirm(`"${sub}" 서브카테고리를 삭제하시겠습니까?`)) {
                                       try {
-                                        const categoryId = categoryMap[category];
+                                        
+                                        const categoryId = categoryMap[category];                    
                                         if (!categoryId) {
-                                          alert('카테고리 ID를 찾을 수 없습니다.');
+                                          alert(`카테고리 ID를 찾을 수 없습니다.\n\n카테고리: ${category}\n사용 가능한 카테고리: ${Object.keys(categoryMap).join(', ')}`);
                                           return;
                                         }
                                         
                                         // 서브카테고리 삭제 API 호출 (부모 ID 사용)
                                         const deleteUrl = `/api/admin/categories/${categoryId}/subcategories/${encodeURIComponent(sub)}`;
-                                        console.log('🗑️ 서브카테고리 삭제 요청:', deleteUrl);
-                                        console.log('  - 메인 카테고리:', category, '(ID:', categoryId, ')');
-                                        console.log('  - 서브카테고리:', sub);
-                                        
+
                                         const response = await api.delete(deleteUrl);
-                                        console.log('✅ 서브카테고리 삭제 성공:', response.data);
-                                        
-                                        console.log('🔄 카테고리 목록 다시 로드 시작...');
+
                                         await loadCourses();
-                                        console.log('🔄 카테고리 목록 다시 로드 완료!');
+
                                         
                                         alert('서브카테고리가 삭제되었습니다.');
                                       } catch (error: any) {
-                                        console.error('❌ 서브카테고리 삭제 실패:', error);
-                                        console.error('  - 상태 코드:', error.response?.status);
-                                        console.error('  - 에러 메시지:', error.response?.data);
-                                        alert(error.response?.data?.message || '서브카테고리 삭제에 실패했습니다.');
+                                        
+                                        const errorMsg = error.response?.data?.message || error.message || '서브카테고리 삭제에 실패했습니다.';
+                                        alert(`서브카테고리 삭제 실패\n\n${errorMsg}\n\n백엔드 로그를 확인해주세요.`);
                                       }
                                     }
                                   }}
