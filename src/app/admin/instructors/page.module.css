@@ -84,7 +84,8 @@
 
 .editButton,
 .assignButton,
-.deleteButton {
+.deleteButton,
+.manageButton {
   padding: 8px 12px;
   margin-right: 8px;
   border: none;
@@ -120,6 +121,15 @@
 
 .deleteButton:hover {
   background-color: #FFCDD2;
+}
+
+.manageButton {
+  background-color: #F3E5F5;
+  color: #7B1FA2;
+}
+
+.manageButton:hover {
+  background-color: #E1BEE7;
 }
 
 /* 모달 스타일 */

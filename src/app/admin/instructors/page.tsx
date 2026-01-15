@@ -70,6 +70,20 @@ export default function InstructorsManagementPage() {
     endDate: ''
   });
 
+  // 강의 관리 모달 상태
+  const [showManageCoursesModal, setShowManageCoursesModal] = useState(false);
+  const [managingInstructor, setManagingInstructor] = useState<Instructor | null>(null);
+  const [assignedCourses, setAssignedCourses] = useState<any[]>([]);
+  const [loadingAssignedCourses, setLoadingAssignedCourses] = useState(false);
+  
+  // 공지사항 편집 모달 상태
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<any | null>(null);
+  const [announcementForm, setAnnouncementForm] = useState({
+    classLink: '',
+    announcement: ''
+  });
+
   useEffect(() => {
     fetchInstructors();
   }, []);
@@ -188,6 +202,104 @@ export default function InstructorsManagementPage() {
       const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
       alert(`강의 할당 중 오류가 발생했습니다: ${errorMsg}`);
     }
+  };
+
+  // 강의 관리 모달 열기
+  const handleManageCoursesClick = async (instructor: Instructor) => {
+    setManagingInstructor(instructor);
+    setShowManageCoursesModal(true);
+    await fetchAssignedCourses(instructor.id);
+  };
+
+  // 할당된 강의 목록 조회
+  const fetchAssignedCourses = async (instructorId: number) => {
+    try {
+      setLoadingAssignedCourses(true);
+      const response = await api.get(`/api/instructors/${instructorId}/courses`);
+      const result = response.data;
+      const coursesData = result.success ? result.data : (Array.isArray(result.data) ? result.data : []);
+      console.log('📚 할당된 강의 목록:', coursesData);
+      setAssignedCourses(coursesData);
+    } catch (error) {
+      console.error('할당된 강의 목록 로드 실패:', error);
+      setAssignedCourses([]);
+    } finally {
+      setLoadingAssignedCourses(false);
+    }
+  };
+
+  // 강의 삭제
+  const handleDeleteCourse = async (courseId: number) => {
+    if (!confirm('이 강의를 삭제하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/instructors/${managingInstructor?.id}/courses/${courseId}`);
+      alert('강의가 삭제되었습니다.');
+      // 목록 새로고침
+      if (managingInstructor) {
+        await fetchAssignedCourses(managingInstructor.id);
+      }
+    } catch (error: any) {
+      console.error('강의 삭제 실패:', error);
+      const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
+      alert(`강의 삭제 중 오류가 발생했습니다: ${errorMsg}`);
+    }
+  };
+
+  // 강의 관리 모달 닫기
+  const handleCloseManageCoursesModal = () => {
+    setShowManageCoursesModal(false);
+    setManagingInstructor(null);
+    setAssignedCourses([]);
+  };
+
+  // 공지사항 편집 모달 열기
+  const handleEditAnnouncement = (course: any) => {
+    setEditingCourse(course);
+    setAnnouncementForm({
+      classLink: course.classLink || '',
+      announcement: course.announcement || ''
+    });
+    setShowAnnouncementModal(true);
+  };
+
+  // 공지사항 저장
+  const handleSaveAnnouncement = async () => {
+    if (!managingInstructor || !editingCourse) return;
+
+    try {
+      await api.put(`/api/instructors/${managingInstructor.id}/courses/${editingCourse.id}/announcement`, {
+        classLink: announcementForm.classLink,
+        announcement: announcementForm.announcement
+      });
+
+      // 목록 업데이트
+      setAssignedCourses(prev => prev.map(c => 
+        c.id === editingCourse.id ? { 
+          ...c, 
+          classLink: announcementForm.classLink,
+          announcement: announcementForm.announcement
+        } : c
+      ));
+      
+      setShowAnnouncementModal(false);
+      setEditingCourse(null);
+      setAnnouncementForm({ classLink: '', announcement: '' });
+      alert('공지사항이 저장되었습니다.');
+    } catch (error: any) {
+      console.error('공지사항 저장 실패:', error);
+      const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
+      alert(`공지사항 저장 중 오류가 발생했습니다: ${errorMsg}`);
+    }
+  };
+
+  // 공지사항 편집 모달 닫기
+  const handleCloseAnnouncementModal = () => {
+    setShowAnnouncementModal(false);
+    setEditingCourse(null);
+    setAnnouncementForm({ classLink: '', announcement: '' });
   };
 
   const fetchInstructors = async () => {
@@ -439,6 +551,12 @@ export default function InstructorsManagementPage() {
                       onClick={() => handleEditClick(instructor)}
                     >
                       수정
+                    </button>
+                    <button
+                      className={styles.manageButton}
+                      onClick={() => handleManageCoursesClick(instructor)}
+                    >
+                      강의 관리
                     </button>
                     <button
                       className={styles.assignButton}
@@ -721,6 +839,289 @@ export default function InstructorsManagementPage() {
                   disabled={selectedMaterials.length === 0 || !assignmentDetails.studentCount || !assignmentDetails.startDate || !assignmentDetails.endDate}
                 >
                   할당하기 ({selectedMaterials.length})
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 공지사항 등록/수정 모달 */}
+      {showAnnouncementModal && editingCourse && (
+        <div className={styles.modalOverlay} style={{ zIndex: 1100 }}>
+          <div className={styles.modal} style={{ maxWidth: '700px' }}>
+            <div className={styles.modalHeader}>
+              <h2>공지사항 {editingCourse.classLink || editingCourse.announcement ? '수정' : '등록'}</h2>
+              <button
+                onClick={handleCloseAnnouncementModal}
+                className={styles.closeButton}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ padding: '20px' }}>
+              <div style={{ 
+                padding: '12px 16px', 
+                backgroundColor: '#f0f9ff', 
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: '1px solid #bae6fd'
+              }}>
+                <p style={{ fontSize: '14px', color: '#0369a1', margin: 0, fontWeight: '600' }}>
+                  📚 {editingCourse.title}
+                </p>
+              </div>
+
+              <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
+                <label>🔗 외부 강의 링크</label>
+                <input
+                  type="url"
+                  value={announcementForm.classLink}
+                  onChange={(e) => setAnnouncementForm(prev => ({ ...prev, classLink: e.target.value }))}
+                  placeholder="https://zoom.us/j/123456789 또는 https://meet.google.com/abc-defg-hij"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit'
+                  }}
+                />
+                <p style={{ fontSize: '12px', color: '#666', marginTop: '6px', lineHeight: '1.5' }}>
+                  수강생들이 접속할 수 있는 외부 강의 링크 (예: Zoom, Google Meet, YouTube 등)
+                </p>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>📢 공지사항 내용</label>
+                <textarea
+                  value={announcementForm.announcement}
+                  onChange={(e) => setAnnouncementForm(prev => ({ ...prev, announcement: e.target.value }))}
+                  placeholder="강의와 관련된 공지사항을 입력하세요.&#10;예: 강의 일정, 준비물, 과제 안내 등"
+                  rows={6}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    resize: 'vertical',
+                    lineHeight: '1.6'
+                  }}
+                />
+                <p style={{ fontSize: '12px', color: '#666', marginTop: '6px', lineHeight: '1.5' }}>
+                  강의 일정, 준비물, 과제 등 수강생에게 전달할 내용을 입력하세요.
+                </p>
+              </div>
+
+              {(editingCourse.classLink || editingCourse.announcement) && (
+                <div style={{ 
+                  padding: '16px', 
+                  backgroundColor: '#f9fafb', 
+                  borderRadius: '8px',
+                  marginTop: '20px',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <p style={{ fontSize: '13px', color: '#374151', margin: '0 0 12px 0', fontWeight: '600' }}>
+                    📌 현재 등록된 정보
+                  </p>
+                  {editingCourse.classLink && (
+                    <div style={{ marginBottom: '8px' }}>
+                      <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600' }}>링크: </span>
+                      <a 
+                        href={editingCourse.classLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ 
+                          fontSize: '12px', 
+                          color: '#0284c7',
+                          wordBreak: 'break-all',
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        {editingCourse.classLink}
+                      </a>
+                    </div>
+                  )}
+                  {editingCourse.announcement && (
+                    <div>
+                      <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600' }}>공지: </span>
+                      <span style={{ fontSize: '12px', color: '#374151', whiteSpace: 'pre-wrap' }}>
+                        {editingCourse.announcement}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className={styles.formActions} style={{ marginTop: '24px' }}>
+                <button
+                  type="button"
+                  onClick={handleCloseAnnouncementModal}
+                  className={styles.cancelButton}
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveAnnouncement}
+                  className={styles.submitButton}
+                  disabled={!announcementForm.classLink.trim() && !announcementForm.announcement.trim()}
+                >
+                  저장
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 강의 관리 모달 */}
+      {showManageCoursesModal && managingInstructor && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal} style={{ maxWidth: '900px' }}>
+            <div className={styles.modalHeader}>
+              <h2>강의 관리 - {managingInstructor.name}</h2>
+              <button
+                onClick={handleCloseManageCoursesModal}
+                className={styles.closeButton}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ padding: '20px' }}>
+              {loadingAssignedCourses ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                  강의 목록을 불러오는 중...
+                </div>
+              ) : assignedCourses.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                  할당된 강의가 없습니다.
+                </div>
+              ) : (
+                <div style={{ 
+                  maxHeight: '500px', 
+                  overflowY: 'auto'
+                }}>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th style={{ width: '35%' }}>강의명</th>
+                        <th style={{ width: '10%' }}>수강생</th>
+                        <th style={{ width: '10%' }}>진행률</th>
+                        <th style={{ width: '15%' }}>기간</th>
+                        <th style={{ width: '10%' }}>상태</th>
+                        <th style={{ width: '20%' }}>작업</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {assignedCourses.map(course => (
+                        <tr key={course.id}>
+                          <td style={{ maxWidth: '300px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              {course.thumbnail && (
+                                <img
+                                  src={course.thumbnail.startsWith('http') 
+                                    ? course.thumbnail 
+                                    : `https://api.nallijaku.com${course.thumbnail}`
+                                  }
+                                  alt={course.title}
+                                  style={{
+                                    width: '50px',
+                                    height: '50px',
+                                    objectFit: 'cover',
+                                    borderRadius: '8px',
+                                    flexShrink: 0
+                                  }}
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                  }}
+                                />
+                              )}
+                              <div style={{ minWidth: 0, flex: 1 }}>
+                                <div style={{ 
+                                  fontWeight: '600', 
+                                  marginBottom: '4px',
+                                  lineHeight: '1.5',
+                                  wordBreak: 'keep-all',
+                                  overflowWrap: 'break-word'
+                                }}>
+                                  {course.title}
+                                </div>
+                                {course.subtitle && (
+                                  <div style={{ 
+                                    fontSize: '12px', 
+                                    color: '#666',
+                                    lineHeight: '1.4',
+                                    wordBreak: 'keep-all',
+                                    overflowWrap: 'break-word'
+                                  }}>
+                                    {course.subtitle}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td>{course.studentCount || 0}명</td>
+                          <td>{Math.round(course.avgProgress || 0)}%</td>
+                          <td>
+                            <div style={{ fontSize: '12px' }}>
+                              {course.startDate && course.endDate && (
+                                <>
+                                  <div>{new Date(course.startDate).toLocaleDateString('ko-KR')}</div>
+                                  <div>~ {new Date(course.endDate).toLocaleDateString('ko-KR')}</div>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                          <td>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '12px',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              backgroundColor: course.status === 'active' ? '#E8F5E9' : '#F5F5F5',
+                              color: course.status === 'active' ? '#2E7D32' : '#666'
+                            }}>
+                              {course.status === 'active' ? '진행중' : '완료'}
+                            </span>
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                              <button
+                                className={styles.editButton}
+                                onClick={() => handleEditAnnouncement(course)}
+                                style={{ fontSize: '11px', padding: '6px 10px' }}
+                              >
+                                {course.classLink || course.announcement ? '공지 수정' : '공지 등록'}
+                              </button>
+                              <button
+                                className={styles.deleteButton}
+                                onClick={() => handleDeleteCourse(course.id)}
+                                style={{ fontSize: '11px', padding: '6px 10px' }}
+                              >
+                                삭제
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div className={styles.formActions} style={{ marginTop: '20px' }}>
+                <button
+                  type="button"
+                  onClick={handleCloseManageCoursesModal}
+                  className={styles.cancelButton}
+                >
+                  닫기
                 </button>
               </div>
             </div>

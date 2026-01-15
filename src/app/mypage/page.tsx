@@ -43,7 +43,8 @@ interface InstructorCourse {
   endDate: string;
   assignedAt: string;
   createdAt?: string;
-  externalLink?: string;
+  classLink?: string;
+  announcement?: string;
 }
 
 export default function MyPage() {
@@ -585,17 +586,17 @@ export default function MyPage() {
                 </div>
 
                 <div className={styles.studentsSection}>
-                  <h3>📢 공지사항</h3>
-                  {selectedCourse.externalLink ? (
+                  <h3>🔗 교육 사이트 링크</h3>
+                  {selectedCourse.classLink ? (
                     <div className={styles.announcementCard}>
                       <div className={styles.announcementHeader}>
-                        <span className={styles.announcementIcon}>🔗</span>
-                        <h4>외부 강의 링크</h4>
+                        <span className={styles.announcementIcon}>🎓</span>
+                        <h4>강의 접속 링크</h4>
                       </div>
                       <div className={styles.announcementContent}>
                         <p>아래 링크를 통해 강의에 접속하실 수 있습니다.</p>
                         <a 
-                          href={selectedCourse.externalLink} 
+                          href={selectedCourse.classLink} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className={styles.externalLinkButton}
@@ -606,8 +607,38 @@ export default function MyPage() {
                     </div>
                   ) : (
                     <div className={styles.emptyAnnouncement}>
+                      <p>🔗 등록된 강의 링크가 없습니다.</p>
+                      <p className={styles.emptyAnnouncementSub}>관리자가 링크를 등록하면 표시됩니다.</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.studentsSection}>
+                  <h3>📢 공지사항</h3>
+                  {selectedCourse.announcement ? (
+                    <div className={styles.announcementCard} style={{ 
+                      background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)',
+                      border: '2px solid #fed7aa'
+                    }}>
+                      <div className={styles.announcementHeader}>
+                        <span className={styles.announcementIcon}>📋</span>
+                        <h4>강의 공지사항</h4>
+                      </div>
+                      <div className={styles.announcementContent}>
+                        <p style={{ 
+                          whiteSpace: 'pre-wrap', 
+                          lineHeight: '1.8',
+                          color: '#9a3412',
+                          fontSize: '1rem'
+                        }}>
+                          {selectedCourse.announcement}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={styles.emptyAnnouncement}>
                       <p>📝 등록된 공지사항이 없습니다.</p>
-                      <p className={styles.emptyAnnouncementSub}>관리자가 외부 강의 링크를 등록하면 여기에 표시됩니다.</p>
+                      <p className={styles.emptyAnnouncementSub}>관리자가 공지를 등록하면 표시됩니다.</p>
                     </div>
                   )}
                 </div>
