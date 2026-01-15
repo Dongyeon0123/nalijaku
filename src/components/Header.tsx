@@ -442,9 +442,11 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
           <a href="#" className={styles.navLink}>
             날리자쿠 소개
           </a>
-          <a href="/classroom" className={styles.navLink}>
-            강의하기
-          </a>
+          {isLoggedIn && (
+            <a href="/mypage" className={styles.navLink}>
+              마이페이지
+            </a>
+          )}
         </nav>
 
         <div className={styles.buttonSection}>

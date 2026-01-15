@@ -16,6 +16,24 @@ interface Instructor {
   certificates?: string | Array<{ name: string; issuer: string; issueDate: string }>;
   experience?: string | Array<{ company: string; position: string; startDate: string; endDate: string; description: string }>;
   awards?: string | Array<{ name: string; issuer: string; awardDate: string; description: string }>;
+  userId?: number;
+}
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+}
+
+interface Material {
+  id: number;
+  category: string;
+  subCategory?: string;
+  image: string;
+  title: string;
+  subtitle: string;
+  instructor: string;
 }
 
 export default function InstructorsManagementPage() {
@@ -23,7 +41,10 @@ export default function InstructorsManagementPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(null);
+  const [teacherUsers, setTeacherUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
   const [formData, setFormData] = useState({
+    userId: 0,
     name: '',
     region: '',
     category: '',
@@ -36,10 +57,138 @@ export default function InstructorsManagementPage() {
     awards: [] as Array<{ name: string; issuer: string; awardDate: string; description: string }>
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
+  
+  // 강의 할당 모달 상태
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [assigningInstructor, setAssigningInstructor] = useState<Instructor | null>(null);
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [loadingMaterials, setLoadingMaterials] = useState(false);
+  const [selectedMaterials, setSelectedMaterials] = useState<number[]>([]);
+  const [assignmentDetails, setAssignmentDetails] = useState({
+    studentCount: 0,
+    startDate: '',
+    endDate: ''
+  });
 
   useEffect(() => {
     fetchInstructors();
   }, []);
+
+  const fetchTeacherUsers = async () => {
+    try {
+      setLoadingUsers(true);
+      const response = await api.get('/api/users');
+      const users = response.data.data || response.data || [];
+      // TEACHER 역할을 가진 사용자만 필터링
+      const teachers = users.filter((user: User) => user.role === 'TEACHER');
+      console.log('📋 강사 역할 사용자 목록:', teachers);
+      setTeacherUsers(teachers);
+    } catch (error) {
+      console.error('강사 사용자 목록 로드 실패:', error);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const fetchMaterials = async () => {
+    try {
+      setLoadingMaterials(true);
+      const response = await api.get('/api/resources');
+      const result = response.data;
+      const materialsData = result.success ? result.data : (Array.isArray(result.data) ? result.data : []);
+      console.log('📚 학습자료 목록:', materialsData);
+      setMaterials(materialsData);
+    } catch (error) {
+      console.error('학습자료 목록 로드 실패:', error);
+      alert('학습자료 목록을 불러올 수 없습니다.');
+    } finally {
+      setLoadingMaterials(false);
+    }
+  };
+
+  const handleAssignClick = (instructor: Instructor) => {
+    setAssigningInstructor(instructor);
+    setSelectedMaterials([]);
+    setAssignmentDetails({
+      studentCount: 0,
+      startDate: '',
+      endDate: ''
+    });
+    setShowAssignModal(true);
+    fetchMaterials();
+  };
+
+  const handleCloseAssignModal = () => {
+    setShowAssignModal(false);
+    setAssigningInstructor(null);
+    setSelectedMaterials([]);
+    setAssignmentDetails({
+      studentCount: 0,
+      startDate: '',
+      endDate: ''
+    });
+  };
+
+  const handleMaterialToggle = (materialId: number) => {
+    setSelectedMaterials(prev => {
+      if (prev.includes(materialId)) {
+        return prev.filter(id => id !== materialId);
+      } else {
+        return [...prev, materialId];
+      }
+    });
+  };
+
+  const handleAssignCourses = async () => {
+    if (!assigningInstructor || selectedMaterials.length === 0) {
+      alert('할당할 강의를 선택해주세요.');
+      return;
+    }
+
+    if (!assignmentDetails.studentCount || assignmentDetails.studentCount <= 0) {
+      alert('수강 인원을 입력해주세요.');
+      return;
+    }
+
+    if (!assignmentDetails.startDate || !assignmentDetails.endDate) {
+      alert('강의 기간을 선택해주세요.');
+      return;
+    }
+
+    // 날짜 유효성 검사
+    const startDate = new Date(assignmentDetails.startDate);
+    const endDate = new Date(assignmentDetails.endDate);
+    
+    if (endDate < startDate) {
+      alert('종료일은 시작일보다 이후여야 합니다.');
+      return;
+    }
+
+    try {
+      console.log('강의 할당 요청:', {
+        instructorId: assigningInstructor.id,
+        materialIds: selectedMaterials,
+        studentCount: assignmentDetails.studentCount,
+        startDate: assignmentDetails.startDate,
+        endDate: assignmentDetails.endDate
+      });
+
+      // API 호출: 강사에게 강의 할당
+      await api.post(`/api/instructors/${assigningInstructor.id}/assign-courses`, {
+        materialIds: selectedMaterials,
+        studentCount: assignmentDetails.studentCount,
+        startDate: assignmentDetails.startDate,
+        endDate: assignmentDetails.endDate
+      });
+
+      alert(`${assigningInstructor.name} 강사에게 ${selectedMaterials.length}개의 강의가 할당되었습니다.`);
+      handleCloseAssignModal();
+    } catch (error: any) {
+      console.error('강의 할당 실패:', error);
+      const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
+      alert(`강의 할당 중 오류가 발생했습니다: ${errorMsg}`);
+    }
+  };
 
   const fetchInstructors = async () => {
     try {
@@ -89,6 +238,7 @@ export default function InstructorsManagementPage() {
     console.log('로드된 소개말:', profileDesc);
 
     setFormData({
+      userId: instructor.userId || 0,
       name: instructor.name,
       region: instructor.region,
       category: instructor.category || '',
@@ -101,13 +251,20 @@ export default function InstructorsManagementPage() {
       awards: (Array.isArray(instructor.awards) ? instructor.awards : []) as Array<{ name: string; issuer: string; awardDate: string; description: string }>
     });
     setImageFile(null);
+    fetchTeacherUsers();
     setShowModal(true);
+  };
+
+  const handleOpenModal = () => {
+    setShowModal(true);
+    fetchTeacherUsers();
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingInstructor(null);
     setFormData({
+      userId: 0,
       name: '',
       region: '',
       category: '',
@@ -154,6 +311,9 @@ export default function InstructorsManagementPage() {
       }
 
       const submitData = new FormData();
+      if (formData.userId) {
+        submitData.append('userId', formData.userId.toString());
+      }
       submitData.append('name', formData.name);
       submitData.append('region', formData.region);
       submitData.append('subtitle', formData.subtitle);
@@ -231,7 +391,7 @@ export default function InstructorsManagementPage() {
       <div className={styles.header}>
         <h1>강사 관리</h1>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={handleOpenModal}
           className={styles.addButton}
         >
           + 강사 등록
@@ -281,6 +441,12 @@ export default function InstructorsManagementPage() {
                       수정
                     </button>
                     <button
+                      className={styles.assignButton}
+                      onClick={() => handleAssignClick(instructor)}
+                    >
+                      강의 할당
+                    </button>
+                    <button
                       className={styles.deleteButton}
                       onClick={() => handleDeleteClick(instructor)}
                     >
@@ -291,6 +457,274 @@ export default function InstructorsManagementPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* 강의 할당 모달 */}
+      {showAssignModal && assigningInstructor && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal} style={{ maxWidth: '800px' }}>
+            <div className={styles.modalHeader}>
+              <h2>강의 할당 - {assigningInstructor.name}</h2>
+              <button
+                onClick={handleCloseAssignModal}
+                className={styles.closeButton}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ padding: '20px' }}>
+              <p style={{ marginBottom: '20px', color: '#666', fontSize: '14px' }}>
+                할당할 학습자료를 선택하고, 수강 인원과 강의 기간을 설정하세요.
+              </p>
+
+              {/* 수강 인원 및 강의 기간 입력 */}
+              <div style={{ 
+                padding: '20px', 
+                backgroundColor: '#f8f9fa', 
+                borderRadius: '8px', 
+                marginBottom: '20px',
+                border: '1px solid #e0e0e0'
+              }}>
+                <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600', color: '#333' }}>
+                  📋 강의 정보
+                </h3>
+                
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                  <div style={{ flex: '0 0 120px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                      수강 인원 *
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={assignmentDetails.studentCount || ''}
+                      onChange={(e) => setAssignmentDetails(prev => ({ 
+                        ...prev, 
+                        studentCount: parseInt(e.target.value) || 0 
+                      }))}
+                      placeholder="인원 수"
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        border: '1px solid #ddd',
+                        borderRadius: '6px',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-end' }}>
+                    <div style={{ flex: '0 0 150px' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                        시작일 *
+                      </label>
+                      <input
+                        type="date"
+                        value={assignmentDetails.startDate}
+                        onChange={(e) => setAssignmentDetails(prev => ({ 
+                          ...prev, 
+                          startDate: e.target.value 
+                        }))}
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          fontSize: '14px'
+                        }}
+                      />
+                    </div>
+                    
+                    <div style={{ flex: '0 0 150px' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                        종료일 *
+                      </label>
+                      <input
+                        type="date"
+                        value={assignmentDetails.endDate}
+                        onChange={(e) => setAssignmentDetails(prev => ({ 
+                          ...prev, 
+                          endDate: e.target.value 
+                        }))}
+                        min={assignmentDetails.startDate}
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          fontSize: '14px'
+                        }}
+                      />
+                    </div>
+
+                    {assignmentDetails.startDate && assignmentDetails.endDate && (
+                      <div style={{ 
+                        padding: '10px 16px',
+                        backgroundColor: '#E3F2FD',
+                        borderRadius: '6px',
+                        fontSize: '13px', 
+                        color: '#1976D2',
+                        fontWeight: '600',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        📅 {Math.ceil((new Date(assignmentDetails.endDate).getTime() - new Date(assignmentDetails.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {loadingMaterials ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                  학습자료 목록을 불러오는 중...
+                </div>
+              ) : materials.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                  할당 가능한 학습자료가 없습니다.
+                </div>
+              ) : (
+                <>
+                  <div style={{ 
+                    maxHeight: '400px', 
+                    overflowY: 'auto', 
+                    border: '1px solid #e0e0e0', 
+                    borderRadius: '8px',
+                    marginBottom: '20px'
+                  }}>
+                    {materials.map(material => {
+                      const categoryColors: { [key: string]: { bg: string; text: string } } = {
+                        '창업': { bg: '#E3F2FD', text: '#1976D2' },
+                        '드론': { bg: '#F3E5F5', text: '#7B1FA2' },
+                        'AI': { bg: '#FFF3E0', text: '#E65100' },
+                        '환경': { bg: '#E8F5E9', text: '#2E7D32' }
+                      };
+                      const categoryColor = categoryColors[material.category] || { bg: '#F5F5F5', text: '#666' };
+
+                      return (
+                        <div
+                          key={material.id}
+                          onClick={() => handleMaterialToggle(material.id)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '16px',
+                            borderBottom: '1px solid #f0f0f0',
+                            cursor: 'pointer',
+                            backgroundColor: selectedMaterials.includes(material.id) ? '#f0f7ff' : 'white',
+                            transition: 'background-color 0.2s'
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedMaterials.includes(material.id)}
+                            onChange={() => {}}
+                            style={{
+                              width: '20px',
+                              height: '20px',
+                              marginRight: '16px',
+                              cursor: 'pointer'
+                            }}
+                          />
+                          <img
+                            src={material.image.startsWith('http') ? material.image : `https://api.nallijaku.com${material.image}`}
+                            alt={material.title}
+                            style={{
+                              width: '80px',
+                              height: '80px',
+                              objectFit: 'cover',
+                              borderRadius: '8px',
+                              marginRight: '16px'
+                            }}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/placeholder.png';
+                            }}
+                          />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ 
+                              display: 'inline-block',
+                              padding: '4px 12px',
+                              borderRadius: '12px',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              marginBottom: '8px',
+                              backgroundColor: categoryColor.bg,
+                              color: categoryColor.text
+                            }}>
+                              {material.category}
+                              {material.subCategory && ` - ${material.subCategory}`}
+                            </div>
+                            <h4 style={{ margin: '4px 0', fontSize: '16px', fontWeight: '600' }}>
+                              {material.title}
+                            </h4>
+                            <p style={{ margin: '4px 0', fontSize: '13px', color: '#666' }}>
+                              {material.subtitle}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    padding: '16px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    marginBottom: '20px'
+                  }}>
+                    <div>
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: '#333', display: 'block', marginBottom: '4px' }}>
+                        선택된 강의: {selectedMaterials.length}개
+                      </span>
+                      {assignmentDetails.studentCount > 0 && (
+                        <span style={{ fontSize: '12px', color: '#666' }}>
+                          수강 인원: {assignmentDetails.studentCount}명
+                        </span>
+                      )}
+                    </div>
+                    {selectedMaterials.length > 0 && (
+                      <button
+                        onClick={() => setSelectedMaterials([])}
+                        style={{
+                          padding: '6px 12px',
+                          fontSize: '12px',
+                          color: '#666',
+                          backgroundColor: 'white',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        선택 해제
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+
+              <div className={styles.formActions}>
+                <button
+                  type="button"
+                  onClick={handleCloseAssignModal}
+                  className={styles.cancelButton}
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAssignCourses}
+                  className={styles.submitButton}
+                  disabled={selectedMaterials.length === 0 || !assignmentDetails.studentCount || !assignmentDetails.startDate || !assignmentDetails.endDate}
+                >
+                  할당하기 ({selectedMaterials.length})
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -309,6 +743,45 @@ export default function InstructorsManagementPage() {
             </div>
 
             <form onSubmit={handleSubmit} className={styles.form}>
+              {!editingInstructor && (
+                <div className={styles.formGroup}>
+                  <label>강사 계정 선택 *</label>
+                  {loadingUsers ? (
+                    <div style={{ padding: '12px', textAlign: 'center', color: '#666' }}>
+                      사용자 목록 로딩 중...
+                    </div>
+                  ) : (
+                    <select
+                      name="userId"
+                      value={formData.userId}
+                      onChange={(e) => {
+                        const selectedUserId = parseInt(e.target.value);
+                        const selectedUser = teacherUsers.find(u => u.id === selectedUserId);
+                        setFormData(prev => ({
+                          ...prev,
+                          userId: selectedUserId,
+                          name: selectedUser?.username || prev.name
+                        }));
+                      }}
+                      required
+                      style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '8px', fontSize: '14px' }}
+                    >
+                      <option value="">강사 역할을 가진 사용자를 선택하세요</option>
+                      {teacherUsers.map(user => (
+                        <option key={user.id} value={user.id}>
+                          {user.username} ({user.email})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {teacherUsers.length === 0 && !loadingUsers && (
+                    <p style={{ fontSize: '12px', color: '#f44336', margin: '8px 0 0 0' }}>
+                      ⚠️ 강사 역할을 가진 사용자가 없습니다. 먼저 사용자 관리에서 강사 역할을 부여해주세요.
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className={styles.formGroup}>
                 <label>이름 *</label>
                 <input
@@ -319,6 +792,11 @@ export default function InstructorsManagementPage() {
                   required
                   placeholder="강사 이름을 입력하세요"
                 />
+                {!editingInstructor && formData.userId > 0 && (
+                  <p style={{ fontSize: '12px', color: '#1976D2', margin: '4px 0 0 0' }}>
+                    💡 선택한 사용자: {teacherUsers.find(u => u.id === formData.userId)?.username || ''} (이름은 수정 가능합니다)
+                  </p>
+                )}
               </div>
 
               <div className={styles.formGroup}>
