@@ -308,7 +308,10 @@ export default function ResourcesPage() {
                           alt={material.alt}
                           className={styles.materialImage}
                           onError={(e) => {
-                            console.error('이미지 로드 실패:', material.image);
+                            // 이미지 로드 실패 시 placeholder로 대체 (에러 로그는 개발 모드에서만)
+                            if (process.env.NODE_ENV === 'development') {
+                              console.warn('이미지 로드 실패:', material.image);
+                            }
                             (e.target as HTMLImageElement).src = '/placeholder.png';
                           }}
                         />

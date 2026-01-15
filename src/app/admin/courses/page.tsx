@@ -291,11 +291,41 @@ export default function CoursesPage() {
       try {
         // Axios 사용 (인증 토큰 자동 포함)
         await api.delete(`/api/resources/${id}`);
+        
+        // 목록에서 즉시 제거
         setCourses(courses.filter(c => c.id !== id));
+        
         alert('강좌가 삭제되었습니다.');
-      } catch (error) {
+        
+        // 목록 새로고침 (서버에서 최신 데이터 가져오기)
+        await loadCourses();
+      } catch (error: any) {
         console.error('강좌 삭제 실패:', error);
-        alert('강좌 삭제에 실패했습니다.');
+        
+        if (error.response?.status === 404) {
+          // 404 에러: 백엔드 API가 구현되지 않았거나 이미 삭제된 경우
+          console.warn('백엔드 DELETE API가 구현되지 않았거나 강좌를 찾을 수 없습니다.');
+          alert('⚠️ 백엔드 삭제 API가 아직 구현되지 않았습니다.\n프론트엔드에서만 목록에서 제거합니다.');
+          // 목록에서 제거
+          setCourses(courses.filter(c => c.id !== id));
+        } else if (error.response?.status === 403) {
+          alert('강좌를 삭제할 권한이 없습니다.');
+        } else if (error.response?.status === 401) {
+          alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+          window.location.href = '/';
+        } else if (error.response?.status === 409 || error.message?.includes('foreign key constraint')) {
+          // 외래 키 제약 조건 에러
+          alert('⚠️ 이 강좌는 강사와 연결되어 있어 삭제할 수 없습니다.\n\n백엔드 개발자에게 다음을 요청하세요:\n1. instructor_courses 테이블에서 관련 레코드를 먼저 삭제\n2. 또는 CASCADE 삭제 설정');
+        } else {
+          const errorMsg = error.response?.data?.message || error.message || '강좌 삭제에 실패했습니다.';
+          
+          // 외래 키 제약 조건 에러 메시지 감지
+          if (errorMsg.includes('foreign key constraint') || errorMsg.includes('Cannot delete or update a parent row')) {
+            alert('⚠️ 이 강좌는 다른 데이터(강사 등)와 연결되어 있어 삭제할 수 없습니다.\n\n해결 방법:\n1. 연결된 강사를 먼저 제거하거나\n2. 백엔드에서 CASCADE 삭제를 설정해야 합니다.');
+          } else {
+            alert(`강좌 삭제에 실패했습니다: ${errorMsg}`);
+          }
+        }
       }
     }
   };
@@ -1199,15 +1229,30 @@ export default function CoursesPage() {
                           onClick={async () => {
                             if (confirm(`"${category}" 카테고리를 삭제하시겠습니까?`)) {
                               try {
-                                // 메인 카테고리 삭제 API 호출
-                                await api.delete(`/api/admin/categories/${encodeURIComponent(category)}`);
+                                const categoryId = categoryMap[category];
+                                if (!categoryId) {
+                                  alert('카테고리 ID를 찾을 수 없습니다.');
+                                  return;
+                                }
+                                
+                                // 메인 카테고리 삭제 API 호출 (ID 사용)
+                                await api.delete(`/api/admin/categories/${categoryId}`);
                                 
                                 alert('카테고리가 삭제되었습니다.');
                                 // 카테고리 목록 다시 로드
                                 await loadCourses();
                               } catch (error: any) {
                                 console.error('카테고리 삭제 실패:', error);
-                                alert(error.response?.data?.message || '카테고리 삭제에 실패했습니다.');
+                                
+                                if (error.response?.status === 400) {
+                                  const errorData = error.response?.data?.data;
+                                  const resourceCount = errorData?.resourceCount || '여러';
+                                  alert(`카테고리를 삭제할 수 없습니다.\n해당 카테고리에 ${resourceCount}개의 강좌가 있습니다.`);
+                                } else if (error.response?.status === 404) {
+                                  alert('카테고리를 찾을 수 없습니다.');
+                                } else {
+                                  alert(error.response?.data?.message || '카테고리 삭제에 실패했습니다.');
+                                }
                               }
                             }
                           }}
@@ -1251,12 +1296,18 @@ export default function CoursesPage() {
                                   onClick={async () => {
                                     if (confirm(`"${sub}" 서브카테고리를 삭제하시겠습니까?`)) {
                                       try {
-                                        const deleteUrl = `/api/admin/categories/${encodeURIComponent(category)}/subcategories/${encodeURIComponent(sub)}`;
+                                        const categoryId = categoryMap[category];
+                                        if (!categoryId) {
+                                          alert('카테고리 ID를 찾을 수 없습니다.');
+                                          return;
+                                        }
+                                        
+                                        // 서브카테고리 삭제 API 호출 (부모 ID 사용)
+                                        const deleteUrl = `/api/admin/categories/${categoryId}/subcategories/${encodeURIComponent(sub)}`;
                                         console.log('🗑️ 서브카테고리 삭제 요청:', deleteUrl);
-                                        console.log('  - 메인 카테고리:', category);
+                                        console.log('  - 메인 카테고리:', category, '(ID:', categoryId, ')');
                                         console.log('  - 서브카테고리:', sub);
                                         
-                                        // 서브카테고리 삭제 API 호출
                                         const response = await api.delete(deleteUrl);
                                         console.log('✅ 서브카테고리 삭제 성공:', response.data);
                                         
