@@ -43,6 +43,7 @@ interface InstructorCourse {
   endDate: string;
   assignedAt: string;
   createdAt?: string;
+  externalLink?: string;
 }
 
 export default function MyPage() {
@@ -52,6 +53,7 @@ export default function MyPage() {
   const [instructorCourses, setInstructorCourses] = useState<InstructorCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'profile' | 'courses' | 'settings' | 'certificates'>('profile');
+  const [selectedCourse, setSelectedCourse] = useState<InstructorCourse | null>(null);
   
   // 수정 모드 상태
   const [editMode, setEditMode] = useState({
@@ -238,6 +240,14 @@ export default function MyPage() {
     }
   };
 
+  const handleCourseClick = (course: InstructorCourse) => {
+    setSelectedCourse(course);
+  };
+
+  const handleBackToCourses = () => {
+    setSelectedCourse(null);
+  };
+
   if (loading) {
     return (
       <div className={styles.container}>
@@ -411,110 +421,196 @@ export default function MyPage() {
 
         {activeTab === 'courses' && user.role === 'TEACHER' && (
           <div className={styles.instructorCoursesSection}>
-            <div className={styles.courseStatsGrid}>
-              <div className={styles.courseStatCard}>
-                <div className={styles.courseStatIcon}>📚</div>
-                <div className={styles.courseStatInfo}>
-                  <p className={styles.courseStatLabel}>담당 강의</p>
-                  <p className={styles.courseStatValue}>{instructorCourses.length}개</p>
-                </div>
-              </div>
-              <div className={styles.courseStatCard}>
-                <div className={styles.courseStatIcon}>👥</div>
-                <div className={styles.courseStatInfo}>
-                  <p className={styles.courseStatLabel}>총 수강생</p>
-                  <p className={styles.courseStatValue}>
-                    {instructorCourses.reduce((acc, c) => acc + (c.studentCount || 0), 0)}명
-                  </p>
-                </div>
-              </div>
-              <div className={styles.courseStatCard}>
-                <div className={styles.courseStatIcon}>📊</div>
-                <div className={styles.courseStatInfo}>
-                  <p className={styles.courseStatLabel}>평균 진행률</p>
-                  <p className={styles.courseStatValue}>
-                    {instructorCourses.length > 0
-                      ? Math.round(
-                          instructorCourses.reduce((acc, c) => acc + (c.avgProgress || 0), 0) /
-                            instructorCourses.length
-                        )
-                      : 0}%
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {instructorCourses.length === 0 ? (
-              <div className={styles.emptyState}>
-                <div className={styles.emptyIcon}>📖</div>
-                <h3>아직 담당 강의가 없습니다</h3>
-                <p>관리자가 강의를 할당하면 여기에 표시됩니다.</p>
-              </div>
-            ) : (
-              <div className={styles.instructorCourseGrid}>
-                {instructorCourses.map(course => (
-                  <div key={course.id} className={styles.instructorCourseCard}>
-                    <div className={styles.instructorCourseThumbnail}>
-                      {course.thumbnail ? (
-                        <img 
-                          src={course.thumbnail.startsWith('http') 
-                            ? course.thumbnail 
-                            : `https://api.nallijaku.com${course.thumbnail}`
-                          } 
-                          alt={course.title}
-                          onError={(e) => {
-                            console.error('이미지 로드 실패:', course.thumbnail);
-                            (e.target as HTMLImageElement).style.display = 'none';
-                            const placeholder = (e.target as HTMLImageElement).nextElementSibling;
-                            if (placeholder) {
-                              (placeholder as HTMLElement).style.display = 'flex';
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className={styles.placeholderThumbnail}
-                        style={{ display: course.thumbnail ? 'none' : 'flex' }}
-                      >
-                        {course.title.charAt(0)}
-                      </div>
-                      <div className={`${styles.statusBadge} ${styles[course.status]}`}>
-                        {course.status === 'active' ? '진행중' : '완료'}
-                      </div>
-                    </div>
-                    <div className={styles.instructorCourseInfo}>
-                      <h3>{course.title}</h3>
-                      <p className={styles.courseDescription}>{course.description}</p>
-                      
-                      {/* 강의 기간 */}
-                      {course.startDate && course.endDate && (
-                        <div className={styles.courseDates}>
-                          <span>📅 {new Date(course.startDate).toLocaleDateString('ko-KR')} ~ {new Date(course.endDate).toLocaleDateString('ko-KR')}</span>
-                          <span className={styles.courseDuration}>
-                            ({Math.ceil((new Date(course.endDate).getTime() - new Date(course.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일)
-                          </span>
-                        </div>
-                      )}
-                      
-                      <div className={styles.courseMetrics}>
-                        <div className={styles.metric}>
-                          <span className={styles.metricLabel}>수강생</span>
-                          <span className={styles.metricValue}>{course.studentCount || 0}명</span>
-                        </div>
-                        <div className={styles.metric}>
-                          <span className={styles.metricLabel}>평균 진행률</span>
-                          <span className={styles.metricValue}>{Math.round(course.avgProgress || 0)}%</span>
-                        </div>
-                      </div>
-                      <button
-                        className={styles.manageCourseButton}
-                        onClick={() => router.push(`/instructor/courses/${course.id}`)}
-                      >
-                        강의 관리
-                      </button>
+            {!selectedCourse ? (
+              <>
+                <div className={styles.courseStatsGrid}>
+                  <div className={styles.courseStatCard}>
+                    <div className={styles.courseStatIcon}>📚</div>
+                    <div className={styles.courseStatInfo}>
+                      <p className={styles.courseStatLabel}>담당 강의</p>
+                      <p className={styles.courseStatValue}>{instructorCourses.length}개</p>
                     </div>
                   </div>
-                ))}
+                  <div className={styles.courseStatCard}>
+                    <div className={styles.courseStatIcon}>👥</div>
+                    <div className={styles.courseStatInfo}>
+                      <p className={styles.courseStatLabel}>총 수강생</p>
+                      <p className={styles.courseStatValue}>
+                        {instructorCourses.reduce((acc, c) => acc + (c.studentCount || 0), 0)}명
+                      </p>
+                    </div>
+                  </div>
+                  <div className={styles.courseStatCard}>
+                    <div className={styles.courseStatIcon}>📊</div>
+                    <div className={styles.courseStatInfo}>
+                      <p className={styles.courseStatLabel}>평균 진행률</p>
+                      <p className={styles.courseStatValue}>
+                        {instructorCourses.length > 0
+                          ? Math.round(
+                              instructorCourses.reduce((acc, c) => acc + (c.avgProgress || 0), 0) /
+                                instructorCourses.length
+                            )
+                          : 0}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {instructorCourses.length === 0 ? (
+                  <div className={styles.emptyState}>
+                    <div className={styles.emptyIcon}>📖</div>
+                    <h3>아직 담당 강의가 없습니다</h3>
+                    <p>관리자가 강의를 할당하면 여기에 표시됩니다.</p>
+                  </div>
+                ) : (
+                  <div className={styles.instructorCourseGrid}>
+                    {instructorCourses.map(course => (
+                      <div key={course.id} className={styles.instructorCourseCard}>
+                        <div className={styles.instructorCourseThumbnail}>
+                          {course.thumbnail ? (
+                            <img 
+                              src={course.thumbnail.startsWith('http') 
+                                ? course.thumbnail 
+                                : `https://api.nallijaku.com${course.thumbnail}`
+                              } 
+                              alt={course.title}
+                              onError={(e) => {
+                                console.error('이미지 로드 실패:', course.thumbnail);
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                const placeholder = (e.target as HTMLImageElement).nextElementSibling;
+                                if (placeholder) {
+                                  (placeholder as HTMLElement).style.display = 'flex';
+                                }
+                              }}
+                            />
+                          ) : null}
+                          <div 
+                            className={styles.placeholderThumbnail}
+                            style={{ display: course.thumbnail ? 'none' : 'flex' }}
+                          >
+                            {course.title.charAt(0)}
+                          </div>
+                          <div className={`${styles.statusBadge} ${styles[course.status]}`}>
+                            {course.status === 'active' ? '진행중' : '완료'}
+                          </div>
+                        </div>
+                        <div className={styles.instructorCourseInfo}>
+                          <h3>{course.title}</h3>
+                          <p className={styles.courseDescription}>{course.description}</p>
+                          
+                          {/* 강의 기간 */}
+                          {course.startDate && course.endDate && (
+                            <div className={styles.courseDates}>
+                              <span>📅 {new Date(course.startDate).toLocaleDateString('ko-KR')} ~ {new Date(course.endDate).toLocaleDateString('ko-KR')}</span>
+                              <span className={styles.courseDuration}>
+                                ({Math.ceil((new Date(course.endDate).getTime() - new Date(course.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일)
+                              </span>
+                            </div>
+                          )}
+                          
+                          <div className={styles.courseMetrics}>
+                            <div className={styles.metric}>
+                              <span className={styles.metricLabel}>수강생</span>
+                              <span className={styles.metricValue}>{course.studentCount || 0}명</span>
+                            </div>
+                            <div className={styles.metric}>
+                              <span className={styles.metricLabel}>평균 진행률</span>
+                              <span className={styles.metricValue}>{Math.round(course.avgProgress || 0)}%</span>
+                            </div>
+                          </div>
+                          <button
+                            className={styles.manageCourseButton}
+                            onClick={() => handleCourseClick(course)}
+                          >
+                            강의 관리
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className={styles.courseManagementView}>
+                <div className={styles.courseManagementHeader}>
+                  <button className={styles.backButton} onClick={handleBackToCourses}>
+                    ← 뒤로가기
+                  </button>
+                  <h2>{selectedCourse.title}</h2>
+                </div>
+
+                <div className={styles.courseDetailCard}>
+                  <div className={styles.courseDetailHeader}>
+                    <div className={styles.courseDetailThumbnail}>
+                      {selectedCourse.thumbnail ? (
+                        <img 
+                          src={selectedCourse.thumbnail.startsWith('http') 
+                            ? selectedCourse.thumbnail 
+                            : `https://api.nallijaku.com${selectedCourse.thumbnail}`
+                          } 
+                          alt={selectedCourse.title}
+                        />
+                      ) : (
+                        <div className={styles.placeholderThumbnail}>
+                          {selectedCourse.title.charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                    <div className={styles.courseDetailInfo}>
+                      <h3>{selectedCourse.title}</h3>
+                      <p>{selectedCourse.description}</p>
+                      {selectedCourse.startDate && selectedCourse.endDate && (
+                        <p className={styles.courseDetailDates}>
+                          📅 {new Date(selectedCourse.startDate).toLocaleDateString('ko-KR')} ~ {new Date(selectedCourse.endDate).toLocaleDateString('ko-KR')}
+                          <span> ({Math.ceil((new Date(selectedCourse.endDate).getTime() - new Date(selectedCourse.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일)</span>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className={styles.courseDetailStats}>
+                    <div className={styles.statItem}>
+                      <span className={styles.statLabel}>수강생</span>
+                      <span className={styles.statValue}>{selectedCourse.studentCount || 0}명</span>
+                    </div>
+                    <div className={styles.statItem}>
+                      <span className={styles.statLabel}>평균 진행률</span>
+                      <span className={styles.statValue}>{Math.round(selectedCourse.avgProgress || 0)}%</span>
+                    </div>
+                    <div className={styles.statItem}>
+                      <span className={styles.statLabel}>상태</span>
+                      <span className={styles.statValue}>{selectedCourse.status === 'active' ? '진행중' : '완료'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.studentsSection}>
+                  <h3>📢 공지사항</h3>
+                  {selectedCourse.externalLink ? (
+                    <div className={styles.announcementCard}>
+                      <div className={styles.announcementHeader}>
+                        <span className={styles.announcementIcon}>🔗</span>
+                        <h4>외부 강의 링크</h4>
+                      </div>
+                      <div className={styles.announcementContent}>
+                        <p>아래 링크를 통해 강의에 접속하실 수 있습니다.</p>
+                        <a 
+                          href={selectedCourse.externalLink} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className={styles.externalLinkButton}
+                        >
+                          강의 바로가기 →
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={styles.emptyAnnouncement}>
+                      <p>📝 등록된 공지사항이 없습니다.</p>
+                      <p className={styles.emptyAnnouncementSub}>관리자가 외부 강의 링크를 등록하면 여기에 표시됩니다.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

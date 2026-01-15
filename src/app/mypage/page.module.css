@@ -827,3 +827,304 @@
     padding: 25px;
   }
 }
+
+/* 강의 관리 뷰 */
+.courseManagementView {
+  animation: fadeIn 0.3s ease;
+}
+
+.courseManagementHeader {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.backButton {
+  padding: 10px 20px;
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.backButton:hover {
+  background: #e5e7eb;
+  transform: translateX(-3px);
+}
+
+.courseManagementHeader h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.courseDetailCard {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 2px solid #f3f4f6;
+}
+
+.courseDetailHeader {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 25px;
+  padding-bottom: 25px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.courseDetailThumbnail {
+  width: 200px;
+  height: 150px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.courseDetailThumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.courseDetailInfo {
+  flex: 1;
+}
+
+.courseDetailInfo h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.courseDetailInfo p {
+  font-size: 1rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.courseDetailDates {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.courseDetailStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.statValue {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #04AD74;
+}
+
+.studentsSection {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 2px solid #f3f4f6;
+  margin-bottom: 25px;
+}
+
+.studentsSection h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+.studentsTable {
+  overflow-x: auto;
+}
+
+.studentsTable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.studentsTable thead {
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.studentsTable th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.studentsTable td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.studentsTable tbody tr:hover {
+  background: #f9fafb;
+}
+
+.progressBarContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progressBarContainer .progressBar {
+  flex: 1;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressBarContainer .progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #04AD74, #00A169);
+  transition: width 0.3s ease;
+}
+
+.progressBarContainer span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #04AD74;
+  min-width: 40px;
+}
+
+.completedBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #04AD74, #00A169);
+  color: white;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.inProgressBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #f3f4f6;
+  color: #6b7280;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* 공지사항 */
+.announcementCard {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 12px;
+  padding: 25px;
+  border: 2px solid #bae6fd;
+}
+
+.announcementHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.announcementIcon {
+  font-size: 1.8rem;
+}
+
+.announcementHeader h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0c4a6e;
+  margin: 0;
+}
+
+.announcementContent {
+  padding-left: 42px;
+}
+
+.announcementContent p {
+  font-size: 1rem;
+  color: #0369a1;
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.externalLinkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.externalLinkButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(14, 165, 233, 0.4);
+}
+
+.emptyAnnouncement {
+  text-align: center;
+  padding: 40px 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px dashed #e5e7eb;
+}
+
+.emptyAnnouncement p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.emptyAnnouncementSub {
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
