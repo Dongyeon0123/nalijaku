@@ -622,6 +622,122 @@ GET /api/users/count
 }
 ```
 
+### 3. 사용자 목록 조회 (관리자)
+```
+GET /api/users
+Authorization: Bearer {admin_token}
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "data": [
+    {
+      "id": "ObjectId",
+      "username": "string",
+      "email": "string",
+      "organization": "string",
+      "role": "USER | INSTRUCTOR | ADMIN",
+      "phone": "string",
+      "droneExperience": boolean,
+      "createdAt": "2025-01-01T00:00:00Z"
+    }
+  ],
+  "count": 150
+}
+```
+
+### 4. 사용자 역할 변경 (관리자)
+```
+PUT /api/users/{id}/role
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+요청 본문:
+{
+  "role": "USER | INSTRUCTOR | ADMIN"
+}
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "message": "역할이 변경되었습니다",
+  "data": {
+    "id": "ObjectId",
+    "username": "string",
+    "role": "INSTRUCTOR"
+  }
+}
+
+응답 (실패 - 400):
+{
+  "success": false,
+  "message": "유효하지 않은 역할입니다",
+  "code": "INVALID_ROLE"
+}
+
+응답 (실패 - 404):
+{
+  "success": false,
+  "message": "사용자를 찾을 수 없습니다",
+  "code": "USER_NOT_FOUND"
+}
+```
+
+### 5. 계정 활성화/비활성화 (관리자)
+```
+PATCH /api/users/{id}/status
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+요청 본문:
+{
+  "status": "ACTIVE | INACTIVE"
+}
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "message": "계정 상태가 변경되었습니다"
+}
+```
+
+### 6. 계정 잠금/해제 (관리자)
+```
+PATCH /api/users/{id}/lock
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+요청 본문:
+{
+  "locked": true | false
+}
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "message": "계정 잠금 상태가 변경되었습니다"
+}
+```
+
+### 7. 사용자 삭제 (관리자)
+```
+DELETE /api/users/{id}
+Authorization: Bearer {admin_token}
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "message": "사용자가 삭제되었습니다"
+}
+
+응답 (실패 - 404):
+{
+  "success": false,
+  "message": "사용자를 찾을 수 없습니다",
+  "code": "USER_NOT_FOUND"
+}
+```
+
 ---
 
 ## 📊 MongoDB 컬렉션 스키마
