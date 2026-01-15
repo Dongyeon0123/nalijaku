@@ -29,13 +29,20 @@ interface EnrolledCourse {
 
 interface InstructorCourse {
   id: number;
+  materialId: number;
   title: string;
+  subtitle?: string;
   thumbnail?: string;
   description: string;
+  categoryName?: string;
+  instructorName?: string;
   studentCount: number;
   avgProgress: number;
   status: 'active' | 'completed';
-  createdAt: string;
+  startDate: string;
+  endDate: string;
+  assignedAt: string;
+  createdAt?: string;
 }
 
 export default function MyPage() {
@@ -417,7 +424,7 @@ export default function MyPage() {
                 <div className={styles.courseStatInfo}>
                   <p className={styles.courseStatLabel}>총 수강생</p>
                   <p className={styles.courseStatValue}>
-                    {instructorCourses.reduce((acc, c) => acc + c.studentCount, 0)}명
+                    {instructorCourses.reduce((acc, c) => acc + (c.studentCount || 0), 0)}명
                   </p>
                 </div>
               </div>
@@ -428,7 +435,7 @@ export default function MyPage() {
                   <p className={styles.courseStatValue}>
                     {instructorCourses.length > 0
                       ? Math.round(
-                          instructorCourses.reduce((acc, c) => acc + c.avgProgress, 0) /
+                          instructorCourses.reduce((acc, c) => acc + (c.avgProgress || 0), 0) /
                             instructorCourses.length
                         )
                       : 0}%
@@ -449,12 +456,28 @@ export default function MyPage() {
                   <div key={course.id} className={styles.instructorCourseCard}>
                     <div className={styles.instructorCourseThumbnail}>
                       {course.thumbnail ? (
-                        <img src={course.thumbnail} alt={course.title} />
-                      ) : (
-                        <div className={styles.placeholderThumbnail}>
-                          {course.title.charAt(0)}
-                        </div>
-                      )}
+                        <img 
+                          src={course.thumbnail.startsWith('http') 
+                            ? course.thumbnail 
+                            : `https://api.nallijaku.com${course.thumbnail}`
+                          } 
+                          alt={course.title}
+                          onError={(e) => {
+                            console.error('이미지 로드 실패:', course.thumbnail);
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            const placeholder = (e.target as HTMLImageElement).nextElementSibling;
+                            if (placeholder) {
+                              (placeholder as HTMLElement).style.display = 'flex';
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className={styles.placeholderThumbnail}
+                        style={{ display: course.thumbnail ? 'none' : 'flex' }}
+                      >
+                        {course.title.charAt(0)}
+                      </div>
                       <div className={`${styles.statusBadge} ${styles[course.status]}`}>
                         {course.status === 'active' ? '진행중' : '완료'}
                       </div>
@@ -462,14 +485,25 @@ export default function MyPage() {
                     <div className={styles.instructorCourseInfo}>
                       <h3>{course.title}</h3>
                       <p className={styles.courseDescription}>{course.description}</p>
+                      
+                      {/* 강의 기간 */}
+                      {course.startDate && course.endDate && (
+                        <div className={styles.courseDates}>
+                          <span>📅 {new Date(course.startDate).toLocaleDateString('ko-KR')} ~ {new Date(course.endDate).toLocaleDateString('ko-KR')}</span>
+                          <span className={styles.courseDuration}>
+                            ({Math.ceil((new Date(course.endDate).getTime() - new Date(course.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일)
+                          </span>
+                        </div>
+                      )}
+                      
                       <div className={styles.courseMetrics}>
                         <div className={styles.metric}>
                           <span className={styles.metricLabel}>수강생</span>
-                          <span className={styles.metricValue}>{course.studentCount}명</span>
+                          <span className={styles.metricValue}>{course.studentCount || 0}명</span>
                         </div>
                         <div className={styles.metric}>
                           <span className={styles.metricLabel}>평균 진행률</span>
-                          <span className={styles.metricValue}>{course.avgProgress}%</span>
+                          <span className={styles.metricValue}>{Math.round(course.avgProgress || 0)}%</span>
                         </div>
                       </div>
                       <button
