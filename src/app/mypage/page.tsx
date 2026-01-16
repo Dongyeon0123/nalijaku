@@ -465,58 +465,87 @@ export default function MyPage() {
                   <div className={styles.instructorCourseGrid}>
                     {instructorCourses.map(group => (
                       <div key={group.id} className={styles.instructorCourseCard} style={{
-                        border: '1px solid #22c55e',
-                        boxShadow: '0 2px 8px rgba(34, 197, 94, 0.1)'
+                        border: 'none',
+                        overflow: 'hidden',
+                        boxShadow: '0 4px 12px rgba(34, 197, 94, 0.15)'
                       }}>
                         <div className={styles.instructorCourseThumbnail} style={{
-                          background: 'white',
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#16a34a',
+                          color: 'white',
                           fontSize: '48px',
                           fontWeight: 'bold',
-                          border: '1px solid #22c55e',
-                          borderBottom: 'none'
+                          border: 'none',
+                          position: 'relative'
                         }}>
                           🏫
                           <div className={`${styles.statusBadge} ${styles[group.status]}`} style={{
-                            backgroundColor: group.status === 'active' ? '#dcfce7' : '#f3f4f6',
-                            color: group.status === 'active' ? '#16a34a' : '#6b7280',
-                            border: `1px solid ${group.status === 'active' ? '#22c55e' : '#d1d5db'}`
+                            backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                            color: 'white',
+                            border: '1px solid rgba(255, 255, 255, 0.4)',
+                            backdropFilter: 'blur(10px)'
                           }}>
-                            {group.status === 'active' ? '진행중' : '완료'}
+                            {group.status === 'active' ? '✓ 진행중' : '완료'}
                           </div>
                         </div>
                         <div className={styles.instructorCourseInfo}>
-                          <h3 style={{ color: '#16a34a' }}>{group.schoolName}</h3>
+                          <h3 style={{ color: '#059669', fontSize: '1.25rem', fontWeight: '700' }}>{group.schoolName}</h3>
                           
                           {/* 강의 기간 */}
                           {group.startDate && group.endDate && (
-                            <div className={styles.courseDates}>
-                              <span>📅 {new Date(group.startDate).toLocaleDateString('ko-KR')} ~ {new Date(group.endDate).toLocaleDateString('ko-KR')}</span>
-                              <span className={styles.courseDuration}>
+                            <div className={styles.courseDates} style={{ 
+                              backgroundColor: '#f0fdf4',
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              border: '1px solid #bbf7d0'
+                            }}>
+                              <span style={{ color: '#166534', fontWeight: '500' }}>📅 {new Date(group.startDate).toLocaleDateString('ko-KR')} ~ {new Date(group.endDate).toLocaleDateString('ko-KR')}</span>
+                              <span className={styles.courseDuration} style={{ color: '#16a34a' }}>
                                 ({Math.ceil((new Date(group.endDate).getTime() - new Date(group.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일)
                               </span>
                             </div>
                           )}
                           
                           <div className={styles.courseMetrics}>
-                            <div className={styles.metric}>
-                              <span className={styles.metricLabel}>수강생</span>
-                              <span className={styles.metricValue} style={{ color: '#16a34a' }}>{group.studentCount || 0}명</span>
+                            <div className={styles.metric} style={{
+                              backgroundColor: '#f0fdf4',
+                              padding: '12px',
+                              borderRadius: '8px',
+                              border: '1px solid #bbf7d0'
+                            }}>
+                              <span className={styles.metricLabel} style={{ color: '#166534' }}>수강생</span>
+                              <span className={styles.metricValue} style={{ color: '#059669', fontSize: '1.5rem' }}>{group.studentCount || 0}명</span>
                             </div>
-                            <div className={styles.metric}>
-                              <span className={styles.metricLabel}>강의 수</span>
-                              <span className={styles.metricValue} style={{ color: '#16a34a' }}>{group.courseCount || 0}개</span>
+                            <div className={styles.metric} style={{
+                              backgroundColor: '#f0fdf4',
+                              padding: '12px',
+                              borderRadius: '8px',
+                              border: '1px solid #bbf7d0'
+                            }}>
+                              <span className={styles.metricLabel} style={{ color: '#166534' }}>강의 수</span>
+                              <span className={styles.metricValue} style={{ color: '#059669', fontSize: '1.5rem' }}>{group.courseCount || 0}개</span>
                             </div>
                           </div>
                           <button
                             className={styles.manageCourseButton}
                             onClick={() => handleCourseClick(group)}
                             style={{
-                              backgroundColor: '#22c55e',
-                              borderColor: '#16a34a'
+                              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                              borderColor: '#059669',
+                              color: 'white',
+                              fontWeight: '600',
+                              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = 'translateY(-2px)';
+                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = 'translateY(0)';
+                              e.currentTarget.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
                             }}
                           >
                             상세보기
@@ -539,39 +568,58 @@ export default function MyPage() {
                 <div className={styles.courseDetailCard}>
                   <div className={styles.courseDetailHeader}>
                     <div className={styles.courseDetailThumbnail} style={{
-                      background: 'white',
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#16a34a',
+                      color: 'white',
                       fontSize: '64px',
-                      border: '1px solid #22c55e'
+                      border: 'none',
+                      boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
                     }}>
                       🏫
                     </div>
                     <div className={styles.courseDetailInfo}>
-                      <h3 style={{ color: '#16a34a' }}>{selectedCourse.schoolName}</h3>
+                      <h3 style={{ color: '#059669' }}>{selectedCourse.schoolName}</h3>
                       {selectedCourse.startDate && selectedCourse.endDate && (
-                        <p className={styles.courseDetailDates}>
+                        <p className={styles.courseDetailDates} style={{
+                          backgroundColor: '#f0fdf4',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          border: '1px solid #bbf7d0',
+                          color: '#166534'
+                        }}>
                           📅 {new Date(selectedCourse.startDate).toLocaleDateString('ko-KR')} ~ {new Date(selectedCourse.endDate).toLocaleDateString('ko-KR')}
-                          <span> ({Math.ceil((new Date(selectedCourse.endDate).getTime() - new Date(selectedCourse.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일)</span>
+                          <span style={{ color: '#16a34a' }}> ({Math.ceil((new Date(selectedCourse.endDate).getTime() - new Date(selectedCourse.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일)</span>
                         </p>
                       )}
                     </div>
                   </div>
 
                   <div className={styles.courseDetailStats}>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>수강생</span>
-                      <span className={styles.statValue} style={{ color: '#16a34a' }}>{selectedCourse.studentCount || 0}명</span>
+                    <div className={styles.statItem} style={{
+                      backgroundColor: '#f0fdf4',
+                      border: '1px solid #bbf7d0',
+                      borderRadius: '8px'
+                    }}>
+                      <span className={styles.statLabel} style={{ color: '#166534' }}>수강생</span>
+                      <span className={styles.statValue} style={{ color: '#059669' }}>{selectedCourse.studentCount || 0}명</span>
                     </div>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>강의 수</span>
-                      <span className={styles.statValue} style={{ color: '#16a34a' }}>{selectedCourse.courseCount || 0}개</span>
+                    <div className={styles.statItem} style={{
+                      backgroundColor: '#f0fdf4',
+                      border: '1px solid #bbf7d0',
+                      borderRadius: '8px'
+                    }}>
+                      <span className={styles.statLabel} style={{ color: '#166534' }}>강의 수</span>
+                      <span className={styles.statValue} style={{ color: '#059669' }}>{selectedCourse.courseCount || 0}개</span>
                     </div>
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>상태</span>
-                      <span className={styles.statValue}>{selectedCourse.status === 'active' ? '진행중' : '완료'}</span>
+                    <div className={styles.statItem} style={{
+                      backgroundColor: '#f0fdf4',
+                      border: '1px solid #bbf7d0',
+                      borderRadius: '8px'
+                    }}>
+                      <span className={styles.statLabel} style={{ color: '#166534' }}>상태</span>
+                      <span className={styles.statValue} style={{ color: '#059669' }}>{selectedCourse.status === 'active' ? '진행중' : '완료'}</span>
                     </div>
                   </div>
                 </div>

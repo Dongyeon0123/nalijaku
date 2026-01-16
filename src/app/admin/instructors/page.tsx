@@ -1244,7 +1244,14 @@ export default function InstructorsManagementPage() {
                             }}>
                               📖 포함된 강의 목록
                             </h4>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <div style={{ 
+                              display: 'flex', 
+                              flexDirection: 'column', 
+                              gap: '12px',
+                              maxHeight: '400px',
+                              overflowY: 'auto',
+                              paddingRight: '8px'
+                            }}>
                               {group.courses && group.courses.length > 0 ? (
                                 group.courses.map((course, idx) => (
                                   <div 
