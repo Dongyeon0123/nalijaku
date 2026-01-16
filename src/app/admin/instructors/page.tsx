@@ -53,6 +53,8 @@ interface CourseGroup {
   }>;
   createdAt: string;
   updatedAt: string;
+  classLink?: string;
+  announcement?: string;
 }
 
 export default function InstructorsManagementPage() {
@@ -207,9 +209,8 @@ export default function InstructorsManagementPage() {
     }
 
     try {
-      // 임시: 백엔드 class-groups API 구현 전까지 기존 API 사용
-      // TODO: 백엔드 구현 후 /api/instructors/{id}/class-groups로 변경
-      await api.post(`/api/instructors/${assigningInstructor.id}/assign-courses`, {
+      console.log('🚀 강의 그룹 할당 시작:', {
+        instructorId: assigningInstructor.id,
         schoolName: assignmentDetails.schoolName,
         studentCount: assignmentDetails.studentCount,
         startDate: assignmentDetails.startDate,
@@ -217,12 +218,23 @@ export default function InstructorsManagementPage() {
         materialIds: selectedMaterials
       });
 
+      // 백엔드 class-groups API 사용
+      const response = await api.post(`/api/instructors/${assigningInstructor.id}/class-groups`, {
+        schoolName: assignmentDetails.schoolName,
+        studentCount: assignmentDetails.studentCount,
+        startDate: assignmentDetails.startDate,
+        endDate: assignmentDetails.endDate,
+        materialIds: selectedMaterials
+      });
+
+      console.log('✅ 강의 그룹 할당 성공:', response.data);
       alert(`${assigningInstructor.name} 강사에게 "${assignmentDetails.schoolName}" 강의 그룹이 할당되었습니다.`);
       handleCloseAssignModal();
     } catch (error: any) {
-      console.error('강의 할당 실패:', error);
+      console.error('❌ 강의 할당 실패:', error);
+      console.error('에러 응답:', error.response?.data);
       const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
-      alert(`강의 할당 중 오류가 발생했습니다: ${errorMsg}`);
+      alert(`강의 할당 중 오류가 발생했습니다: ${errorMsg}\n\n백엔드 개발자에게 다음 API 구현을 요청하세요:\nPOST /api/instructors/{id}/class-groups`);
     }
   };
 
@@ -237,13 +249,19 @@ export default function InstructorsManagementPage() {
   const fetchAssignedCourses = async (instructorId: number) => {
     try {
       setLoadingAssignedCourses(true);
+      console.log('🔍 강사 강의 그룹 목록 조회 시작, instructorId:', instructorId);
+      
       const response = await api.get(`/api/instructors/${instructorId}/courses`);
       const result = response.data;
+      
+      console.log('📦 API 응답:', result);
+      
       const coursesData = result.success ? result.data : (Array.isArray(result.data) ? result.data : []);
-      console.log('📚 할당된 강의 목록:', coursesData);
+      console.log('📚 파싱된 강의 그룹 목록:', coursesData);
+      
       setAssignedCourses(coursesData);
     } catch (error) {
-      console.error('할당된 강의 목록 로드 실패:', error);
+      console.error('❌ 할당된 강의 목록 로드 실패:', error);
       setAssignedCourses([]);
     } finally {
       setLoadingAssignedCourses(false);
@@ -291,33 +309,43 @@ export default function InstructorsManagementPage() {
     });
   };
 
-  // 공지사항 편집 모달 열기
-  const handleEditAnnouncement = (course: any) => {
-    setEditingCourse(course);
+  // 공지사항 편집 모달 열기 (그룹용)
+  const handleEditAnnouncement = (group: CourseGroup) => {
+    setEditingCourse(group);
     setAnnouncementForm({
-      classLink: course.classLink || '',
-      announcement: course.announcement || ''
+      classLink: group.classLink || '',
+      announcement: group.announcement || ''
     });
     setShowAnnouncementModal(true);
   };
 
-  // 공지사항 저장
+  // 공지사항 저장 (그룹용)
   const handleSaveAnnouncement = async () => {
     if (!managingInstructor || !editingCourse) return;
 
     try {
-      await api.put(`/api/instructors/${managingInstructor.id}/courses/${editingCourse.id}/announcement`, {
+      console.log('📝 공지사항 저장 시작:', {
+        instructorId: managingInstructor.id,
+        groupId: editingCourse.id,
         classLink: announcementForm.classLink,
         announcement: announcementForm.announcement
       });
 
+      // 그룹 공지사항 업데이트 API 호출
+      const response = await api.put(`/api/instructors/${managingInstructor.id}/class-groups/${editingCourse.id}/announcement`, {
+        classLink: announcementForm.classLink,
+        announcement: announcementForm.announcement
+      });
+
+      console.log('✅ 공지사항 저장 성공:', response.data);
+
       // 목록 업데이트
-      setAssignedCourses(prev => prev.map(c => 
-        c.id === editingCourse.id ? { 
-          ...c, 
+      setAssignedCourses(prev => prev.map(g => 
+        g.id === editingCourse.id ? { 
+          ...g, 
           classLink: announcementForm.classLink,
           announcement: announcementForm.announcement
-        } : c
+        } : g
       ));
       
       setShowAnnouncementModal(false);
@@ -325,9 +353,15 @@ export default function InstructorsManagementPage() {
       setAnnouncementForm({ classLink: '', announcement: '' });
       alert('공지사항이 저장되었습니다.');
     } catch (error: any) {
-      console.error('공지사항 저장 실패:', error);
+      console.error('❌ 공지사항 저장 실패:', error);
+      console.error('에러 상태:', error.response?.status);
+      console.error('에러 응답:', error.response?.data);
+      console.error('에러 메시지:', error.message);
+      
       const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
-      alert(`공지사항 저장 중 오류가 발생했습니다: ${errorMsg}`);
+      const errorDetail = error.response?.data?.error || error.response?.data?.details || '';
+      
+      alert(`공지사항 저장 중 오류가 발생했습니다.\n\n에러: ${errorMsg}\n${errorDetail ? `상세: ${errorDetail}` : ''}\n\n백엔드 개발자에게 다음을 확인 요청하세요:\n- API: PUT /api/instructors/${managingInstructor.id}/class-groups/${editingCourse.id}/announcement\n- 요청 본문: { classLink, announcement }\n- 서버 로그 확인 필요`);
     }
   };
 
@@ -928,13 +962,13 @@ export default function InstructorsManagementPage() {
             <div style={{ padding: '20px' }}>
               <div style={{ 
                 padding: '12px 16px', 
-                backgroundColor: '#f0f9ff', 
+                backgroundColor: '#dcfce7', 
                 borderRadius: '8px',
                 marginBottom: '20px',
-                border: '1px solid #bae6fd'
+                border: '1px solid #22c55e'
               }}>
-                <p style={{ fontSize: '14px', color: '#0369a1', margin: 0, fontWeight: '600' }}>
-                  📚 {editingCourse.title}
+                <p style={{ fontSize: '14px', color: '#16a34a', margin: 0, fontWeight: '600' }}>
+                  🏫 {editingCourse.schoolName}
                 </p>
               </div>
 
@@ -1082,18 +1116,19 @@ export default function InstructorsManagementPage() {
                       <div 
                         key={group.id}
                         style={{
-                          border: '2px solid #e0e0e0',
+                          border: '1px solid #22c55e',
                           borderRadius: '12px',
                           overflow: 'hidden',
                           backgroundColor: 'white',
-                          transition: 'all 0.2s'
+                          transition: 'all 0.2s',
+                          boxShadow: '0 2px 8px rgba(34, 197, 94, 0.1)'
                         }}
                       >
                         {/* 그룹 카드 헤더 */}
                         <div style={{
                           padding: '20px',
-                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                          color: 'white'
+                          backgroundColor: 'white',
+                          borderBottom: '1px solid #22c55e'
                         }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div style={{ flex: 1 }}>
@@ -1103,7 +1138,8 @@ export default function InstructorsManagementPage() {
                                 fontWeight: '700',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '8px'
+                                gap: '8px',
+                                color: '#16a34a'
                               }}>
                                 🏫 {group.schoolName}
                               </h3>
@@ -1111,33 +1147,33 @@ export default function InstructorsManagementPage() {
                                 display: 'grid', 
                                 gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
                                 gap: '12px',
-                                fontSize: '14px',
-                                opacity: 0.95
+                                fontSize: '14px'
                               }}>
                                 <div>
-                                  <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>수강 인원</div>
-                                  <div style={{ fontSize: '18px', fontWeight: '600' }}>👥 {group.studentCount}명</div>
+                                  <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>수강 인원</div>
+                                  <div style={{ fontSize: '18px', fontWeight: '600', color: '#16a34a' }}>👥 {group.studentCount}명</div>
                                 </div>
                                 <div>
-                                  <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>강의 수</div>
-                                  <div style={{ fontSize: '18px', fontWeight: '600' }}>📚 {group.courseCount}개</div>
+                                  <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>강의 수</div>
+                                  <div style={{ fontSize: '18px', fontWeight: '600', color: '#16a34a' }}>📚 {group.courseCount}개</div>
                                 </div>
                                 <div>
-                                  <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>수강 기간</div>
-                                  <div style={{ fontSize: '13px', fontWeight: '600' }}>
+                                  <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>수강 기간</div>
+                                  <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>
                                     📅 {new Date(group.startDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} ~ {new Date(group.endDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
                                   </div>
                                 </div>
                                 <div>
-                                  <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>상태</div>
+                                  <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>상태</div>
                                   <div>
                                     <span style={{
                                       padding: '4px 12px',
                                       borderRadius: '12px',
                                       fontSize: '12px',
                                       fontWeight: '600',
-                                      backgroundColor: group.status === 'active' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.15)',
-                                      border: '1px solid rgba(255, 255, 255, 0.3)'
+                                      backgroundColor: group.status === 'active' ? '#dcfce7' : '#f3f4f6',
+                                      color: group.status === 'active' ? '#16a34a' : '#6b7280',
+                                      border: `1px solid ${group.status === 'active' ? '#22c55e' : '#d1d5db'}`
                                     }}>
                                       {group.status === 'active' ? '✓ 진행중' : '완료'}
                                     </span>
@@ -1151,29 +1187,39 @@ export default function InstructorsManagementPage() {
                         {/* 그룹 카드 액션 버튼 */}
                         <div style={{
                           padding: '16px 20px',
-                          backgroundColor: '#f8f9fa',
-                          borderTop: '1px solid #e0e0e0',
+                          backgroundColor: '#f9fafb',
+                          borderTop: '1px solid #e5e7eb',
                           display: 'flex',
                           gap: '8px',
                           justifyContent: 'space-between',
-                          alignItems: 'center'
+                          alignItems: 'center',
+                          flexWrap: 'wrap'
                         }}>
-                          <button
-                            onClick={() => toggleGroupExpansion(group.id)}
-                            style={{
-                              padding: '8px 16px',
-                              backgroundColor: isExpanded ? '#e3f2fd' : 'white',
-                              color: isExpanded ? '#1976d2' : '#666',
-                              border: '1px solid #e0e0e0',
-                              borderRadius: '6px',
-                              fontSize: '13px',
-                              fontWeight: '600',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s'
-                            }}
-                          >
-                            {isExpanded ? '▲ 접기' : '▼ 상세보기'}
-                          </button>
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                            <button
+                              onClick={() => toggleGroupExpansion(group.id)}
+                              style={{
+                                padding: '8px 16px',
+                                backgroundColor: isExpanded ? '#dcfce7' : 'white',
+                                color: isExpanded ? '#16a34a' : '#6b7280',
+                                border: `1px solid ${isExpanded ? '#22c55e' : '#d1d5db'}`,
+                                borderRadius: '6px',
+                                fontSize: '13px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              {isExpanded ? '▲ 접기' : '▼ 상세보기'}
+                            </button>
+                            <button
+                              className={styles.editButton}
+                              onClick={() => handleEditAnnouncement(group)}
+                              style={{ fontSize: '13px', padding: '8px 16px' }}
+                            >
+                              {group.classLink || group.announcement ? '📝 공지 수정' : '📝 공지 등록'}
+                            </button>
+                          </div>
                           <button
                             className={styles.deleteButton}
                             onClick={() => handleDeleteCourseGroup(group.id)}

@@ -464,23 +464,32 @@ export default function MyPage() {
                 ) : (
                   <div className={styles.instructorCourseGrid}>
                     {instructorCourses.map(group => (
-                      <div key={group.id} className={styles.instructorCourseCard}>
+                      <div key={group.id} className={styles.instructorCourseCard} style={{
+                        border: '1px solid #22c55e',
+                        boxShadow: '0 2px 8px rgba(34, 197, 94, 0.1)'
+                      }}>
                         <div className={styles.instructorCourseThumbnail} style={{
-                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          background: 'white',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: 'white',
+                          color: '#16a34a',
                           fontSize: '48px',
-                          fontWeight: 'bold'
+                          fontWeight: 'bold',
+                          border: '1px solid #22c55e',
+                          borderBottom: 'none'
                         }}>
                           🏫
-                          <div className={`${styles.statusBadge} ${styles[group.status]}`}>
+                          <div className={`${styles.statusBadge} ${styles[group.status]}`} style={{
+                            backgroundColor: group.status === 'active' ? '#dcfce7' : '#f3f4f6',
+                            color: group.status === 'active' ? '#16a34a' : '#6b7280',
+                            border: `1px solid ${group.status === 'active' ? '#22c55e' : '#d1d5db'}`
+                          }}>
                             {group.status === 'active' ? '진행중' : '완료'}
                           </div>
                         </div>
                         <div className={styles.instructorCourseInfo}>
-                          <h3>{group.schoolName}</h3>
+                          <h3 style={{ color: '#16a34a' }}>{group.schoolName}</h3>
                           
                           {/* 강의 기간 */}
                           {group.startDate && group.endDate && (
@@ -495,16 +504,20 @@ export default function MyPage() {
                           <div className={styles.courseMetrics}>
                             <div className={styles.metric}>
                               <span className={styles.metricLabel}>수강생</span>
-                              <span className={styles.metricValue}>{group.studentCount || 0}명</span>
+                              <span className={styles.metricValue} style={{ color: '#16a34a' }}>{group.studentCount || 0}명</span>
                             </div>
                             <div className={styles.metric}>
                               <span className={styles.metricLabel}>강의 수</span>
-                              <span className={styles.metricValue}>{group.courseCount || 0}개</span>
+                              <span className={styles.metricValue} style={{ color: '#16a34a' }}>{group.courseCount || 0}개</span>
                             </div>
                           </div>
                           <button
                             className={styles.manageCourseButton}
                             onClick={() => handleCourseClick(group)}
+                            style={{
+                              backgroundColor: '#22c55e',
+                              borderColor: '#16a34a'
+                            }}
                           >
                             상세보기
                           </button>
@@ -526,17 +539,18 @@ export default function MyPage() {
                 <div className={styles.courseDetailCard}>
                   <div className={styles.courseDetailHeader}>
                     <div className={styles.courseDetailThumbnail} style={{
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      background: 'white',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: 'white',
-                      fontSize: '64px'
+                      color: '#16a34a',
+                      fontSize: '64px',
+                      border: '1px solid #22c55e'
                     }}>
                       🏫
                     </div>
                     <div className={styles.courseDetailInfo}>
-                      <h3>{selectedCourse.schoolName}</h3>
+                      <h3 style={{ color: '#16a34a' }}>{selectedCourse.schoolName}</h3>
                       {selectedCourse.startDate && selectedCourse.endDate && (
                         <p className={styles.courseDetailDates}>
                           📅 {new Date(selectedCourse.startDate).toLocaleDateString('ko-KR')} ~ {new Date(selectedCourse.endDate).toLocaleDateString('ko-KR')}
@@ -549,11 +563,11 @@ export default function MyPage() {
                   <div className={styles.courseDetailStats}>
                     <div className={styles.statItem}>
                       <span className={styles.statLabel}>수강생</span>
-                      <span className={styles.statValue}>{selectedCourse.studentCount || 0}명</span>
+                      <span className={styles.statValue} style={{ color: '#16a34a' }}>{selectedCourse.studentCount || 0}명</span>
                     </div>
                     <div className={styles.statItem}>
                       <span className={styles.statLabel}>강의 수</span>
-                      <span className={styles.statValue}>{selectedCourse.courseCount || 0}개</span>
+                      <span className={styles.statValue} style={{ color: '#16a34a' }}>{selectedCourse.courseCount || 0}개</span>
                     </div>
                     <div className={styles.statItem}>
                       <span className={styles.statLabel}>상태</span>
@@ -604,11 +618,12 @@ export default function MyPage() {
                               width: '100px',
                               height: '100px',
                               borderRadius: '12px',
-                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                              background: 'white',
+                              border: '1px solid #22c55e',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              color: 'white',
+                              color: '#16a34a',
                               fontSize: '32px',
                               fontWeight: 'bold',
                               flexShrink: 0
