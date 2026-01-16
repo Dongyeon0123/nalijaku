@@ -208,6 +208,374 @@ GET /api/resources/categories
 }
 ```
 
+### 4. 학습자료 추가 (관리자)
+```
+POST /api/resources
+Authorization: Bearer {admin_token}
+Content-Type: multipart/form-data
+
+요청 본문:
+{
+  "categoryId": number (필수),
+  "subCategory": "string (선택사항)",
+  "title": "string (필수)",
+  "subtitle": "string (필수)",
+  "description": "string (선택사항)",
+  "instructor": "string (필수)",
+  "price": number (선택사항, 기본값: 0),
+  "duration": "string (선택사항)",
+  "level": "string (선택사항)",
+  "alt": "string (선택사항)",
+  "file": File (이미지 파일, 선택사항),
+  "imageUrl": "string (이미지 URL, 선택사항)"
+}
+
+응답 (성공 - 201):
+{
+  "success": true,
+  "message": "학습자료가 추가되었습니다",
+  "data": {
+    "id": "ObjectId",
+    "category": "진로",
+    "subCategory": "배송",
+    "title": "진로-배송",
+    "subtitle": "24년 2학기 디지털 새싹 데이터 분석가 전용 커리큘럼",
+    "image": "/uploads/images/xxx.png",
+    "createdAt": "2025-01-01T00:00:00Z"
+  }
+}
+```
+
+### 5. 학습자료 수정 (관리자)
+```
+PUT /api/resources/{id}
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+요청 본문:
+{
+  "category": "string (필수)",
+  "subCategory": "string (선택사항)",
+  "title": "string (필수)",
+  "subtitle": "string (필수)",
+  "description": "string (선택사항)",
+  "instructor": "string (필수)",
+  "price": number (선택사항),
+  "duration": "string (선택사항)",
+  "level": "string (선택사항)",
+  "alt": "string (선택사항)",
+  "image": "string (이미지 URL)"
+}
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "message": "학습자료가 수정되었습니다",
+  "data": {
+    "id": "ObjectId",
+    "category": "진로",
+    "title": "진로-배송",
+    "updatedAt": "2025-01-01T00:00:00Z"
+  }
+}
+```
+
+### 6. 학습자료 삭제 (관리자)
+```
+DELETE /api/resources/{id}
+Authorization: Bearer {admin_token}
+
+⚠️ 중요: 삭제 시 외래 키 제약 조건 처리 필요
+- instructor_courses 테이블에서 해당 learning_material_id를 참조하는 레코드를 먼저 삭제해야 함
+- 또는 CASCADE 삭제 설정 필요
+
+백엔드 구현 예시:
+1. instructor_courses에서 learning_material_id = {id}인 레코드 삭제
+2. learning_materials에서 id = {id}인 레코드 삭제
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "message": "학습자료가 삭제되었습니다"
+}
+
+응답 (실패 - 404):
+{
+  "success": false,
+  "message": "학습자료를 찾을 수 없습니다",
+  "code": "RESOURCE_NOT_FOUND"
+}
+
+응답 (실패 - 403):
+{
+  "success": false,
+  "message": "권한이 없습니다",
+  "code": "FORBIDDEN"
+}
+
+응답 (실패 - 409):
+{
+  "success": false,
+  "message": "다른 데이터에서 참조 중인 학습자료는 삭제할 수 없습니다",
+  "code": "FOREIGN_KEY_CONSTRAINT",
+  "details": {
+    "referencedBy": ["instructor_courses"]
+  }
+}
+```
+
+---
+
+## � 카 테고리 관리 API (관리자)
+
+### 1. 계층형 카테고리 목록 조회
+```
+GET /api/categories
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "data": {
+    "categories": [
+      {
+        "id": 1,
+        "name": "전체",
+        "subCategories": []
+      },
+      {
+        "id": 2,
+        "name": "드론",
+        "subCategories": [
+          {
+            "id": 10,
+            "name": "촬영드론",
+            "parentId": 2
+          },
+          {
+            "id": 11,
+            "name": "레이싱드론",
+            "parentId": 2
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "name": "AI",
+        "subCategories": [
+          {
+            "id": 20,
+            "name": "머신러닝",
+            "parentId": 3
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### 2. 메인 카테고리 추가 (관리자)
+```
+POST /api/admin/categories
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+요청 본문:
+{
+  "name": "string (필수, 카테고리명)"
+}
+
+응답 (성공 - 201):
+{
+  "success": true,
+  "message": "카테고리가 추가되었습니다",
+  "data": {
+    "id": 4,
+    "name": "환경",
+    "subCategories": []
+  }
+}
+
+응답 (실패 - 409):
+{
+  "success": false,
+  "message": "이미 존재하는 카테고리입니다",
+  "code": "DUPLICATE_CATEGORY"
+}
+```
+
+### 3. 서브카테고리 추가 (관리자)
+```
+POST /api/admin/categories/subcategories
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+요청 본문:
+{
+  "name": "string (필수, 서브카테고리명)",
+  "parentId": number (필수, 부모 카테고리 ID)
+}
+
+응답 (성공 - 201):
+{
+  "success": true,
+  "message": "서브카테고리가 추가되었습니다",
+  "data": {
+    "id": 21,
+    "name": "딥러닝",
+    "parentId": 3
+  }
+}
+
+응답 (실패 - 404):
+{
+  "success": false,
+  "message": "부모 카테고리를 찾을 수 없습니다",
+  "code": "PARENT_CATEGORY_NOT_FOUND"
+}
+
+응답 (실패 - 409):
+{
+  "success": false,
+  "message": "이미 존재하는 서브카테고리입니다",
+  "code": "DUPLICATE_SUBCATEGORY"
+}
+```
+
+### 4. 메인 카테고리 삭제 (관리자)
+```
+DELETE /api/admin/categories/{categoryId}
+Authorization: Bearer {admin_token}
+
+⚠️ 중요: 
+- 해당 카테고리에 속한 모든 서브카테고리도 함께 삭제됩니다
+- 해당 카테고리를 사용하는 학습자료가 있으면 삭제 실패
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "message": "카테고리가 삭제되었습니다"
+}
+
+응답 (실패 - 404):
+{
+  "success": false,
+  "message": "카테고리를 찾을 수 없습니다",
+  "code": "CATEGORY_NOT_FOUND"
+}
+
+응답 (실패 - 409):
+{
+  "success": false,
+  "message": "이 카테고리를 사용하는 학습자료가 있어 삭제할 수 없습니다",
+  "code": "CATEGORY_IN_USE",
+  "details": {
+    "resourceCount": 5
+  }
+}
+```
+
+### 5. 서브카테고리 삭제 (관리자)
+```
+DELETE /api/admin/categories/{categoryId}/subcategories/{subCategoryName}
+Authorization: Bearer {admin_token}
+
+⚠️ 중요:
+- categoryId는 부모 카테고리의 ID입니다
+- subCategoryName은 URL 인코딩되어 전달됩니다 (예: "촬영드론" → "%EC%B4%AC%EC%98%81%EB%93%9C%EB%A1%A0")
+- 백엔드에서 URL 디코딩 처리 필요
+- 해당 서브카테고리를 사용하는 학습자료가 있으면 삭제 실패
+
+백엔드 구현 예시:
+```java
+@DeleteMapping("/admin/categories/{categoryId}/subcategories/{subCategoryName}")
+public ResponseEntity<?> deleteSubCategory(
+    @PathVariable Long categoryId,
+    @PathVariable String subCategoryName  // Spring이 자동으로 URL 디코딩
+) {
+    // 1. 부모 카테고리 존재 확인
+    Category parentCategory = categoryRepository.findById(categoryId)
+        .orElseThrow(() -> new CategoryNotFoundException("부모 카테고리를 찾을 수 없습니다: " + categoryId));
+    
+    // 2. 서브카테고리 찾기
+    SubCategory subCategory = subCategoryRepository
+        .findByParentIdAndName(categoryId, subCategoryName)
+        .orElseThrow(() -> new SubCategoryNotFoundException("서브카테고리를 찾을 수 없습니다: " + subCategoryName));
+    
+    // 3. 사용 중인지 확인
+    long resourceCount = learningMaterialRepository.countBySubCategory(subCategoryName);
+    if (resourceCount > 0) {
+        throw new SubCategoryInUseException("이 서브카테고리를 사용하는 학습자료가 " + resourceCount + "개 있습니다");
+    }
+    
+    // 4. 삭제
+    subCategoryRepository.delete(subCategory);
+    
+    return ResponseEntity.ok(new ApiResponse(true, "서브카테고리가 삭제되었습니다"));
+}
+```
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "message": "서브카테고리가 삭제되었습니다"
+}
+
+응답 (실패 - 400):
+{
+  "success": false,
+  "message": "부모 카테고리를 찾을 수 없습니다: 3",
+  "code": "PARENT_CATEGORY_NOT_FOUND"
+}
+
+응답 (실패 - 404):
+{
+  "success": false,
+  "message": "서브카테고리를 찾을 수 없습니다: 촬영드론",
+  "code": "SUBCATEGORY_NOT_FOUND"
+}
+
+응답 (실패 - 409):
+{
+  "success": false,
+  "message": "이 서브카테고리를 사용하는 학습자료가 3개 있습니다",
+  "code": "SUBCATEGORY_IN_USE",
+  "details": {
+    "resourceCount": 3
+  }
+}
+```
+
+### 6. 서브카테고리 목록 조회
+```
+GET /api/categories/subcategories
+
+응답 (성공 - 200):
+{
+  "success": true,
+  "data": [
+    {
+      "id": 10,
+      "name": "촬영드론",
+      "parentId": 2,
+      "parentName": "드론"
+    },
+    {
+      "id": 11,
+      "name": "레이싱드론",
+      "parentId": 2,
+      "parentName": "드론"
+    },
+    {
+      "id": 20,
+      "name": "머신러닝",
+      "parentId": 3,
+      "parentName": "AI"
+    }
+  ]
+}
+```
+
 ---
 
 ## 👨‍🏫 강사 API
