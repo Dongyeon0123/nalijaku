@@ -216,7 +216,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                           console.log('🔗 Viewer URL:', pdfViewerUrl);
                           
                           return (
-                            <div style={{ width: '100%', height: '600px', border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
+                            <div style={{ width: '100%', height: '750px', border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
                               <iframe
                                 src={pdfViewerUrl}
                                 style={{ width: '100%', height: '100%', border: 'none' }}
