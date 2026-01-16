@@ -65,6 +65,7 @@ export default function InstructorsManagementPage() {
   const [loadingMaterials, setLoadingMaterials] = useState(false);
   const [selectedMaterials, setSelectedMaterials] = useState<number[]>([]);
   const [assignmentDetails, setAssignmentDetails] = useState({
+    schoolName: '',      // 학교/기관 이름 추가
     studentCount: 0,
     startDate: '',
     endDate: ''
@@ -137,6 +138,7 @@ export default function InstructorsManagementPage() {
     setAssigningInstructor(null);
     setSelectedMaterials([]);
     setAssignmentDetails({
+      schoolName: '',
       studentCount: 0,
       startDate: '',
       endDate: ''
@@ -156,6 +158,11 @@ export default function InstructorsManagementPage() {
   const handleAssignCourses = async () => {
     if (!assigningInstructor || selectedMaterials.length === 0) {
       alert('할당할 강의를 선택해주세요.');
+      return;
+    }
+
+    if (!assignmentDetails.schoolName.trim()) {
+      alert('학교/기관 이름을 입력해주세요.');
       return;
     }
 
@@ -179,23 +186,16 @@ export default function InstructorsManagementPage() {
     }
 
     try {
-      console.log('강의 할당 요청:', {
-        instructorId: assigningInstructor.id,
-        materialIds: selectedMaterials,
+      // API 호출: 강사에게 강의 그룹 할당
+      await api.post(`/api/instructors/${assigningInstructor.id}/class-groups`, {
+        schoolName: assignmentDetails.schoolName,
         studentCount: assignmentDetails.studentCount,
         startDate: assignmentDetails.startDate,
-        endDate: assignmentDetails.endDate
+        endDate: assignmentDetails.endDate,
+        materialIds: selectedMaterials
       });
 
-      // API 호출: 강사에게 강의 할당
-      await api.post(`/api/instructors/${assigningInstructor.id}/assign-courses`, {
-        materialIds: selectedMaterials,
-        studentCount: assignmentDetails.studentCount,
-        startDate: assignmentDetails.startDate,
-        endDate: assignmentDetails.endDate
-      });
-
-      alert(`${assigningInstructor.name} 강사에게 ${selectedMaterials.length}개의 강의가 할당되었습니다.`);
+      alert(`${assigningInstructor.name} 강사에게 "${assignmentDetails.schoolName}" 강의 그룹이 할당되었습니다.`);
       handleCloseAssignModal();
     } catch (error: any) {
       console.error('강의 할당 실패:', error);
@@ -594,10 +594,10 @@ export default function InstructorsManagementPage() {
 
             <div style={{ padding: '20px' }}>
               <p style={{ marginBottom: '20px', color: '#666', fontSize: '14px' }}>
-                할당할 학습자료를 선택하고, 수강 인원과 강의 기간을 설정하세요.
+                학교/기관 정보를 입력하고, 할당할 학습자료를 선택하세요.
               </p>
 
-              {/* 수강 인원 및 강의 기간 입력 */}
+              {/* 학교/기관 정보 및 강의 기간 입력 */}
               <div style={{ 
                 padding: '20px', 
                 backgroundColor: '#f8f9fa', 
@@ -606,8 +606,31 @@ export default function InstructorsManagementPage() {
                 border: '1px solid #e0e0e0'
               }}>
                 <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600', color: '#333' }}>
-                  📋 강의 정보
+                  📋 강의 그룹 정보
                 </h3>
+                
+                {/* 학교/기관 이름 */}
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                    학교/기관 이름 *
+                  </label>
+                  <input
+                    type="text"
+                    value={assignmentDetails.schoolName}
+                    onChange={(e) => setAssignmentDetails(prev => ({ 
+                      ...prev, 
+                      schoolName: e.target.value 
+                    }))}
+                    placeholder="예: 서울초등학교, 부산중학교"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
                 
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                   <div style={{ flex: '0 0 120px' }}>
@@ -836,9 +859,15 @@ export default function InstructorsManagementPage() {
                   type="button"
                   onClick={handleAssignCourses}
                   className={styles.submitButton}
-                  disabled={selectedMaterials.length === 0 || !assignmentDetails.studentCount || !assignmentDetails.startDate || !assignmentDetails.endDate}
+                  disabled={
+                    selectedMaterials.length === 0 || 
+                    !assignmentDetails.schoolName.trim() ||
+                    !assignmentDetails.studentCount || 
+                    !assignmentDetails.startDate || 
+                    !assignmentDetails.endDate
+                  }
                 >
-                  할당하기 ({selectedMaterials.length})
+                  할당하기 ({selectedMaterials.length}개 강의)
                 </button>
               </div>
             </div>
