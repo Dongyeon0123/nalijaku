@@ -144,6 +144,12 @@ export default function InstructorsManagementPage() {
   };
 
   const handleAssignClick = (instructor: Instructor) => {
+    console.log('🎯 강의 할당 버튼 클릭:', {
+      instructorId: instructor.id,
+      instructorName: instructor.name,
+      instructorUserId: instructor.userId,
+      전체객체: instructor
+    });
     setAssigningInstructor(instructor);
     setSelectedMaterials([]);
     setAssignmentDetails({
@@ -211,12 +217,17 @@ export default function InstructorsManagementPage() {
     try {
       console.log('🚀 강의 그룹 할당 시작:', {
         instructorId: assigningInstructor.id,
+        instructorName: assigningInstructor.name,
+        instructorUserId: assigningInstructor.userId,
         schoolName: assignmentDetails.schoolName,
         studentCount: assignmentDetails.studentCount,
         startDate: assignmentDetails.startDate,
         endDate: assignmentDetails.endDate,
         materialIds: selectedMaterials
       });
+
+      console.log('📍 API 요청 URL:', `/api/instructors/${assigningInstructor.id}/class-groups`);
+      console.log('📦 전체 강사 객체:', assigningInstructor);
 
       // 백엔드 class-groups API 사용
       const response = await api.post(`/api/instructors/${assigningInstructor.id}/class-groups`, {
@@ -382,7 +393,10 @@ export default function InstructorsManagementPage() {
       console.log('📥 로드된 강사 목록:', data);
       data.forEach((instructor: Instructor, idx: number) => {
         console.log(`강사 ${idx + 1}:`, {
+          id: instructor.id,
+          userId: instructor.userId,
           name: instructor.name,
+          region: instructor.region,
           profileDescription: instructor.profileDescription,
           education: instructor.education,
           certificates: instructor.certificates,
@@ -495,6 +509,9 @@ export default function InstructorsManagementPage() {
       const submitData = new FormData();
       if (formData.userId) {
         submitData.append('userId', formData.userId.toString());
+        console.log('📤 강사 등록/수정 - 선택한 사용자 ID:', formData.userId);
+        const selectedUser = teacherUsers.find(u => u.id === formData.userId);
+        console.log('📤 선택한 사용자 정보:', selectedUser);
       }
       submitData.append('name', formData.name);
       submitData.append('region', formData.region);
@@ -551,14 +568,16 @@ export default function InstructorsManagementPage() {
       console.log(`강사 ${isEditing ? '수정' : '등록'} 성공:`, result);
       console.log('전체 응답:', JSON.stringify(result, null, 2));
       console.log('data 내용:', JSON.stringify(result.data, null, 2));
+      console.log('🆔 생성된 강사 ID:', result.data?.id);
+      console.log('👤 연결된 사용자 ID:', result.data?.userId);
       console.log('profileDescription:', result.data?.profileDescription);
-        console.log('education:', result.data?.education);
-        console.log('certificates:', result.data?.certificates);
-        console.log('💼 experience:', result.data?.experience);
-        console.log('awards:', result.data?.awards);
-        alert(`강사가 ${isEditing ? '수정' : '등록'}되었습니다.`);
-        handleCloseModal();
-        fetchInstructors();
+      console.log('education:', result.data?.education);
+      console.log('certificates:', result.data?.certificates);
+      console.log('💼 experience:', result.data?.experience);
+      console.log('awards:', result.data?.awards);
+      alert(`강사가 ${isEditing ? '수정' : '등록'}되었습니다.\n강사 ID: ${result.data?.id}\n사용자 ID: ${result.data?.userId || formData.userId}`);
+      handleCloseModal();
+      fetchInstructors();
       } catch (error: any) {
         console.error('강사 처리 중 오류:', error);
         const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
