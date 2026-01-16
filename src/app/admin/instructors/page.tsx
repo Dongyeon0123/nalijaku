@@ -36,6 +36,25 @@ interface Material {
   instructor: string;
 }
 
+interface CourseGroup {
+  id: number;
+  schoolName: string;
+  studentCount: number;
+  startDate: string;
+  endDate: string;
+  status: string;
+  courseCount: number;
+  courses: Array<{
+    id: number;
+    title: string;
+    subtitle?: string;
+    thumbnail?: string;
+    category?: string;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function InstructorsManagementPage() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,8 +93,9 @@ export default function InstructorsManagementPage() {
   // 강의 관리 모달 상태
   const [showManageCoursesModal, setShowManageCoursesModal] = useState(false);
   const [managingInstructor, setManagingInstructor] = useState<Instructor | null>(null);
-  const [assignedCourses, setAssignedCourses] = useState<any[]>([]);
+  const [assignedCourses, setAssignedCourses] = useState<CourseGroup[]>([]);  // 타입 변경
   const [loadingAssignedCourses, setLoadingAssignedCourses] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());  // 확장된 그룹 ID 추적
   
   // 공지사항 편집 모달 상태
   const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
@@ -125,6 +145,7 @@ export default function InstructorsManagementPage() {
     setAssigningInstructor(instructor);
     setSelectedMaterials([]);
     setAssignmentDetails({
+      schoolName: '',
       studentCount: 0,
       startDate: '',
       endDate: ''
@@ -186,8 +207,9 @@ export default function InstructorsManagementPage() {
     }
 
     try {
-      // API 호출: 강사에게 강의 그룹 할당
-      await api.post(`/api/instructors/${assigningInstructor.id}/class-groups`, {
+      // 임시: 백엔드 class-groups API 구현 전까지 기존 API 사용
+      // TODO: 백엔드 구현 후 /api/instructors/{id}/class-groups로 변경
+      await api.post(`/api/instructors/${assigningInstructor.id}/assign-courses`, {
         schoolName: assignmentDetails.schoolName,
         studentCount: assignmentDetails.studentCount,
         startDate: assignmentDetails.startDate,
@@ -228,23 +250,23 @@ export default function InstructorsManagementPage() {
     }
   };
 
-  // 강의 삭제
-  const handleDeleteCourse = async (courseId: number) => {
-    if (!confirm('이 강의를 삭제하시겠습니까?')) {
+  // 강의 그룹 삭제
+  const handleDeleteCourseGroup = async (groupId: number) => {
+    if (!confirm('이 강의 그룹을 삭제하시겠습니까?')) {
       return;
     }
 
     try {
-      await api.delete(`/api/instructors/${managingInstructor?.id}/courses/${courseId}`);
-      alert('강의가 삭제되었습니다.');
+      await api.delete(`/api/instructors/${managingInstructor?.id}/class-groups/${groupId}`);
+      alert('강의 그룹이 삭제되었습니다.');
       // 목록 새로고침
       if (managingInstructor) {
         await fetchAssignedCourses(managingInstructor.id);
       }
     } catch (error: any) {
-      console.error('강의 삭제 실패:', error);
+      console.error('강의 그룹 삭제 실패:', error);
       const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
-      alert(`강의 삭제 중 오류가 발생했습니다: ${errorMsg}`);
+      alert(`강의 그룹 삭제 중 오류가 발생했습니다: ${errorMsg}`);
     }
   };
 
@@ -253,6 +275,20 @@ export default function InstructorsManagementPage() {
     setShowManageCoursesModal(false);
     setManagingInstructor(null);
     setAssignedCourses([]);
+    setExpandedGroups(new Set());  // 확장 상태 초기화
+  };
+
+  // 그룹 확장/축소 토글
+  const toggleGroupExpansion = (groupId: number) => {
+    setExpandedGroups(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(groupId)) {
+        newSet.delete(groupId);
+      } else {
+        newSet.add(groupId);
+      }
+      return newSet;
+    });
   };
 
   // 공지사항 편집 모달 열기
@@ -1034,113 +1070,218 @@ export default function InstructorsManagementPage() {
               ) : (
                 <div style={{ 
                   maxHeight: '500px', 
-                  overflowY: 'auto'
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px'
                 }}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <th style={{ width: '35%' }}>강의명</th>
-                        <th style={{ width: '10%' }}>수강생</th>
-                        <th style={{ width: '10%' }}>진행률</th>
-                        <th style={{ width: '15%' }}>기간</th>
-                        <th style={{ width: '10%' }}>상태</th>
-                        <th style={{ width: '20%' }}>작업</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {assignedCourses.map(course => (
-                        <tr key={course.id}>
-                          <td style={{ maxWidth: '300px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              {course.thumbnail && (
-                                <img
-                                  src={course.thumbnail.startsWith('http') 
-                                    ? course.thumbnail 
-                                    : `https://api.nallijaku.com${course.thumbnail}`
-                                  }
-                                  alt={course.title}
-                                  style={{
-                                    width: '50px',
-                                    height: '50px',
-                                    objectFit: 'cover',
-                                    borderRadius: '8px',
-                                    flexShrink: 0
-                                  }}
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).style.display = 'none';
-                                  }}
-                                />
-                              )}
-                              <div style={{ minWidth: 0, flex: 1 }}>
-                                <div style={{ 
-                                  fontWeight: '600', 
-                                  marginBottom: '4px',
-                                  lineHeight: '1.5',
-                                  wordBreak: 'keep-all',
-                                  overflowWrap: 'break-word'
-                                }}>
-                                  {course.title}
+                  {assignedCourses.map(group => {
+                    const isExpanded = expandedGroups.has(group.id);
+                    
+                    return (
+                      <div 
+                        key={group.id}
+                        style={{
+                          border: '2px solid #e0e0e0',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {/* 그룹 카드 헤더 */}
+                        <div style={{
+                          padding: '20px',
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          color: 'white'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{ flex: 1 }}>
+                              <h3 style={{ 
+                                margin: '0 0 12px 0', 
+                                fontSize: '20px', 
+                                fontWeight: '700',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}>
+                                🏫 {group.schoolName}
+                              </h3>
+                              <div style={{ 
+                                display: 'grid', 
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                                gap: '12px',
+                                fontSize: '14px',
+                                opacity: 0.95
+                              }}>
+                                <div>
+                                  <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>수강 인원</div>
+                                  <div style={{ fontSize: '18px', fontWeight: '600' }}>👥 {group.studentCount}명</div>
                                 </div>
-                                {course.subtitle && (
-                                  <div style={{ 
-                                    fontSize: '12px', 
-                                    color: '#666',
-                                    lineHeight: '1.4',
-                                    wordBreak: 'keep-all',
-                                    overflowWrap: 'break-word'
-                                  }}>
-                                    {course.subtitle}
+                                <div>
+                                  <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>강의 수</div>
+                                  <div style={{ fontSize: '18px', fontWeight: '600' }}>📚 {group.courseCount}개</div>
+                                </div>
+                                <div>
+                                  <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>수강 기간</div>
+                                  <div style={{ fontSize: '13px', fontWeight: '600' }}>
+                                    📅 {new Date(group.startDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} ~ {new Date(group.endDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
                                   </div>
-                                )}
+                                </div>
+                                <div>
+                                  <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>상태</div>
+                                  <div>
+                                    <span style={{
+                                      padding: '4px 12px',
+                                      borderRadius: '12px',
+                                      fontSize: '12px',
+                                      fontWeight: '600',
+                                      backgroundColor: group.status === 'active' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.15)',
+                                      border: '1px solid rgba(255, 255, 255, 0.3)'
+                                    }}>
+                                      {group.status === 'active' ? '✓ 진행중' : '완료'}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </td>
-                          <td>{course.studentCount || 0}명</td>
-                          <td>{Math.round(course.avgProgress || 0)}%</td>
-                          <td>
-                            <div style={{ fontSize: '12px' }}>
-                              {course.startDate && course.endDate && (
-                                <>
-                                  <div>{new Date(course.startDate).toLocaleDateString('ko-KR')}</div>
-                                  <div>~ {new Date(course.endDate).toLocaleDateString('ko-KR')}</div>
-                                </>
+                          </div>
+                        </div>
+
+                        {/* 그룹 카드 액션 버튼 */}
+                        <div style={{
+                          padding: '16px 20px',
+                          backgroundColor: '#f8f9fa',
+                          borderTop: '1px solid #e0e0e0',
+                          display: 'flex',
+                          gap: '8px',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}>
+                          <button
+                            onClick={() => toggleGroupExpansion(group.id)}
+                            style={{
+                              padding: '8px 16px',
+                              backgroundColor: isExpanded ? '#e3f2fd' : 'white',
+                              color: isExpanded ? '#1976d2' : '#666',
+                              border: '1px solid #e0e0e0',
+                              borderRadius: '6px',
+                              fontSize: '13px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            {isExpanded ? '▲ 접기' : '▼ 상세보기'}
+                          </button>
+                          <button
+                            className={styles.deleteButton}
+                            onClick={() => handleDeleteCourseGroup(group.id)}
+                            style={{ fontSize: '13px', padding: '8px 16px' }}
+                          >
+                            🗑️ 그룹 삭제
+                          </button>
+                        </div>
+
+                        {/* 확장된 강의 목록 */}
+                        {isExpanded && (
+                          <div style={{
+                            padding: '20px',
+                            backgroundColor: 'white',
+                            borderTop: '1px solid #e0e0e0'
+                          }}>
+                            <h4 style={{ 
+                              margin: '0 0 16px 0', 
+                              fontSize: '15px', 
+                              fontWeight: '600',
+                              color: '#333'
+                            }}>
+                              📖 포함된 강의 목록
+                            </h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                              {group.courses && group.courses.length > 0 ? (
+                                group.courses.map((course, idx) => (
+                                  <div 
+                                    key={idx}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '16px',
+                                      padding: '16px',
+                                      backgroundColor: '#f9fafb',
+                                      borderRadius: '8px',
+                                      border: '1px solid #e5e7eb'
+                                    }}
+                                  >
+                                    {course.thumbnail && (
+                                      <img
+                                        src={course.thumbnail.startsWith('http') 
+                                          ? course.thumbnail 
+                                          : `https://api.nallijaku.com${course.thumbnail}`
+                                        }
+                                        alt={course.title}
+                                        style={{
+                                          width: '60px',
+                                          height: '60px',
+                                          objectFit: 'cover',
+                                          borderRadius: '8px',
+                                          flexShrink: 0
+                                        }}
+                                        onError={(e) => {
+                                          (e.target as HTMLImageElement).style.display = 'none';
+                                        }}
+                                      />
+                                    )}
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{ 
+                                        fontWeight: '600', 
+                                        marginBottom: '4px',
+                                        fontSize: '14px',
+                                        color: '#1f2937'
+                                      }}>
+                                        {idx + 1}. {course.title}
+                                      </div>
+                                      {course.subtitle && (
+                                        <div style={{ 
+                                          fontSize: '12px', 
+                                          color: '#6b7280',
+                                          marginBottom: '4px'
+                                        }}>
+                                          {course.subtitle}
+                                        </div>
+                                      )}
+                                      {course.category && (
+                                        <span style={{
+                                          display: 'inline-block',
+                                          padding: '2px 8px',
+                                          borderRadius: '4px',
+                                          fontSize: '11px',
+                                          fontWeight: '600',
+                                          backgroundColor: '#e0e7ff',
+                                          color: '#4338ca'
+                                        }}>
+                                          {course.category}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))
+                              ) : (
+                                <div style={{ 
+                                  textAlign: 'center', 
+                                  padding: '20px', 
+                                  color: '#999',
+                                  fontSize: '13px'
+                                }}>
+                                  강의 정보가 없습니다.
+                                </div>
                               )}
                             </div>
-                          </td>
-                          <td>
-                            <span style={{
-                              padding: '4px 12px',
-                              borderRadius: '12px',
-                              fontSize: '12px',
-                              fontWeight: '600',
-                              backgroundColor: course.status === 'active' ? '#E8F5E9' : '#F5F5F5',
-                              color: course.status === 'active' ? '#2E7D32' : '#666'
-                            }}>
-                              {course.status === 'active' ? '진행중' : '완료'}
-                            </span>
-                          </td>
-                          <td>
-                            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                              <button
-                                className={styles.editButton}
-                                onClick={() => handleEditAnnouncement(course)}
-                                style={{ fontSize: '11px', padding: '6px 10px' }}
-                              >
-                                {course.classLink || course.announcement ? '공지 수정' : '공지 등록'}
-                              </button>
-                              <button
-                                className={styles.deleteButton}
-                                onClick={() => handleDeleteCourse(course.id)}
-                                style={{ fontSize: '11px', padding: '6px 10px' }}
-                              >
-                                삭제
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 

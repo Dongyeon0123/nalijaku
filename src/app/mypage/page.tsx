@@ -27,22 +27,23 @@ interface EnrolledCourse {
   thumbnail?: string;
 }
 
-interface InstructorCourse {
+interface CourseGroup {
   id: number;
-  materialId: number;
-  title: string;
-  subtitle?: string;
-  thumbnail?: string;
-  description: string;
-  categoryName?: string;
-  instructorName?: string;
+  schoolName: string;
   studentCount: number;
-  avgProgress: number;
-  status: 'active' | 'completed';
   startDate: string;
   endDate: string;
-  assignedAt: string;
-  createdAt?: string;
+  status: string;
+  courseCount: number;
+  courses: Array<{
+    id: number;
+    title: string;
+    subtitle?: string;
+    thumbnail?: string;
+    category?: string;
+  }>;
+  createdAt: string;
+  updatedAt: string;
   classLink?: string;
   announcement?: string;
 }
@@ -51,10 +52,10 @@ export default function MyPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
-  const [instructorCourses, setInstructorCourses] = useState<InstructorCourse[]>([]);
+  const [instructorCourses, setInstructorCourses] = useState<CourseGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'profile' | 'courses' | 'settings' | 'certificates'>('profile');
-  const [selectedCourse, setSelectedCourse] = useState<InstructorCourse | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<CourseGroup | null>(null);
   
   // 수정 모드 상태
   const [editMode, setEditMode] = useState({
@@ -145,12 +146,14 @@ export default function MyPage() {
       // 강사인 경우 담당 강의 목록 조회
       if (profileResponse.data.data.role === 'TEACHER') {
         try {
+          // userId로 직접 강의 목록 조회 (백엔드에서 userId → instructorId 변환)
           const instructorCoursesResponse = await api.get(`/api/instructors/${userId}/courses`);
+          
           if (instructorCoursesResponse.data.success) {
             setInstructorCourses(instructorCoursesResponse.data.data);
           }
         } catch (error) {
-          console.log('강사 강의 목록 API 미구현');
+          console.error('❌ 강사 강의 목록 로드 실패:', error);
           setInstructorCourses([]);
         }
       }
@@ -241,7 +244,7 @@ export default function MyPage() {
     }
   };
 
-  const handleCourseClick = (course: InstructorCourse) => {
+  const handleCourseClick = (course: CourseGroup) => {
     setSelectedCourse(course);
   };
 
@@ -428,8 +431,17 @@ export default function MyPage() {
                   <div className={styles.courseStatCard}>
                     <div className={styles.courseStatIcon}>📚</div>
                     <div className={styles.courseStatInfo}>
-                      <p className={styles.courseStatLabel}>담당 강의</p>
+                      <p className={styles.courseStatLabel}>담당 그룹</p>
                       <p className={styles.courseStatValue}>{instructorCourses.length}개</p>
+                    </div>
+                  </div>
+                  <div className={styles.courseStatCard}>
+                    <div className={styles.courseStatIcon}>🎓</div>
+                    <div className={styles.courseStatInfo}>
+                      <p className={styles.courseStatLabel}>총 강의</p>
+                      <p className={styles.courseStatValue}>
+                        {instructorCourses.reduce((acc, g) => acc + (g.courseCount || 0), 0)}개
+                      </p>
                     </div>
                   </div>
                   <div className={styles.courseStatCard}>
@@ -437,21 +449,7 @@ export default function MyPage() {
                     <div className={styles.courseStatInfo}>
                       <p className={styles.courseStatLabel}>총 수강생</p>
                       <p className={styles.courseStatValue}>
-                        {instructorCourses.reduce((acc, c) => acc + (c.studentCount || 0), 0)}명
-                      </p>
-                    </div>
-                  </div>
-                  <div className={styles.courseStatCard}>
-                    <div className={styles.courseStatIcon}>📊</div>
-                    <div className={styles.courseStatInfo}>
-                      <p className={styles.courseStatLabel}>평균 진행률</p>
-                      <p className={styles.courseStatValue}>
-                        {instructorCourses.length > 0
-                          ? Math.round(
-                              instructorCourses.reduce((acc, c) => acc + (c.avgProgress || 0), 0) /
-                                instructorCourses.length
-                            )
-                          : 0}%
+                        {instructorCourses.reduce((acc, g) => acc + (g.studentCount || 0), 0)}명
                       </p>
                     </div>
                   </div>
@@ -465,46 +463,31 @@ export default function MyPage() {
                   </div>
                 ) : (
                   <div className={styles.instructorCourseGrid}>
-                    {instructorCourses.map(course => (
-                      <div key={course.id} className={styles.instructorCourseCard}>
-                        <div className={styles.instructorCourseThumbnail}>
-                          {course.thumbnail ? (
-                            <img 
-                              src={course.thumbnail.startsWith('http') 
-                                ? course.thumbnail 
-                                : `https://api.nallijaku.com${course.thumbnail}`
-                              } 
-                              alt={course.title}
-                              onError={(e) => {
-                                console.error('이미지 로드 실패:', course.thumbnail);
-                                (e.target as HTMLImageElement).style.display = 'none';
-                                const placeholder = (e.target as HTMLImageElement).nextElementSibling;
-                                if (placeholder) {
-                                  (placeholder as HTMLElement).style.display = 'flex';
-                                }
-                              }}
-                            />
-                          ) : null}
-                          <div 
-                            className={styles.placeholderThumbnail}
-                            style={{ display: course.thumbnail ? 'none' : 'flex' }}
-                          >
-                            {course.title.charAt(0)}
-                          </div>
-                          <div className={`${styles.statusBadge} ${styles[course.status]}`}>
-                            {course.status === 'active' ? '진행중' : '완료'}
+                    {instructorCourses.map(group => (
+                      <div key={group.id} className={styles.instructorCourseCard}>
+                        <div className={styles.instructorCourseThumbnail} style={{
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white',
+                          fontSize: '48px',
+                          fontWeight: 'bold'
+                        }}>
+                          🏫
+                          <div className={`${styles.statusBadge} ${styles[group.status]}`}>
+                            {group.status === 'active' ? '진행중' : '완료'}
                           </div>
                         </div>
                         <div className={styles.instructorCourseInfo}>
-                          <h3>{course.title}</h3>
-                          <p className={styles.courseDescription}>{course.description}</p>
+                          <h3>{group.schoolName}</h3>
                           
                           {/* 강의 기간 */}
-                          {course.startDate && course.endDate && (
+                          {group.startDate && group.endDate && (
                             <div className={styles.courseDates}>
-                              <span>📅 {new Date(course.startDate).toLocaleDateString('ko-KR')} ~ {new Date(course.endDate).toLocaleDateString('ko-KR')}</span>
+                              <span>📅 {new Date(group.startDate).toLocaleDateString('ko-KR')} ~ {new Date(group.endDate).toLocaleDateString('ko-KR')}</span>
                               <span className={styles.courseDuration}>
-                                ({Math.ceil((new Date(course.endDate).getTime() - new Date(course.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일)
+                                ({Math.ceil((new Date(group.endDate).getTime() - new Date(group.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일)
                               </span>
                             </div>
                           )}
@@ -512,18 +495,18 @@ export default function MyPage() {
                           <div className={styles.courseMetrics}>
                             <div className={styles.metric}>
                               <span className={styles.metricLabel}>수강생</span>
-                              <span className={styles.metricValue}>{course.studentCount || 0}명</span>
+                              <span className={styles.metricValue}>{group.studentCount || 0}명</span>
                             </div>
                             <div className={styles.metric}>
-                              <span className={styles.metricLabel}>평균 진행률</span>
-                              <span className={styles.metricValue}>{Math.round(course.avgProgress || 0)}%</span>
+                              <span className={styles.metricLabel}>강의 수</span>
+                              <span className={styles.metricValue}>{group.courseCount || 0}개</span>
                             </div>
                           </div>
                           <button
                             className={styles.manageCourseButton}
-                            onClick={() => handleCourseClick(course)}
+                            onClick={() => handleCourseClick(group)}
                           >
-                            강의 관리
+                            상세보기
                           </button>
                         </div>
                       </div>
@@ -537,29 +520,23 @@ export default function MyPage() {
                   <button className={styles.backButton} onClick={handleBackToCourses}>
                     ← 뒤로가기
                   </button>
-                  <h2>{selectedCourse.title}</h2>
+                  <h2>🏫 {selectedCourse.schoolName}</h2>
                 </div>
 
                 <div className={styles.courseDetailCard}>
                   <div className={styles.courseDetailHeader}>
-                    <div className={styles.courseDetailThumbnail}>
-                      {selectedCourse.thumbnail ? (
-                        <img 
-                          src={selectedCourse.thumbnail.startsWith('http') 
-                            ? selectedCourse.thumbnail 
-                            : `https://api.nallijaku.com${selectedCourse.thumbnail}`
-                          } 
-                          alt={selectedCourse.title}
-                        />
-                      ) : (
-                        <div className={styles.placeholderThumbnail}>
-                          {selectedCourse.title.charAt(0)}
-                        </div>
-                      )}
+                    <div className={styles.courseDetailThumbnail} style={{
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '64px'
+                    }}>
+                      🏫
                     </div>
                     <div className={styles.courseDetailInfo}>
-                      <h3>{selectedCourse.title}</h3>
-                      <p>{selectedCourse.description}</p>
+                      <h3>{selectedCourse.schoolName}</h3>
                       {selectedCourse.startDate && selectedCourse.endDate && (
                         <p className={styles.courseDetailDates}>
                           📅 {new Date(selectedCourse.startDate).toLocaleDateString('ko-KR')} ~ {new Date(selectedCourse.endDate).toLocaleDateString('ko-KR')}
@@ -575,14 +552,110 @@ export default function MyPage() {
                       <span className={styles.statValue}>{selectedCourse.studentCount || 0}명</span>
                     </div>
                     <div className={styles.statItem}>
-                      <span className={styles.statLabel}>평균 진행률</span>
-                      <span className={styles.statValue}>{Math.round(selectedCourse.avgProgress || 0)}%</span>
+                      <span className={styles.statLabel}>강의 수</span>
+                      <span className={styles.statValue}>{selectedCourse.courseCount || 0}개</span>
                     </div>
                     <div className={styles.statItem}>
                       <span className={styles.statLabel}>상태</span>
                       <span className={styles.statValue}>{selectedCourse.status === 'active' ? '진행중' : '완료'}</span>
                     </div>
                   </div>
+                </div>
+
+                {/* 포함된 강의 목록 */}
+                <div className={styles.studentsSection}>
+                  <h3>📚 포함된 강의 목록</h3>
+                  {selectedCourse.courses && selectedCourse.courses.length > 0 ? (
+                    <div style={{ display: 'grid', gap: '16px' }}>
+                      {selectedCourse.courses.map((course, idx) => (
+                        <div 
+                          key={idx}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '16px',
+                            padding: '20px',
+                            backgroundColor: 'white',
+                            borderRadius: '12px',
+                            border: '2px solid #e5e7eb',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                          }}
+                        >
+                          {course.thumbnail ? (
+                            <img
+                              src={course.thumbnail.startsWith('http') 
+                                ? course.thumbnail 
+                                : `https://api.nallijaku.com${course.thumbnail}`
+                              }
+                              alt={course.title}
+                              style={{
+                                width: '100px',
+                                height: '100px',
+                                objectFit: 'cover',
+                                borderRadius: '12px',
+                                flexShrink: 0
+                              }}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <div style={{
+                              width: '100px',
+                              height: '100px',
+                              borderRadius: '12px',
+                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: 'white',
+                              fontSize: '32px',
+                              fontWeight: 'bold',
+                              flexShrink: 0
+                            }}>
+                              {course.title.charAt(0)}
+                            </div>
+                          )}
+                          <div style={{ flex: 1 }}>
+                            <div style={{ 
+                              fontSize: '20px', 
+                              fontWeight: '700',
+                              marginBottom: '8px',
+                              color: '#1f2937'
+                            }}>
+                              {idx + 1}. {course.title}
+                            </div>
+                            {course.subtitle && (
+                              <div style={{ 
+                                fontSize: '14px', 
+                                color: '#6b7280',
+                                marginBottom: '8px'
+                              }}>
+                                {course.subtitle}
+                              </div>
+                            )}
+                            {course.category && (
+                              <span style={{
+                                display: 'inline-block',
+                                padding: '4px 12px',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                backgroundColor: '#e0e7ff',
+                                color: '#4338ca'
+                              }}>
+                                {course.category}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={styles.emptyAnnouncement}>
+                      <p>📚 포함된 강의가 없습니다.</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className={styles.studentsSection}>
