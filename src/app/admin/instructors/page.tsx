@@ -271,8 +271,15 @@ export default function InstructorsManagementPage() {
       console.log('📚 파싱된 강의 그룹 목록:', coursesData);
       
       setAssignedCourses(coursesData);
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ 할당된 강의 목록 로드 실패:', error);
+      
+      // CORS 또는 502 에러인 경우
+      if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+        console.warn('⚠️ 백엔드 서버 연결 실패 (CORS 또는 502 에러)');
+        alert('백엔드 서버에 연결할 수 없습니다.\n\n백엔드 개발자에게 다음을 확인 요청하세요:\n1. 서버가 실행 중인지\n2. CORS 설정이 되어 있는지\n3. /api/instructors/{id}/courses 엔드포인트가 있는지');
+      }
+      
       setAssignedCourses([]);
     } finally {
       setLoadingAssignedCourses(false);
@@ -491,7 +498,9 @@ export default function InstructorsManagementPage() {
       fetchInstructors();
     } catch (error: any) {
       console.error('강사 삭제 중 오류:', error);
-      const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
+      console.error('에러 상태:', error.response?.status);
+      console.error('에러 응답 (JSON):', JSON.stringify(error.response?.data, null, 2));
+      const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message || '알 수 없는 오류';
       alert(`강사 삭제 중 오류가 발생했습니다: ${errorMsg}`);
     }
   };

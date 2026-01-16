@@ -146,14 +146,20 @@ export default function MyPage() {
       // 강사인 경우 담당 강의 목록 조회
       if (profileResponse.data.data.role === 'TEACHER') {
         try {
-          // userId로 직접 강의 목록 조회 (백엔드에서 userId → instructorId 변환)
-          const instructorCoursesResponse = await api.get(`/api/instructors/${userId}/courses`);
+          console.log('🔍 강사 강의 목록 조회 시작, userId:', userId);
+          
+          // userId로 강의 목록 조회 (백엔드에서 userId → instructorId 변환)
+          const instructorCoursesResponse = await api.get(`/api/instructors/by-user/${userId}/courses`);
+          
+          console.log('✅ 강사 강의 목록 응답:', instructorCoursesResponse.data);
           
           if (instructorCoursesResponse.data.success) {
             setInstructorCourses(instructorCoursesResponse.data.data);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('❌ 강사 강의 목록 로드 실패:', error);
+          console.error('에러 상태:', error.response?.status);
+          console.error('에러 메시지:', error.response?.data);
           setInstructorCourses([]);
         }
       }
