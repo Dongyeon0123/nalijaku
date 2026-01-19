@@ -234,11 +234,11 @@
 
 .curriculumButton {
   padding: 8px 16px;
-  border: 2px solid #00C187;
+  border: 2px solid #1a1a1a;
   border-radius: 6px;
   margin-bottom: -1px;
-  background: transparent;
-  color: #00C187;
+  background: #ffffff;
+  color: #1a1a1a;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -246,33 +246,35 @@
 }
 
 .curriculumButton:hover {
-  background: #00C187;
-  border-color: #00C187;
+  background: #1a1a1a;
+  border-color: #1a1a1a;
   color: #ffffff;
 }
 
 .header.transparent .curriculumButton {
   border: 2px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.9);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .header.transparent .curriculumButton:hover {
-  background: #00A169;
-  border-color: #00A169;
+  background: #1a1a1a;
+  border-color: #1a1a1a;
   color: white;
-  text-shadow: 0 0 8px rgba(0, 161, 105, 0.3);
-  box-shadow: 0 0 15px rgba(0, 161, 105, 0.4);
+  text-shadow: none;
+  box-shadow: 0 0 15px rgba(26, 26, 26, 0.6);
 }
 
 .header.scrolled .curriculumButton {
-  border: 2px solid #00C187;
-  color: #00C187;
+  border: 2px solid #1a1a1a;
+  background: #ffffff;
+  color: #1a1a1a;
   text-shadow: none;
 }
 
 .header.scrolled .curriculumButton:hover {
-  background: #00C187;
+  background: #1a1a1a;
   color: white;
 }
 
@@ -630,6 +632,93 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
+/* 아이디 입력 필드와 중복확인 버튼 */
+.inputWithButton {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin: 0 auto;
+  margin-bottom: 10px;
+  margin-top: -5px;
+  align-items: stretch;
+}
+
+.inputWithButton input {
+  flex: 1;
+  width: auto;
+  margin: 0;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #868686;
+  border-radius: 10px;
+  background: #f9f9f9;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.inputWithButton input::placeholder {
+  color: #9a9a9a;
+}
+
+.inputWithButton input:hover {
+  background: #ffffff;
+}
+
+.inputWithButton input:focus {
+  border-color: #00C187;
+  box-shadow: 0 0 0 4px rgba(0, 193, 135, 0.15);
+  background: #ffffff;
+}
+
+.checkButton {
+  padding: 12px 8px;
+  border: 1px solid #00C187;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #00C187;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  width: 60px;
+}
+
+.checkButton:hover:not(:disabled) {
+  background: #00C187;
+  color: #ffffff;
+}
+
+.checkButton:disabled {
+  background: #f0f0f0;
+  border-color: #ccc;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.successText {
+  font-size: 13px;
+  color: #00C187;
+  margin: -5px 0 10px 0;
+  font-weight: 500;
+  text-align: left;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.errorText {
+  font-size: 13px;
+  color: #ff4444;
+  margin: -5px 0 10px 0;
+  font-weight: 500;
+  text-align: left;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .modalBody input::placeholder {
   color: #9a9a9a;
 }
@@ -926,4 +1015,19 @@
     transform: translateY(0); 
     opacity: 1; 
   }
+}
+
+/* 드론 경험 토글 행 */
+.experienceRow {
+  width: 90%;
+  margin: 0 auto 16px auto;
+}
+
+.experienceLabel {
+  margin-bottom: 8px;
+}
+
+.studyLink {
+  text-decoration: none;
+  color: inherit;
 }

@@ -10,6 +10,7 @@ import { usePathname } from 'next/navigation';
 import { SignupData, LoginData } from '@/types/auth';
 import { signup, login, logoutUser, checkAdminStatus } from '@/services/authService';
 import { validateSignupStep1, validateSignupStep2, validateSignupStep3 } from '@/utils/validation';
+import axios from 'axios';
 
 interface HeaderProps {
   forceLightMode?: boolean;
@@ -61,15 +62,80 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
   const [errorMessage, setErrorMessage] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
 
+  // 아이디 중복확인 상태
+  const [isUsernameChecked, setIsUsernameChecked] = React.useState(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] = React.useState(false);
+
   // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [userInfo, setUserInfo] = React.useState<{ username: string; token?: string; role?: string } | null>(null);
   const [isAdmin, setIsAdmin] = React.useState(false);
 
+  // 아이디 중복확인 처리
+  const handleCheckUsername = async () => {
+    if (!signupForm.username) {
+      setErrorMessage('아이디를 입력해주세요.');
+      return;
+    }
 
+    if (signupForm.username.length < 4) {
+      setErrorMessage('아이디는 4자 이상이어야 합니다.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setErrorMessage('');
+      setSuccessMessage(''); // 기존 성공 메시지 초기화
+
+      // PUBLIC API이므로 인증 토큰 없이 axios 직접 호출
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/checkDuplicatedId/${signupForm.username}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const result = response.data;
+
+      if (result.success && result.data) {
+        if (result.data.available) {
+          setIsUsernameChecked(true);
+          setIsUsernameAvailable(true);
+          // 성공 메시지는 표시하지 않음
+        } else {
+          setIsUsernameChecked(true);
+          setIsUsernameAvailable(false);
+          // 에러 메시지는 표시하지 않음
+        }
+      }
+    } catch (error: any) {
+      console.error('아이디 중복확인 오류:', error);
+      
+      if (error.response?.status === 401) {
+        setErrorMessage('백엔드 API 설정 오류: 아이디 중복확인 API가 PUBLIC으로 설정되지 않았습니다.');
+      } else if (error.response?.status === 500) {
+        setErrorMessage('백엔드 서버 오류가 발생했습니다. 백엔드 개발자에게 /api/checkDuplicatedId/{id} 엔드포인트 확인을 요청하세요.');
+      } else if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+        setErrorMessage('백엔드 서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.');
+      } else {
+        setErrorMessage('아이디 중복확인 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // 회원가입 처리
   const handleSignup = async () => {
+    // 아이디 중복확인 체크
+    if (!isUsernameChecked || !isUsernameAvailable) {
+      setErrorMessage('아이디 중복확인을 해주세요.');
+      return;
+    }
+
     // 최종 유효성 검사
     const errors = validateSignupStep3(signupForm.phone, ageCheck, termsCheck);
     if (errors.length > 0) {
@@ -217,6 +283,8 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
     setRole('');
     setAgeCheck(false);
     setTermsCheck(false);
+    setIsUsernameChecked(false);
+    setIsUsernameAvailable(false);
   };
 
   const resetLoginForm = () => {
@@ -250,6 +318,17 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
 
       if (errors.length > 0) {
         setErrorMessage(errors[0]);
+        return;
+      }
+
+      // 아이디 중복확인 체크
+      if (!isUsernameChecked) {
+        setErrorMessage('아이디 중복확인을 해주세요.');
+        return;
+      }
+
+      if (!isUsernameAvailable) {
+        setErrorMessage('사용 가능한 아이디로 변경해주세요.');
         return;
       }
 
@@ -451,7 +530,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
 
         <div className={styles.buttonSection}>
           <button className={styles.curriculumButton}>
-            전체 커리큘럼
+            <a href="https://www.raporapo.dev/startium" className={styles.studyLink}>교육 플랫폼 이동</a>
           </button>
           {isLoggedIn ? (
             <div className={styles.userMenu}>
@@ -559,12 +638,31 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                 {signupStep === 0 && (
                   <>
                     <p>아이디 <span style={{ color: 'red' }}>*</span></p>
-                    <input
-                      type="text"
-                      placeholder="사용할 아이디를 입력하세요."
-                      value={signupForm.username}
-                      onChange={(e) => setSignupForm(prev => ({ ...prev, username: e.target.value }))}
-                    />
+                    <div className={styles.inputWithButton}>
+                      <input
+                        type="text"
+                        placeholder="사용할 아이디를 입력하세요."
+                        value={signupForm.username}
+                        onChange={(e) => {
+                          setSignupForm(prev => ({ ...prev, username: e.target.value }));
+                          setIsUsernameChecked(false);
+                          setIsUsernameAvailable(false);
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className={styles.checkButton}
+                        onClick={handleCheckUsername}
+                        disabled={isLoading || !signupForm.username}
+                      >
+                        {isLoading ? '확인 중...' : '중복확인'}
+                      </button>
+                    </div>
+                    {isUsernameChecked && (
+                      <p className={isUsernameAvailable ? styles.successText : styles.errorText}>
+                        {isUsernameAvailable ? '✓ 사용 가능한 아이디입니다.' : '✗ 이미 사용 중인 아이디입니다.'}
+                      </p>
+                    )}
                     <p>비밀번호 <span style={{ color: 'red' }}>*</span></p>
                     <input
                       type="password"
