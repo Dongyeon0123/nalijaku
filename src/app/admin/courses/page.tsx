@@ -2,8 +2,25 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
-import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaGripVertical } from 'react-icons/fa';
 import api from '@/lib/axios';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface Lesson {
   id: number;
@@ -28,6 +45,69 @@ interface Course {
   duration?: string;
   level?: string;
   lessons?: Lesson[];
+}
+
+// 드래그 가능한 행 컴포넌트
+function SortableRow({ course, onEdit, onDelete, onExpand, isExpanded }: {
+  course: Course;
+  onEdit: (course: Course) => void;
+  onDelete: (id: number) => void;
+  onExpand: (id: number) => void;
+  isExpanded: boolean;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: course.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? '#f0f0f0' : 'transparent',
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style}>
+      <td>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'grab' }} {...attributes} {...listeners}>
+          <FaGripVertical style={{ color: '#999' }} />
+          {course.id}
+        </div>
+      </td>
+      <td>{course.category}</td>
+      <td>{course.subCategory || '-'}</td>
+      <td>{course.title}</td>
+      <td>{course.subtitle}</td>
+      <td className={styles.actions}>
+        <button
+          className={styles.expandBtn}
+          onClick={() => onExpand(course.id)}
+          title="차시 보기"
+        >
+          {isExpanded ? '▼' : '▶'} 차시
+        </button>
+        <button
+          className={styles.editBtn}
+          onClick={() => onEdit(course)}
+          title="수정"
+        >
+          <FaEdit />
+        </button>
+        <button
+          className={styles.deleteBtn}
+          onClick={() => onDelete(course.id)}
+          title="삭제"
+        >
+          <FaTrash />
+        </button>
+      </td>
+    </tr>
+  );
 }
 
 export default function CoursesPage() {
@@ -67,6 +147,49 @@ export default function CoursesPage() {
     duration: '',
     level: '',
   });
+
+  // 드래그 앤 드롭 센서 설정
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // 백엔드에 순서 저장
+  const saveOrderToBackend = async (orderedCourses: Course[]) => {
+    try {
+      const orders = orderedCourses.map((course, index) => ({
+        id: course.id,
+        order: index + 1  // 백엔드 API 스펙에 맞춤
+      }));
+
+      await api.patch('/api/resources/reorder', { orders });
+      console.log('✅ 순서가 저장되었습니다');
+    } catch (error: any) {
+      console.error('❌ 순서 저장 실패:', error);
+      alert('순서 저장에 실패했습니다. 백엔드 API를 확인해주세요.');
+    }
+  };
+
+  // 드래그 종료 핸들러
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setCourses((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        const newOrder = arrayMove(items, oldIndex, newIndex);
+        
+        // 백엔드에 순서 변경 저장
+        saveOrderToBackend(newOrder);
+        
+        return newOrder;
+      });
+    }
+  };
 
   useEffect(() => {
     loadCourses();
@@ -635,125 +758,113 @@ export default function CoursesPage() {
         <div className={styles.loading}>로딩 중...</div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>카테고리</th>
-                <th>서브카테고리</th>
-                <th>강좌명</th>
-                <th>설명</th>
-                <th>작업</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCourses.length > 0 ? (
-                filteredCourses.map((course) => (
-                  <React.Fragment key={course.id}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>카테고리</th>
+                  <th>서브카테고리</th>
+                  <th>강좌명</th>
+                  <th>설명</th>
+                  <th>작업</th>
+                </tr>
+              </thead>
+              <tbody>
+                <SortableContext
+                  items={filteredCourses.map((c) => c.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {filteredCourses.length > 0 ? (
+                    filteredCourses.map((course) => (
+                      <React.Fragment key={course.id}>
+                        <SortableRow
+                          course={course}
+                          onEdit={handleEditCourse}
+                          onDelete={handleDeleteCourse}
+                          onExpand={(id) => setExpandedCourseId(expandedCourseId === id ? null : id)}
+                          isExpanded={expandedCourseId === course.id}
+                        />
+                        {expandedCourseId === course.id && (
+                          <tr style={{ backgroundColor: '#f9f9f9' }}>
+                            <td colSpan={6} style={{ padding: '20px' }}>
+                              <div style={{ marginBottom: '16px' }}>
+                                <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>차시 관리</h4>
+                                {course.lessons && course.lessons.length > 0 ? (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {course.lessons.map((lesson, idx) => {
+                                      const typeColors: { [key: string]: { bg: string; text: string } } = {
+                                        '이론': { bg: '#E1BEE7', text: '#6A1B9A' },
+                                        '실습': { bg: '#C8E6C9', text: '#2E7D32' },
+                                        '게임': { bg: '#FFF9C4', text: '#F57F17' },
+                                        '토론': { bg: '#B3E5FC', text: '#01579B' },
+                                        '수료증': { bg: '#FFCDD2', text: '#C62828' }
+                                      };
+                                      const typeColor = typeColors[lesson.type || '이론'] || typeColors['이론'];
+                                      
+                                      return (
+                                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e0e0e0', position: 'relative' }}>
+                                          <div style={{ flex: 1 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                              <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{lesson.order}차시</p>
+                                              <span style={{ 
+                                                padding: '2px 8px', 
+                                                backgroundColor: typeColor.bg, 
+                                                color: typeColor.text, 
+                                                borderRadius: '4px', 
+                                                fontSize: '11px', 
+                                                fontWeight: '600' 
+                                              }}>
+                                                {lesson.type || '이론'}
+                                              </span>
+                                            </div>
+                                            <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#565D6D' }}>제목: {lesson.title}</p>
+                                            {lesson.description && <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{lesson.description}</p>}
+                                          </div>
+                                          <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button
+                                              onClick={() => {
+                                                setEditingLesson(lesson);
+                                                setLessonFormData({ order: lesson.order, title: lesson.title, description: lesson.description, type: lesson.type || '이론' });
+                                                setLessonPdfFile(null);
+                                                setShowLessonModal(true);
+                                              }}
+                                              style={{ padding: '6px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>수정</button>
+                                            <button
+                                              onClick={() => handleDeleteLesson(course.id, lesson.order)}
+                                              style={{ padding: '6px 12px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>삭제</button>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                ) : (
+                                  <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>등록된 차시가 없습니다.</p>
+                                )}
+                                <button
+                                  onClick={() => handleAddLesson()}
+                                  style={{ marginTop: '12px', padding: '8px 16px', backgroundColor: '#04AD74', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>+ 차시 추가</button>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    ))
+                  ) : (
                     <tr>
-                      <td>{course.id}</td>
-                      <td>{course.category}</td>
-                      <td>{course.subCategory || '-'}</td>
-                      <td>{course.title}</td>
-                      <td>{course.subtitle}</td>
-                      <td className={styles.actions}>
-                        <button
-                          className={styles.expandBtn}
-                          onClick={() => setExpandedCourseId(expandedCourseId === course.id ? null : course.id)}
-                          title="차시 보기"
-                        >
-                          {expandedCourseId === course.id ? '▼' : '▶'} 차시
-                        </button>
-                        <button
-                          className={styles.editBtn}
-                          onClick={() => handleEditCourse(course)}
-                          title="수정"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          className={styles.deleteBtn}
-                          onClick={() => handleDeleteCourse(course.id)}
-                          title="삭제"
-                        >
-                          <FaTrash />
-                        </button>
+                      <td colSpan={6} className={styles.noData}>
+                        강좌가 없습니다.
                       </td>
                     </tr>
-                    {expandedCourseId === course.id && (
-                      <tr style={{ backgroundColor: '#f9f9f9' }}>
-                        <td colSpan={6} style={{ padding: '20px' }}>
-                          <div style={{ marginBottom: '16px' }}>
-                            <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>차시 관리</h4>
-                            {course.lessons && course.lessons.length > 0 ? (
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {course.lessons.map((lesson, idx) => {
-                                  const typeColors: { [key: string]: { bg: string; text: string } } = {
-                                    '이론': { bg: '#E1BEE7', text: '#6A1B9A' },
-                                    '실습': { bg: '#C8E6C9', text: '#2E7D32' },
-                                    '게임': { bg: '#FFF9C4', text: '#F57F17' },
-                                    '토론': { bg: '#B3E5FC', text: '#01579B' },
-                                    '수료증': { bg: '#FFCDD2', text: '#C62828' }
-                                  };
-                                  const typeColor = typeColors[lesson.type || '이론'] || typeColors['이론'];
-                                  
-                                  return (
-                                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e0e0e0', position: 'relative' }}>
-                                      <div style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                          <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{lesson.order}차시</p>
-                                          <span style={{ 
-                                            padding: '2px 8px', 
-                                            backgroundColor: typeColor.bg, 
-                                            color: typeColor.text, 
-                                            borderRadius: '4px', 
-                                            fontSize: '11px', 
-                                            fontWeight: '600' 
-                                          }}>
-                                            {lesson.type || '이론'}
-                                          </span>
-                                        </div>
-                                        <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#565D6D' }}>제목: {lesson.title}</p>
-                                        {lesson.description && <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{lesson.description}</p>}
-                                      </div>
-                                      <div style={{ display: 'flex', gap: '8px' }}>
-                                        <button
-                                          onClick={() => {
-                                            setEditingLesson(lesson);
-                                            setLessonFormData({ order: lesson.order, title: lesson.title, description: lesson.description, type: lesson.type || '이론' });
-                                            setLessonPdfFile(null);
-                                            setShowLessonModal(true);
-                                          }}
-                                          style={{ padding: '6px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>수정</button>
-                                        <button
-                                          onClick={() => handleDeleteLesson(course.id, lesson.order)}
-                                          style={{ padding: '6px 12px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>삭제</button>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            ) : (
-                              <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>등록된 차시가 없습니다.</p>
-                            )}
-                            <button
-                              onClick={() => handleAddLesson()}
-                              style={{ marginTop: '12px', padding: '8px 16px', backgroundColor: '#04AD74', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>+ 차시 추가</button>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className={styles.noData}>
-                    강좌가 없습니다.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                  )}
+                </SortableContext>
+              </tbody>
+            </table>
+          </DndContext>
         </div>
       )}
 
