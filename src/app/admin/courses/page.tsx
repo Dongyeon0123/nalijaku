@@ -167,6 +167,7 @@ export default function CoursesPage() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [categoryFormData, setCategoryFormData] = useState({ name: '', parentCategory: '' });
   const [showCourseManagementModal, setShowCourseManagementModal] = useState(false);
+  const [editingCourseInModal, setEditingCourseInModal] = useState<any | null>(null);
   const [courseFormData, setCourseFormData] = useState({
     title: '',
     description: '',
@@ -246,7 +247,43 @@ export default function CoursesPage() {
 
   const handleCreateCourse = async () => {
     try {
-      // 필수 필드 검증
+      // 수정 모드인 경우
+      if (editingCourseInModal) {
+        const formData = new FormData();
+        formData.append('title', courseFormData.title);
+        formData.append('description', courseFormData.description);
+        formData.append('category', courseFormData.category);
+        if (courseFormData.thumbnail) {
+          formData.append('thumbnail', courseFormData.thumbnail);
+        }
+        if (courseFormData.difficulty) {
+          formData.append('difficulty', courseFormData.difficulty);
+        }
+        if (courseFormData.duration) {
+          formData.append('duration', courseFormData.duration);
+        }
+
+        console.log('코스 수정 요청:', editingCourseInModal.id);
+
+        await api.put(`/api/admin/courses/${editingCourseInModal.id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        alert('코스가 수정되었습니다!');
+        setEditingCourseInModal(null);
+        setCourseFormData({
+          title: '',
+          description: '',
+          category: '',
+          thumbnail: null,
+          difficulty: '',
+          duration: ''
+        });
+        loadCoursesForManagement();
+        return;
+      }
+
+      // 필수 필드 검증 (생성 모드)
       if (!courseFormData.title || !courseFormData.category || !courseFormData.thumbnail) {
         alert('제목, 카테고리, 썸네일 이미지는 필수 항목입니다.');
         return;
@@ -1334,7 +1371,18 @@ export default function CoursesPage() {
               <h3>코스 관리</h3>
               <button
                 className={styles.modalCloseBtn}
-                onClick={() => setShowCourseManagementModal(false)}
+                onClick={() => {
+                  setShowCourseManagementModal(false);
+                  setEditingCourseInModal(null);
+                  setCourseFormData({
+                    title: '',
+                    description: '',
+                    category: '',
+                    thumbnail: null,
+                    difficulty: '',
+                    duration: ''
+                  });
+                }}
               >
                 ✕
               </button>
@@ -1345,7 +1393,9 @@ export default function CoursesPage() {
               </p>
               
               <div style={{ marginBottom: '30px' }}>
-                <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: '600' }}>코스 생성</h4>
+                <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: '600' }}>
+                  {editingCourseInModal ? '코스 수정' : '코스 생성'}
+                </h4>
                 
                 <div style={{ marginBottom: '15px' }}>
                   <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
@@ -1476,22 +1526,55 @@ export default function CoursesPage() {
                   </div>
                 </div>
                 
-                <button
-                  onClick={handleCreateCourse}
-                  style={{
-                    background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '12px 24px',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    width: '100%'
-                  }}
-                >
-                  코스 생성
-                </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  {editingCourseInModal && (
+                    <button
+                      onClick={() => {
+                        setEditingCourseInModal(null);
+                        setCourseFormData({
+                          title: '',
+                          description: '',
+                          category: '',
+                          thumbnail: null,
+                          difficulty: '',
+                          duration: ''
+                        });
+                      }}
+                      style={{
+                        background: '#6b7280',
+                        color: 'white',
+                        border: 'none',
+                        padding: '12px 24px',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        flex: 1
+                      }}
+                    >
+                      취소
+                    </button>
+                  )}
+                  <button
+                    onClick={handleCreateCourse}
+                    style={{
+                      background: editingCourseInModal 
+                        ? 'linear-gradient(135deg, #10b981, #059669)' 
+                        : 'linear-gradient(135deg, #667eea, #764ba2)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      flex: editingCourseInModal ? 1 : 'none',
+                      width: editingCourseInModal ? 'auto' : '100%'
+                    }}
+                  >
+                    {editingCourseInModal ? '코스 수정' : '코스 생성'}
+                  </button>
+                </div>
               </div>
               
               <div style={{ borderTop: '2px solid #f0f0f0', paddingTop: '30px' }}>
@@ -1537,31 +1620,58 @@ export default function CoursesPage() {
                             {course.duration && <span>⏱️ {course.duration}</span>}
                           </div>
                         </div>
-                        <button
-                          onClick={async () => {
-                            if (confirm('이 코스를 삭제하시겠습니까?')) {
-                              try {
-                                await api.delete(`/api/admin/courses/${course.id}`);
-                                alert('코스가 삭제되었습니다.');
-                                loadCoursesForManagement();
-                              } catch (error) {
-                                alert('코스 삭제에 실패했습니다.');
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={() => {
+                              setEditingCourseInModal(course);
+                              setCourseFormData({
+                                title: course.title,
+                                description: course.description || '',
+                                category: course.category,
+                                thumbnail: null,
+                                difficulty: course.difficulty || '',
+                                duration: course.duration || ''
+                              });
+                            }}
+                            style={{
+                              background: '#3b82f6',
+                              color: 'white',
+                              border: 'none',
+                              padding: '8px 16px',
+                              borderRadius: '6px',
+                              fontSize: '13px',
+                              fontWeight: '600',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            수정
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (confirm('이 코스를 삭제하시겠습니까?')) {
+                                try {
+                                  await api.delete(`/api/admin/courses/${course.id}`);
+                                  alert('코스가 삭제되었습니다.');
+                                  loadCoursesForManagement();
+                                } catch (error) {
+                                  alert('코스 삭제에 실패했습니다.');
+                                }
                               }
-                            }
-                          }}
-                          style={{
-                            background: '#ff4444',
-                            color: 'white',
-                            border: 'none',
-                            padding: '8px 16px',
-                            borderRadius: '6px',
-                            fontSize: '13px',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          삭제
-                        </button>
+                            }}
+                            style={{
+                              background: '#ff4444',
+                              color: 'white',
+                              border: 'none',
+                              padding: '8px 16px',
+                              borderRadius: '6px',
+                              fontSize: '13px',
+                              fontWeight: '600',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            삭제
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
