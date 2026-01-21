@@ -11,10 +11,26 @@ import { IoCartOutline } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 
+interface Course {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  thumbnail: string;
+  instructor: string;
+  difficulty?: string;
+  duration?: string;
+  displayOrder?: number;
+  learningMaterials?: Material[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface Material {
   id: number;
+  courseId?: number;
+  orderInCourse?: number;
   category: string;
-  subCategory?: string;
   image: string;
   alt: string;
   instructor: string;
@@ -24,21 +40,29 @@ interface Material {
   price?: number;
   duration?: string;
   level?: string;
+  lessons?: Lesson[];
 }
 
-interface CartItem extends Material {
+interface Lesson {
+  id: number;
+  order: number;
+  materials: string;
+  description: string;
+  pdfUrl?: string;
+  type?: string;
+}
+
+interface CartItem extends Course {
   quantity: number;
 }
 
 export default function ResourcesPage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = React.useState('전체');
-  const [selectedSubCategory, setSelectedSubCategory] = React.useState<string | null>(null);
   const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
-  const [materialsData, setMaterialsData] = React.useState<Material[]>([]);
+  const [coursesData, setCoursesData] = React.useState<Course[]>([]);
   const [categories, setCategories] = React.useState<string[]>([]);
-  const [subCategories, setSubCategories] = React.useState<{ [key: string]: string[] }>({});
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -57,54 +81,46 @@ export default function ResourcesPage() {
     }
   }, []);
 
-  // 백엔드에서 학습자료 데이터 가져오기
+  // 백엔드에서 코스 데이터 가져오기
   React.useEffect(() => {
-    const fetchMaterials = async () => {
+    const fetchCourses = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        console.log('학습자료 API 호출');
+        console.log('코스 API 호출');
 
-        // Axios 사용 (인증 토큰 자동 포함)
-        const response = await api.get('/api/resources');
+        // 코스 목록 가져오기
+        const response = await api.get('/api/courses');
 
-        console.log('학습자료 로드 성공:', response.data);
+        console.log('코스 로드 성공:', response.data);
 
         const result = response.data;
 
         if (result.success && result.data) {
-          // 백엔드가 이제 한글 카테고리를 반환하므로 변환 불필요
-          setMaterialsData(result.data);
+          // 백엔드 응답: { success, message, data: { courses: [...] } }
+          const coursesArray = result.data.courses || result.data;
+          setCoursesData(coursesArray);
         } else if (result.data && Array.isArray(result.data)) {
-          // success 필드가 없어도 data가 배열이면 처리
-          setMaterialsData(result.data);
+          setCoursesData(result.data);
+        } else if (Array.isArray(result)) {
+          setCoursesData(result);
         } else {
           console.warn('예상치 못한 API 응답 형식:', result);
-          setError('학습자료 데이터 형식이 올바르지 않습니다.');
+          setError('코스 데이터 형식이 올바르지 않습니다.');
         }
 
         // 카테고리는 별도 API에서 가져오기
         try {
-          // 새로운 계층형 카테고리 API 사용
           const categoriesResponse = await api.get('/api/categories');
           console.log('카테고리 로드 성공:', categoriesResponse.data);
           
           if (categoriesResponse.data.success && categoriesResponse.data.data?.categories) {
             const categoryData = categoriesResponse.data.data.categories;
             
-            // 메인 카테고리 추출
+            // 메인 카테고리만 추출 (서브카테고리 제거)
             const mainCategories = categoryData.map((cat: any) => cat.name);
             setCategories(mainCategories);
-            
-            // 서브카테고리 맵 생성
-            const subCategoryMap: { [key: string]: string[] } = {};
-            categoryData.forEach((cat: any) => {
-              if (cat.subCategories && cat.subCategories.length > 0) {
-                subCategoryMap[cat.name] = cat.subCategories.map((sub: any) => sub.name);
-              }
-            });
-            setSubCategories(subCategoryMap);
             
           } else if (Array.isArray(categoriesResponse.data)) {
             setCategories(categoriesResponse.data);
@@ -120,30 +136,28 @@ export default function ResourcesPage() {
           setCategories(['전체', '창업', '드론', 'AI', '환경']);
         }
       } catch (err: any) {
-        console.error('학습자료 로드 실패:', err);
+        console.error('코스 로드 실패:', err);
         if (err.response?.status === 401) {
           alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
           localStorage.clear();
           window.location.href = '/';
+        } else if (err.response?.status === 500) {
+          setError('백엔드 서버 오류가 발생했습니다. 백엔드 개발자에게 /api/courses 엔드포인트 확인을 요청하세요.');
         } else {
-          setError('학습자료를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
+          setError('코스를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
         }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMaterials();
+    fetchCourses();
   }, []);
 
-  // 필터링된 카드 데이터
-  const filteredMaterials = materialsData.filter(material => {
+  // 필터링된 코스 데이터
+  const filteredCourses = coursesData.filter(course => {
     // 카테고리 필터
-    if (selectedCategory !== '전체' && material.category !== selectedCategory) {
-      return false;
-    }
-    // 서브카테고리 필터
-    if (selectedSubCategory && material.subCategory !== selectedSubCategory) {
+    if (selectedCategory !== '전체' && course.category !== selectedCategory) {
       return false;
     }
     return true;
@@ -151,31 +165,30 @@ export default function ResourcesPage() {
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
-    setSelectedSubCategory(null); // 카테고리 변경 시 서브카테고리 초기화
   };
 
-  const handleMaterialClick = (materialId: number) => {
-    router.push(`/resources/${materialId}`);
+  const handleCourseClick = (courseId: number) => {
+    router.push(`/resources/${courseId}`);
   };
 
-  const handleAddToCart = (e: React.MouseEvent, materialId: number) => {
+  const handleAddToCart = (e: React.MouseEvent, courseId: number) => {
     e.stopPropagation();
-    const material = materialsData.find(m => m.id === materialId);
-    if (material) {
-      const existingItem = cartItems.find(item => item.id === materialId);
+    const course = coursesData.find(c => c.id === courseId);
+    if (course) {
+      const existingItem = cartItems.find(item => item.id === courseId);
       if (existingItem) {
         setCartItems(cartItems.map(item =>
-          item.id === materialId ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === courseId ? { ...item, quantity: item.quantity + 1 } : item
         ));
       } else {
-        setCartItems([...cartItems, { ...material, quantity: 1 }]);
+        setCartItems([...cartItems, { ...course, quantity: 1 }]);
       }
       setIsCartOpen(true);
     }
   };
 
-  const handleRemoveFromCart = (materialId: number) => {
-    setCartItems(cartItems.filter(item => item.id !== materialId));
+  const handleRemoveFromCart = (courseId: number) => {
+    setCartItems(cartItems.filter(item => item.id !== courseId));
   };
 
   const handleCreateClass = () => {
@@ -224,59 +237,9 @@ export default function ResourcesPage() {
             ))}
           </div>
 
-          {/* 서브카테고리 필터 */}
-          {selectedCategory !== '전체' && subCategories[selectedCategory] && (
-            <div style={{ 
-              display: 'flex', 
-              gap: '10px', 
-              flexWrap: 'wrap', 
-              marginTop: '20px',
-              marginBottom: '20px',
-              padding: '15px',
-              backgroundColor: '#f8f9fa',
-              borderRadius: '8px'
-            }}>
-              <button
-                onClick={() => setSelectedSubCategory(null)}
-                style={{
-                  padding: '8px 16px',
-                  border: selectedSubCategory === null ? '2px solid #04AD74' : '1px solid #ddd',
-                  backgroundColor: selectedSubCategory === null ? '#E8F5E9' : '#ffffff',
-                  color: selectedSubCategory === null ? '#04AD74' : '#666',
-                  borderRadius: '20px',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                전체
-              </button>
-              {subCategories[selectedCategory].map((sub) => (
-                <button
-                  key={sub}
-                  onClick={() => setSelectedSubCategory(sub)}
-                  style={{
-                    padding: '8px 16px',
-                    border: selectedSubCategory === sub ? '2px solid #04AD74' : '1px solid #ddd',
-                    backgroundColor: selectedSubCategory === sub ? '#E8F5E9' : '#ffffff',
-                    color: selectedSubCategory === sub ? '#04AD74' : '#666',
-                    borderRadius: '20px',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  {sub}
-                </button>
-              ))}
-            </div>
-          )}
-
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-              <p>학습자료를 불러오는 중입니다...</p>
+              <p>코스를 불러오는 중입니다...</p>
             </div>
           ) : error ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#d32f2f' }}>
@@ -284,8 +247,8 @@ export default function ResourcesPage() {
             </div>
           ) : (
             <div className={styles.materialsGrid}>
-              {filteredMaterials.length > 0 ? (
-                filteredMaterials.map((material) => {
+              {filteredCourses.length > 0 ? (
+                filteredCourses.map((course) => {
                   // 카테고리별 색상 정의
                   const categoryColors: { [key: string]: { bg: string; text: string } } = {
                     '창업': { bg: '#E3F2FD', text: '#1976D2' },
@@ -293,26 +256,38 @@ export default function ResourcesPage() {
                     'AI': { bg: '#FFF3E0', text: '#E65100' },
                     '환경': { bg: '#E8F5E9', text: '#2E7D32' }
                   };
-                  const categoryColor = categoryColors[material.category] || { bg: '#F5F5F5', text: '#666' };
+                  const categoryColor = categoryColors[course.category] || { bg: '#F5F5F5', text: '#666' };
+
+                  // 이미지 URL 처리
+                  const getImageUrl = (thumbnail: string) => {
+                    if (!thumbnail) return '/nallijaku.png';
+                    if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) {
+                      return thumbnail;
+                    }
+                    if (thumbnail.startsWith('/uploads/')) {
+                      return `https://api.nallijaku.com${thumbnail}`;
+                    }
+                    if (thumbnail.startsWith('/')) {
+                      return thumbnail; // public 폴더의 이미지
+                    }
+                    return `https://api.nallijaku.com/uploads/${thumbnail}`;
+                  };
 
                   return (
                     <div
-                      key={material.id}
+                      key={course.id}
                       className={styles.materialItem}
-                      onClick={() => handleMaterialClick(material.id)}
+                      onClick={() => handleCourseClick(course.id)}
                       style={{ cursor: 'pointer' }}
                     >
                       <div className={styles.imageContainer}>
                         <img
-                          src={material.image.startsWith('http') ? material.image : `https://api.nallijaku.com${material.image}`}
-                          alt={material.alt}
+                          src={getImageUrl(course.thumbnail)}
+                          alt={course.title}
                           className={styles.materialImage}
                           onError={(e) => {
-                            // 이미지 로드 실패 시 placeholder로 대체 (에러 로그는 개발 모드에서만)
-                            if (process.env.NODE_ENV === 'development') {
-                              console.warn('이미지 로드 실패:', material.image);
-                            }
-                            (e.target as HTMLImageElement).src = '/placeholder.png';
+                            console.warn('이미지 로드 실패:', course.thumbnail);
+                            (e.target as HTMLImageElement).src = '/nallijaku.png';
                           }}
                         />
                         <div 
@@ -323,23 +298,36 @@ export default function ResourcesPage() {
                             fontWeight: '600'
                           }}
                         >
-                          {material.category}
-                          {material.subCategory && (
-                            <span style={{ marginLeft: '4px' }}>
-                              - {material.subCategory}
-                            </span>
-                          )}
+                          {course.category}
                         </div>
+                        {course.difficulty && (
+                          <div 
+                            className={styles.difficultyTag}
+                            style={{
+                              position: 'absolute',
+                              top: '10px',
+                              right: '10px',
+                              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                              color: 'white',
+                              padding: '4px 10px',
+                              borderRadius: '12px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            {course.difficulty}
+                          </div>
+                        )}
                       </div>
                       <div className={styles.materialContent}>
-                        <p className={styles.materialTitle}>{material.title}</p>
+                        <p className={styles.materialTitle}>{course.title}</p>
                         <p
                           className={styles.subtitle}
-                          dangerouslySetInnerHTML={{ __html: material.subtitle }}
+                          dangerouslySetInnerHTML={{ __html: course.description || '' }}
                         />
                         <button
                           className={styles.addToCartButton}
-                          onClick={(e) => handleAddToCart(e, material.id)}
+                          onClick={(e) => handleAddToCart(e, course.id)}
                           aria-label="장바구니에 담기"
                         >
                           <IoCartOutline size={18} />
@@ -351,7 +339,7 @@ export default function ResourcesPage() {
                 })
               ) : (
                 <div style={{ textAlign: 'center', padding: '40px', color: '#999', gridColumn: '1 / -1' }}>
-                  <p>해당 카테고리의 학습자료가 없습니다.</p>
+                  <p>해당 카테고리의 코스가 없습니다.</p>
                 </div>
               )}
             </div>
