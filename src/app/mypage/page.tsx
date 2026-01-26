@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 import styles from './page.module.css';
 import api from '@/lib/axios';
 import { FiEdit2, FiSave, FiX, FiAward, FiBook, FiClock, FiTrendingUp } from 'react-icons/fi';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 // 날리자쿠 사업자 정보
 const COMPANY_INFO = {
@@ -303,58 +303,47 @@ export default function MyPage() {
   };
 
   // 견적서 다운로드 함수
-  const downloadQuotation = (inquiry: Inquiry) => {
+  const downloadQuotation = async (inquiry: Inquiry) => {
     const today = new Date();
     const dateStr = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
     const validUntil = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
     const validUntilStr = `${validUntil.getFullYear()}년 ${validUntil.getMonth() + 1}월 ${validUntil.getDate()}일`;
 
+    // 강좌가 없으면 기본 항목 추가
+    const courses = inquiry.courses && inquiry.courses.length > 0 
+      ? inquiry.courses 
+      : [{ id: 0, title: '교육 프로그램', category: '기타', price: 0 }];
+
     // 강좌별 금액 계산
-    const courseItems = inquiry.courses.map((course, idx) => {
+    const courseItems = courses.map((course, idx) => {
       const unitPrice = course.price || 0;
       const quantity = inquiry.studentCount;
       const supplyPrice = unitPrice * quantity;
       const tax = Math.round(supplyPrice * 0.1);
-      return {
-        no: idx + 1,
-        title: course.title,
-        unitPrice,
-        quantity,
-        supplyPrice,
-        tax,
-        total: supplyPrice + tax,
-        remark: ''
-      };
+      return { no: idx + 1, title: course.title, unitPrice, quantity, supplyPrice, tax, total: supplyPrice + tax };
     });
 
-    // 합계 계산
     const totalSupplyPrice = courseItems.reduce((sum, item) => sum + item.supplyPrice, 0);
     const totalTax = courseItems.reduce((sum, item) => sum + item.tax, 0);
     const grandTotal = totalSupplyPrice + totalTax;
 
     // 금액을 한글로 변환
-    const numberToKorean = (num: number) => {
+    const numberToKorean = (num: number): string => {
+      if (num === 0) return '영';
       const units = ['', '만', '억', '조'];
       const digits = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
       const smallUnits = ['', '십', '백', '천'];
-      
-      if (num === 0) return '영';
-      
       let result = '';
       let unitIndex = 0;
-      
       while (num > 0) {
         const chunk = num % 10000;
         if (chunk > 0) {
           let chunkStr = '';
           let tempChunk = chunk;
           let smallUnitIndex = 0;
-          
           while (tempChunk > 0) {
             const digit = tempChunk % 10;
-            if (digit > 0) {
-              chunkStr = digits[digit] + smallUnits[smallUnitIndex] + chunkStr;
-            }
+            if (digit > 0) chunkStr = digits[digit] + smallUnits[smallUnitIndex] + chunkStr;
             tempChunk = Math.floor(tempChunk / 10);
             smallUnitIndex++;
           }
@@ -363,78 +352,278 @@ export default function MyPage() {
         num = Math.floor(num / 10000);
         unitIndex++;
       }
-      
       return result;
     };
 
-    // 엑셀 데이터 구성
-    const wsData = [
-      ['견 적 서'],
-      [],
-      [`작성일: ${dateStr}`],
-      [],
-      [`${inquiry.organizationName} 귀하`],
-      [],
-      ['아래와 같이 견적합니다.'],
-      [],
-      ['[공급자 정보]'],
-      ['사업자등록번호', COMPANY_INFO.registrationNumber],
-      ['상호(법인명)', COMPANY_INFO.companyName],
-      ['대표자 성명', COMPANY_INFO.representative],
-      ['사업장 주소', COMPANY_INFO.address],
-      ['업태', COMPANY_INFO.businessType],
-      ['종목', COMPANY_INFO.businessItem],
-      ['전화번호', COMPANY_INFO.phone],
-      [],
-      ['[견적 금액]'],
-      [`금 ${numberToKorean(grandTotal)}원정 (₩${grandTotal.toLocaleString()})`],
-      [],
-      ['[견적 내역]'],
-      ['No', '강의명', '단가', '수량', '공급가액', '세액(10%)', '합계', '비고'],
-      ...courseItems.map(item => [
-        item.no,
-        item.title,
-        item.unitPrice.toLocaleString(),
-        item.quantity,
-        item.supplyPrice.toLocaleString(),
-        item.tax.toLocaleString(),
-        item.total.toLocaleString(),
-        item.remark
-      ]),
-      [],
-      ['합계', '', '', '', totalSupplyPrice.toLocaleString(), totalTax.toLocaleString(), grandTotal.toLocaleString(), ''],
-      [],
-      ['[기타 사항]'],
-      ['유효기간', `견적일로부터 30일 (${validUntilStr}까지)`],
-      ['결제조건', '계약 후 협의'],
-      ['비고', inquiry.message || ''],
-      [],
-      [],
-      ['본 견적서는 날리자쿠에서 발행한 공식 견적서입니다.']
-    ];
-
-    // 워크시트 생성
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const workbook = new ExcelJS.Workbook();
+    const ws = workbook.addWorksheet('견적서');
 
     // 열 너비 설정
-    ws['!cols'] = [
-      { wch: 8 },   // No
-      { wch: 30 },  // 강의명
-      { wch: 15 },  // 단가
-      { wch: 10 },  // 수량
-      { wch: 15 },  // 공급가액
-      { wch: 15 },  // 세액
-      { wch: 15 },  // 합계
-      { wch: 20 }   // 비고
+    ws.columns = [
+      { width: 10 }, { width: 20 }, { width: 14 }, { width: 16 },
+      { width: 8 }, { width: 14 }, { width: 14 }, { width: 14 }
     ];
 
-    // 워크북 생성
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, '견적서');
+    // 스타일 정의
+    const thinBorder: Partial<ExcelJS.Borders> = {
+      top: { style: 'thin' }, bottom: { style: 'thin' },
+      left: { style: 'thin' }, right: { style: 'thin' }
+    };
+    const thickBorder: Partial<ExcelJS.Borders> = {
+      top: { style: 'medium' }, bottom: { style: 'medium' },
+      left: { style: 'medium' }, right: { style: 'medium' }
+    };
+
+    // 공급자/공급받는자 정보 행 스타일 함수
+    const setLabelStyle = (cell: ExcelJS.Cell) => {
+      cell.font = { bold: true, size: 10, name: '맑은 고딕' };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8F5E9' } };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.border = thinBorder;
+    };
+    const setValueStyle = (cell: ExcelJS.Cell) => {
+      cell.font = { size: 10, name: '맑은 고딕' };
+      cell.alignment = { horizontal: 'left', vertical: 'middle' };
+      cell.border = thinBorder;
+    };
+
+    // Row 1: 견적서 제목
+    ws.mergeCells('A1:H1');
+    const titleCell = ws.getCell('A1');
+    titleCell.value = '견  적  서';
+    titleCell.font = { bold: true, size: 28, name: '맑은 고딕' };
+    titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+    titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8F5E9' } };
+    titleCell.border = thickBorder;
+    ws.getRow(1).height = 45;
+
+    // Row 2~3: 빈 행 병합
+    ws.mergeCells('A2:H3');
+
+    // Row 4: 날짜 (우측)
+    ws.mergeCells('A4:H4');
+    ws.getCell('A4').value = dateStr;
+    ws.getCell('A4').font = { size: 12, name: '맑은 고딕' };
+    ws.getCell('A4').alignment = { horizontal: 'right' };
+
+    // Row 5: 귀하
+    ws.mergeCells('A5:H5');
+    ws.getCell('A5').value = `${inquiry.organizationName} 귀하`;
+    ws.getCell('A5').font = { bold: true, size: 14, name: '맑은 고딕' };
+    ws.getRow(5).height = 30;
+
+    // Row 6: 아래와 같이
+    ws.mergeCells('A6:H6');
+    ws.getCell('A6').value = '아래와 같이 견적합니다.';
+    ws.getCell('A6').font = { size: 11, name: '맑은 고딕' };
+
+    // Row 7: 빈 행
+    ws.mergeCells('A7:H7');
+
+    // Row 8: 공급자/공급받는자 헤더
+    ws.mergeCells('A8:D8');
+    ws.mergeCells('E8:H8');
+    const supplierHeader = ws.getCell('A8');
+    supplierHeader.value = '공  급  자';
+    supplierHeader.font = { bold: true, size: 11, name: '맑은 고딕', color: { argb: 'FFFFFFFF' } };
+    supplierHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E7D32' } };
+    supplierHeader.alignment = { horizontal: 'center', vertical: 'middle' };
+    supplierHeader.border = thinBorder;
+    ws.getRow(8).height = 25;
+
+    const receiverHeader = ws.getCell('E8');
+    receiverHeader.value = '공 급 받 는 자';
+    receiverHeader.font = { bold: true, size: 11, name: '맑은 고딕', color: { argb: 'FFFFFFFF' } };
+    receiverHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E7D32' } };
+    receiverHeader.alignment = { horizontal: 'center', vertical: 'middle' };
+    receiverHeader.border = thinBorder;
+
+    // Row 9: 등록번호/상호
+    ws.mergeCells('B9:D9');
+    ws.mergeCells('F9:H9');
+    setLabelStyle(ws.getCell('A9')); ws.getCell('A9').value = '등록번호';
+    setValueStyle(ws.getCell('B9')); ws.getCell('B9').value = COMPANY_INFO.registrationNumber;
+    setLabelStyle(ws.getCell('E9')); ws.getCell('E9').value = '상호';
+    setValueStyle(ws.getCell('F9')); ws.getCell('F9').value = inquiry.organizationName;
+
+    // Row 10: 상호/담당자 + 도장
+    ws.mergeCells('B10:C10');
+    ws.mergeCells('F10:H10');
+    setLabelStyle(ws.getCell('A10')); ws.getCell('A10').value = '상호';
+    setValueStyle(ws.getCell('B10')); ws.getCell('B10').value = COMPANY_INFO.companyName;
+    setLabelStyle(ws.getCell('E10')); ws.getCell('E10').value = '담당자';
+    setValueStyle(ws.getCell('F10')); ws.getCell('F10').value = inquiry.contactPerson;
+    
+    // D10: 도장 이미지 삽입
+    try {
+      const stampResponse = await fetch('/날쿠인.png');
+      const stampBlob = await stampResponse.blob();
+      const stampBase64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(stampBlob);
+      });
+      
+      const imageId = workbook.addImage({
+        base64: stampBase64.split(',')[1],
+        extension: 'png',
+      });
+      
+      ws.addImage(imageId, {
+        tl: { col: 3, row: 8.5 },
+        ext: { width: 70, height: 70 }
+      });
+    } catch (e) {
+      ws.getCell('D10').value = '【날리자쿠】';
+      ws.getCell('D10').font = { bold: true, size: 12, name: '맑은 고딕', color: { argb: 'FFC62828' } };
+      ws.getCell('D10').alignment = { horizontal: 'center', vertical: 'middle' };
+    }
+
+    // Row 11: 대표자/연락처
+    ws.mergeCells('B11:D11');
+    ws.mergeCells('F11:H11');
+    setLabelStyle(ws.getCell('A11')); ws.getCell('A11').value = '대표자';
+    setValueStyle(ws.getCell('B11')); ws.getCell('B11').value = COMPANY_INFO.representative;
+    setLabelStyle(ws.getCell('E11')); ws.getCell('E11').value = '연락처';
+    setValueStyle(ws.getCell('F11')); ws.getCell('F11').value = inquiry.phone;
+
+    // Row 12: 주소/이메일
+    ws.mergeCells('B12:D12');
+    ws.mergeCells('F12:H12');
+    setLabelStyle(ws.getCell('A12')); ws.getCell('A12').value = '주소';
+    setValueStyle(ws.getCell('B12')); ws.getCell('B12').value = COMPANY_INFO.address;
+    setLabelStyle(ws.getCell('E12')); ws.getCell('E12').value = '이메일';
+    setValueStyle(ws.getCell('F12')); ws.getCell('F12').value = inquiry.email;
+
+    // Row 13: 업태/종목/전화
+    ws.mergeCells('F13:H13');
+    setLabelStyle(ws.getCell('A13')); ws.getCell('A13').value = '업태';
+    setValueStyle(ws.getCell('B13')); ws.getCell('B13').value = COMPANY_INFO.businessType;
+    setLabelStyle(ws.getCell('C13')); ws.getCell('C13').value = '종목';
+    setValueStyle(ws.getCell('D13')); ws.getCell('D13').value = COMPANY_INFO.businessItem;
+    ws.getCell('D13').font = { size: 8, name: '맑은 고딕' };
+    setLabelStyle(ws.getCell('E13')); ws.getCell('E13').value = '전화';
+    setValueStyle(ws.getCell('F13')); ws.getCell('F13').value = COMPANY_INFO.phone;
+
+    // Row 15: 합계금액
+    ws.mergeCells('B15:H15');
+    const amountLabel = ws.getCell('A15');
+    amountLabel.value = '합계금액';
+    amountLabel.font = { bold: true, size: 14, name: '맑은 고딕', color: { argb: 'FFFFFFFF' } };
+    amountLabel.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1565C0' } };
+    amountLabel.alignment = { horizontal: 'center', vertical: 'middle' };
+    amountLabel.border = thickBorder;
+    
+    const amountValue = ws.getCell('B15');
+    amountValue.value = `금 ${numberToKorean(grandTotal)}원정 (₩${grandTotal.toLocaleString()})`;
+    amountValue.font = { bold: true, size: 14, name: '맑은 고딕', color: { argb: 'FFFFFFFF' } };
+    amountValue.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1565C0' } };
+    amountValue.alignment = { horizontal: 'center', vertical: 'middle' };
+    amountValue.border = thickBorder;
+    ws.getRow(15).height = 30;
+
+    // Row 17: 견적 내역 헤더
+    ws.mergeCells('B17:C17');
+    const headers = ['No', '품목 (강의명)', '', '단가', '수량', '공급가액', '세액(10%)', '합계'];
+    headers.forEach((h, i) => {
+      const cell = ws.getCell(17, i + 1);
+      cell.value = h;
+      cell.font = { bold: true, size: 11, name: '맑은 고딕', color: { argb: 'FFFFFFFF' } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E7D32' } };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.border = thinBorder;
+    });
+    ws.getRow(17).height = 25;
+
+    // 강좌 데이터
+    courseItems.forEach((item, idx) => {
+      const r = 18 + idx;
+      ws.mergeCells(`B${r}:C${r}`);
+      ws.getRow(r).height = 22;
+      
+      ws.getCell(`A${r}`).value = item.no;
+      ws.getCell(`A${r}`).alignment = { horizontal: 'center', vertical: 'middle' };
+      ws.getCell(`A${r}`).border = thinBorder;
+      
+      ws.getCell(`B${r}`).value = item.title;
+      ws.getCell(`B${r}`).border = thinBorder;
+      
+      ws.getCell(`D${r}`).value = item.unitPrice;
+      ws.getCell(`D${r}`).numFmt = '#,##0';
+      ws.getCell(`D${r}`).alignment = { horizontal: 'right' };
+      ws.getCell(`D${r}`).border = thinBorder;
+      
+      ws.getCell(`E${r}`).value = item.quantity;
+      ws.getCell(`E${r}`).alignment = { horizontal: 'center' };
+      ws.getCell(`E${r}`).border = thinBorder;
+      
+      ws.getCell(`F${r}`).value = item.supplyPrice;
+      ws.getCell(`F${r}`).numFmt = '#,##0';
+      ws.getCell(`F${r}`).alignment = { horizontal: 'right' };
+      ws.getCell(`F${r}`).border = thinBorder;
+      
+      ws.getCell(`G${r}`).value = item.tax;
+      ws.getCell(`G${r}`).numFmt = '#,##0';
+      ws.getCell(`G${r}`).alignment = { horizontal: 'right' };
+      ws.getCell(`G${r}`).border = thinBorder;
+      
+      ws.getCell(`H${r}`).value = item.total;
+      ws.getCell(`H${r}`).numFmt = '#,##0';
+      ws.getCell(`H${r}`).alignment = { horizontal: 'right' };
+      ws.getCell(`H${r}`).border = thinBorder;
+    });
+
+    // 합계 행
+    const sumRow = 18 + courseItems.length;
+    ws.mergeCells(`A${sumRow}:E${sumRow}`);
+    ws.getCell(`A${sumRow}`).value = '합    계';
+    ws.getCell(`A${sumRow}`).font = { bold: true, size: 11, name: '맑은 고딕' };
+    ws.getCell(`A${sumRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8E6C9' } };
+    ws.getCell(`A${sumRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    ws.getCell(`A${sumRow}`).border = thinBorder;
+    
+    ['F', 'G', 'H'].forEach((col, i) => {
+      const cell = ws.getCell(`${col}${sumRow}`);
+      cell.value = [totalSupplyPrice, totalTax, grandTotal][i];
+      cell.numFmt = '#,##0';
+      cell.font = { bold: true, size: 11, name: '맑은 고딕' };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8E6C9' } };
+      cell.alignment = { horizontal: 'right', vertical: 'middle' };
+      cell.border = thinBorder;
+    });
+
+    // 기타 사항
+    const etcRow = sumRow + 2;
+    const etcItems = [
+      { label: '유효기간', value: `견적일로부터 30일 (${validUntilStr}까지)` },
+      { label: '결제조건', value: '계약 후 협의' },
+      { label: '비고', value: inquiry.message || '-' }
+    ];
+    
+    etcItems.forEach((item, i) => {
+      const r = etcRow + i;
+      ws.mergeCells(`B${r}:H${r}`);
+      setLabelStyle(ws.getCell(`A${r}`));
+      ws.getCell(`A${r}`).value = item.label;
+      setValueStyle(ws.getCell(`B${r}`));
+      ws.getCell(`B${r}`).value = item.value;
+    });
+
+    // 푸터
+    ws.mergeCells(`A${etcRow + 4}:H${etcRow + 4}`);
+    ws.getCell(`A${etcRow + 4}`).value = '본 견적서는 날리자쿠에서 발행한 공식 견적서입니다.';
+    ws.getCell(`A${etcRow + 4}`).font = { size: 9, color: { argb: 'FF888888' }, name: '맑은 고딕' };
+    ws.getCell(`A${etcRow + 4}`).alignment = { horizontal: 'center' };
 
     // 파일 다운로드
-    const fileName = `날리자쿠_견적서_${inquiry.organizationName}_${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}.xlsx`;
-    XLSX.writeFile(wb, fileName);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `날리자쿠_견적서_${inquiry.organizationName}_${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}.xlsx`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const handleBackToCourses = () => {
