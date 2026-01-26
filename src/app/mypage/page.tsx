@@ -6,6 +6,18 @@ import Header from '@/components/Header';
 import styles from './page.module.css';
 import api from '@/lib/axios';
 import { FiEdit2, FiSave, FiX, FiAward, FiBook, FiClock, FiTrendingUp } from 'react-icons/fi';
+import * as XLSX from 'xlsx';
+
+// 날리자쿠 사업자 정보
+const COMPANY_INFO = {
+  registrationNumber: '215-65-00727',
+  companyName: '날리자쿠',
+  representative: '이민상',
+  address: '충청북도 청주시 서원구 서원서로 30-23',
+  businessType: '교육 서비스업',
+  businessItem: '온라인 교육 콘텐츠 제공 및 강사와 기관 매칭 시스템',
+  phone: '010-5029-6452'
+};
 
 interface UserProfile {
   id: number;
@@ -62,6 +74,7 @@ interface Inquiry {
     id: number;
     title: string;
     category: string;
+    price?: number;
   }>;
   createdAt: string;
 }
@@ -166,7 +179,12 @@ export default function MyPage() {
       try {
         const inquiriesResponse = await api.get(`/api/inquiries/my`);
         if (inquiriesResponse.data.success) {
-          setInquiries(inquiriesResponse.data.data);
+          // 백엔드에서 대문자로 오는 상태값을 소문자로 변환
+          const mappedInquiries = inquiriesResponse.data.data.map((inq: any) => ({
+            ...inq,
+            status: inq.status?.toLowerCase() || 'pending'
+          }));
+          setInquiries(mappedInquiries);
         }
       } catch (error) {
         console.log('문의 내역 API 미구현 또는 오류');
@@ -282,6 +300,141 @@ export default function MyPage() {
 
   const handleCourseClick = (course: CourseGroup) => {
     setSelectedCourse(course);
+  };
+
+  // 견적서 다운로드 함수
+  const downloadQuotation = (inquiry: Inquiry) => {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
+    const validUntil = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const validUntilStr = `${validUntil.getFullYear()}년 ${validUntil.getMonth() + 1}월 ${validUntil.getDate()}일`;
+
+    // 강좌별 금액 계산
+    const courseItems = inquiry.courses.map((course, idx) => {
+      const unitPrice = course.price || 0;
+      const quantity = inquiry.studentCount;
+      const supplyPrice = unitPrice * quantity;
+      const tax = Math.round(supplyPrice * 0.1);
+      return {
+        no: idx + 1,
+        title: course.title,
+        unitPrice,
+        quantity,
+        supplyPrice,
+        tax,
+        total: supplyPrice + tax,
+        remark: ''
+      };
+    });
+
+    // 합계 계산
+    const totalSupplyPrice = courseItems.reduce((sum, item) => sum + item.supplyPrice, 0);
+    const totalTax = courseItems.reduce((sum, item) => sum + item.tax, 0);
+    const grandTotal = totalSupplyPrice + totalTax;
+
+    // 금액을 한글로 변환
+    const numberToKorean = (num: number) => {
+      const units = ['', '만', '억', '조'];
+      const digits = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+      const smallUnits = ['', '십', '백', '천'];
+      
+      if (num === 0) return '영';
+      
+      let result = '';
+      let unitIndex = 0;
+      
+      while (num > 0) {
+        const chunk = num % 10000;
+        if (chunk > 0) {
+          let chunkStr = '';
+          let tempChunk = chunk;
+          let smallUnitIndex = 0;
+          
+          while (tempChunk > 0) {
+            const digit = tempChunk % 10;
+            if (digit > 0) {
+              chunkStr = digits[digit] + smallUnits[smallUnitIndex] + chunkStr;
+            }
+            tempChunk = Math.floor(tempChunk / 10);
+            smallUnitIndex++;
+          }
+          result = chunkStr + units[unitIndex] + result;
+        }
+        num = Math.floor(num / 10000);
+        unitIndex++;
+      }
+      
+      return result;
+    };
+
+    // 엑셀 데이터 구성
+    const wsData = [
+      ['견 적 서'],
+      [],
+      [`작성일: ${dateStr}`],
+      [],
+      [`${inquiry.organizationName} 귀하`],
+      [],
+      ['아래와 같이 견적합니다.'],
+      [],
+      ['[공급자 정보]'],
+      ['사업자등록번호', COMPANY_INFO.registrationNumber],
+      ['상호(법인명)', COMPANY_INFO.companyName],
+      ['대표자 성명', COMPANY_INFO.representative],
+      ['사업장 주소', COMPANY_INFO.address],
+      ['업태', COMPANY_INFO.businessType],
+      ['종목', COMPANY_INFO.businessItem],
+      ['전화번호', COMPANY_INFO.phone],
+      [],
+      ['[견적 금액]'],
+      [`금 ${numberToKorean(grandTotal)}원정 (₩${grandTotal.toLocaleString()})`],
+      [],
+      ['[견적 내역]'],
+      ['No', '강의명', '단가', '수량', '공급가액', '세액(10%)', '합계', '비고'],
+      ...courseItems.map(item => [
+        item.no,
+        item.title,
+        item.unitPrice.toLocaleString(),
+        item.quantity,
+        item.supplyPrice.toLocaleString(),
+        item.tax.toLocaleString(),
+        item.total.toLocaleString(),
+        item.remark
+      ]),
+      [],
+      ['합계', '', '', '', totalSupplyPrice.toLocaleString(), totalTax.toLocaleString(), grandTotal.toLocaleString(), ''],
+      [],
+      ['[기타 사항]'],
+      ['유효기간', `견적일로부터 30일 (${validUntilStr}까지)`],
+      ['결제조건', '계약 후 협의'],
+      ['비고', inquiry.message || ''],
+      [],
+      [],
+      ['본 견적서는 날리자쿠에서 발행한 공식 견적서입니다.']
+    ];
+
+    // 워크시트 생성
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // 열 너비 설정
+    ws['!cols'] = [
+      { wch: 8 },   // No
+      { wch: 30 },  // 강의명
+      { wch: 15 },  // 단가
+      { wch: 10 },  // 수량
+      { wch: 15 },  // 공급가액
+      { wch: 15 },  // 세액
+      { wch: 15 },  // 합계
+      { wch: 20 }   // 비고
+    ];
+
+    // 워크북 생성
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '견적서');
+
+    // 파일 다운로드
+    const fileName = `날리자쿠_견적서_${inquiry.organizationName}_${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
   };
 
   const handleBackToCourses = () => {
@@ -960,7 +1113,7 @@ export default function MyPage() {
                             fontWeight: '600',
                             cursor: 'pointer'
                           }}
-                          onClick={() => alert('견적서 다운로드 기능 준비 중')}
+                          onClick={() => downloadQuotation(inquiry)}
                         >
                           📄 견적서 다운로드
                         </button>

@@ -71,7 +71,12 @@ export default function InquiriesPage() {
       setLoadingInquiries(true);
       const response = await api.get('/api/admin/inquiries');
       if (response.data.success) {
-        setInquiries(response.data.data);
+        // 백엔드에서 대문자로 오는 상태값을 소문자로 변환
+        const mappedInquiries = response.data.data.map((inq: any) => ({
+          ...inq,
+          status: inq.status?.toLowerCase() || 'pending'
+        }));
+        setInquiries(mappedInquiries);
       }
     } catch (error) {
       console.error('문의 목록 로드 실패:', error);
@@ -119,7 +124,9 @@ export default function InquiriesPage() {
 
   const handleInquiryStatusChange = async (inquiryId: number, newStatus: string) => {
     try {
-      await api.put(`/api/admin/inquiries/${inquiryId}/status`, { status: newStatus });
+      // 백엔드 API는 대문자 상태값 필요
+      const upperStatus = newStatus.toUpperCase();
+      await api.put(`/api/admin/inquiries/${inquiryId}/status?status=${upperStatus}`);
       setInquiries(inquiries.map(inq => 
         inq.id === inquiryId ? { ...inq, status: newStatus as Inquiry['status'] } : inq
       ));
