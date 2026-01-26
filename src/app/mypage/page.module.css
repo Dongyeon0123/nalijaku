@@ -445,6 +445,12 @@
   box-shadow: 0 6px 18px rgba(52, 152, 219, 0.4);
 }
 
+/* 문의 내역 섹션 */
+.inquiriesSection {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
 /* 설정 섹션 */
 .settingsSection {
   max-width: 600px;

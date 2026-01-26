@@ -90,17 +90,20 @@ function EducationIntroContent() {
     }
 
     try {
+      // 백엔드 API로 문의 신청
+      const api = (await import('@/lib/axios')).default;
+      
       const payload = {
-        schoolName: formData.schoolName,
+        organizationName: formData.schoolName,
         contactPerson: formData.contactPerson,
         phone: formData.phone,
         email: formData.email,
-        studentCount: parseInt(formData.studentCount),
+        studentCount: parseInt(formData.studentCount) || 0,
         budget: formData.budget,
         educationRegion: formData.educationRegion,
         grade: formData.grade,
         preferredDate: formData.preferredDate,
-        additionalInfo: formData.inquiryMessage,
+        message: formData.inquiryMessage,
         services: [
           formData.purchaseInquiry && 'purchaseInquiry',
           formData.schoolVisit && 'schoolVisit',
@@ -108,55 +111,26 @@ function EducationIntroContent() {
           formData.boothEntrustment && 'boothEntrustment',
           formData.other && (formData.otherText || 'other')
         ].filter(Boolean),
-        selectedCourses: cartItems.map(item => ({
-          id: item.id,
-          title: item.title,
-          category: item.category
-        }))
+        courseIds: cartItems.map(item => item.id)
       };
 
-      const response = await fetch('/api/education-inquiries', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await api.post('/api/inquiries', payload);
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('교육 도입 신청 성공:', result);
+      if (response.data.success) {
+        console.log('교육 도입 신청 성공:', response.data);
         alert('교육 도입 신청이 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
-        // 폼 초기화
-        setFormData({
-          schoolName: '',
-          contactPerson: '',
-          phone: '',
-          email: '',
-          studentCount: '',
-          budget: '',
-          educationRegion: '',
-          grade: '',
-          preferredDate: '',
-          message: '',
-          inquiryMessage: '',
-          purchaseInquiry: false,
-          schoolVisit: false,
-          careerExperience: false,
-          boothEntrustment: false,
-          other: false,
-          otherText: '',
-          privacyAgreement: false
-        });
-        setCartItems([]);
+        // 홈으로 리다이렉션
+        window.location.href = '/';
       } else {
-        const errorText = await response.text();
-        console.error('신청 실패:', response.status, errorText);
-        alert('신청 중 오류가 발생했습니다. 백엔드 서버를 확인해주세요.');
+        alert('신청 중 오류가 발생했습니다: ' + (response.data.message || '알 수 없는 오류'));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('교육 도입 신청 오류:', error);
-      alert('신청 중 오류가 발생했습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
+      if (error.response?.status === 401) {
+        alert('로그인이 필요합니다. 로그인 후 다시 시도해주세요.');
+      } else {
+        alert('신청 중 오류가 발생했습니다. 백엔드 API(/api/inquiries)가 구현되어 있는지 확인해주세요.');
+      }
     }
   };
 
@@ -358,6 +332,19 @@ function EducationIntroContent() {
                       <option value="jeju">제주</option>
                       <option value="online">온라인</option>
                     </select>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="preferredDate">희망 일정 <span style={{ color: 'red' }}>*</span></label>
+                    <input
+                      type="text"
+                      id="preferredDate"
+                      name="preferredDate"
+                      value={formData.preferredDate}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="예: 2026년 3월 중, 협의 후 결정"
+                    />
                   </div>
 
                   <div className={styles.formGroup}>

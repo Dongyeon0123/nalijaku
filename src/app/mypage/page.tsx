@@ -48,14 +48,33 @@ interface CourseGroup {
   announcement?: string;
 }
 
+interface Inquiry {
+  id: number;
+  organizationName: string;
+  contactPerson: string;
+  phone: string;
+  email: string;
+  studentCount: number;
+  preferredDate: string;
+  message: string;
+  status: 'pending' | 'reviewing' | 'completed';
+  courses: Array<{
+    id: number;
+    title: string;
+    category: string;
+  }>;
+  createdAt: string;
+}
+
 export default function MyPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
   const [instructorCourses, setInstructorCourses] = useState<CourseGroup[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'profile' | 'courses' | 'settings' | 'certificates'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'courses' | 'inquiries' | 'settings' | 'certificates'>('profile');
   const [selectedCourse, setSelectedCourse] = useState<CourseGroup | null>(null);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   
   // 수정 모드 상태
   const [editMode, setEditMode] = useState({
@@ -141,6 +160,17 @@ export default function MyPage() {
       } catch (error) {
         console.log('수강 강의 목록 API 미구현');
         setEnrolledCourses([]);
+      }
+
+      // 내 문의 내역 조회
+      try {
+        const inquiriesResponse = await api.get(`/api/inquiries/my`);
+        if (inquiriesResponse.data.success) {
+          setInquiries(inquiriesResponse.data.data);
+        }
+      } catch (error) {
+        console.log('문의 내역 API 미구현 또는 오류');
+        setInquiries([]);
       }
 
       // 강사인 경우 담당 강의 목록 조회
@@ -301,6 +331,12 @@ export default function MyPage() {
             내 강의
           </button>
         )}
+        <button
+          className={`${styles.tab} ${activeTab === 'inquiries' ? styles.active : ''}`}
+          onClick={() => setActiveTab('inquiries')}
+        >
+          내 문의 내역
+        </button>
         <button
           className={`${styles.tab} ${activeTab === 'settings' ? styles.active : ''}`}
           onClick={() => setActiveTab('settings')}
@@ -784,6 +820,170 @@ export default function MyPage() {
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'inquiries' && (
+          <div className={styles.inquiriesSection}>
+            <h2 style={{ marginBottom: '24px', fontSize: '1.5rem', fontWeight: '700', color: '#1f2937' }}>
+              📋 내 문의 내역
+            </h2>
+            
+            {inquiries.length === 0 ? (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyIcon}>📝</div>
+                <h3>아직 문의 내역이 없습니다</h3>
+                <p>학습자료를 선택하고 교육 도입 문의를 신청해보세요!</p>
+                <button
+                  className={styles.primaryButton}
+                  onClick={() => router.push('/resources')}
+                >
+                  학습 자료 둘러보기
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {inquiries.map((inquiry) => (
+                  <div
+                    key={inquiry.id}
+                    style={{
+                      backgroundColor: 'white',
+                      borderRadius: '12px',
+                      border: '1px solid #e5e7eb',
+                      padding: '24px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                      <div>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937', marginBottom: '4px' }}>
+                          {inquiry.organizationName}
+                        </h3>
+                        <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                          {new Date(inquiry.createdAt).toLocaleDateString('ko-KR')} 신청
+                        </p>
+                      </div>
+                      <span style={{
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        fontSize: '0.8rem',
+                        fontWeight: '600',
+                        backgroundColor: inquiry.status === 'pending' ? '#FEF3C7' :
+                                        inquiry.status === 'reviewing' ? '#DBEAFE' : '#D1FAE5',
+                        color: inquiry.status === 'pending' ? '#92400E' :
+                               inquiry.status === 'reviewing' ? '#1E40AF' : '#065F46'
+                      }}>
+                        {inquiry.status === 'pending' ? '대기중' :
+                         inquiry.status === 'reviewing' ? '검토중' : '완료'}
+                      </span>
+                    </div>
+                    
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: 'repeat(2, 1fr)', 
+                      gap: '12px',
+                      marginBottom: '16px',
+                      padding: '16px',
+                      backgroundColor: '#f9fafb',
+                      borderRadius: '8px'
+                    }}>
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block' }}>담당자</span>
+                        <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{inquiry.contactPerson}</span>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block' }}>연락처</span>
+                        <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{inquiry.phone}</span>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block' }}>예상 인원</span>
+                        <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{inquiry.studentCount}명</span>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block' }}>희망 일정</span>
+                        <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{inquiry.preferredDate}</span>
+                      </div>
+                    </div>
+                    
+                    {inquiry.courses && inquiry.courses.length > 0 && (
+                      <div style={{ marginBottom: '16px' }}>
+                        <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '8px' }}>
+                          선택한 강좌 ({inquiry.courses.length}개)
+                        </span>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                          {inquiry.courses.map((course) => (
+                            <span
+                              key={course.id}
+                              style={{
+                                padding: '4px 12px',
+                                backgroundColor: '#E0F2FE',
+                                color: '#0369A1',
+                                borderRadius: '16px',
+                                fontSize: '0.8rem',
+                                fontWeight: '500'
+                              }}
+                            >
+                              {course.title}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {inquiry.message && (
+                      <div style={{ 
+                        padding: '12px', 
+                        backgroundColor: '#f3f4f6', 
+                        borderRadius: '8px',
+                        marginBottom: '16px'
+                      }}>
+                        <span style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block', marginBottom: '4px' }}>요청사항</span>
+                        <p style={{ fontSize: '0.9rem', color: '#374151', margin: 0, whiteSpace: 'pre-wrap' }}>
+                          {inquiry.message}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {inquiry.status === 'completed' && (
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <button
+                          style={{
+                            flex: 1,
+                            padding: '12px',
+                            backgroundColor: '#04AD74',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '0.9rem',
+                            fontWeight: '600',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => alert('견적서 다운로드 기능 준비 중')}
+                        >
+                          📄 견적서 다운로드
+                        </button>
+                        <button
+                          style={{
+                            flex: 1,
+                            padding: '12px',
+                            backgroundColor: '#3B82F6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '0.9rem',
+                            fontWeight: '600',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => alert('강의계획서 다운로드 기능 준비 중')}
+                        >
+                          📋 강의계획서 다운로드
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>

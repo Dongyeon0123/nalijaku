@@ -76,9 +76,9 @@ export default function AdminLayout({
 
   const menuItems = [
     { path: '/admin', label: '대시보드', icon: '📊' },
-    { path: '/admin/content', label: '콘텐츠 관리', icon: '📝' },
     { path: '/admin/courses', label: '강의 관리', icon: '🎓' },
     { path: '/admin/instructors', label: '강사 관리', icon: '👨‍🏫' },
+    { path: '/admin/inquiries', label: '문의 관리', icon: '📋' },
     { path: '/admin/users', label: '사용자 관리', icon: '👥' },
     { path: '/admin/statistics', label: '통계', icon: '📈' },
     { path: '/admin/settings', label: '설정', icon: '⚙️' },
