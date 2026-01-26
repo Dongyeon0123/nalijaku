@@ -33,16 +33,18 @@ export default function AdminPage() {
 
         // 교육 도입 신청 통계 - Axios 사용
         try {
-          const educationResponse = await api.get('/api/education-inquiries');
+          const educationResponse = await api.get('/api/admin/inquiries');
           const educationData = educationResponse.data;
-          const applications = educationData.data || [];
+          // 백엔드 응답 구조에 맞게 파싱
+          const applications = educationData.data || educationData.inquiries || educationData || [];
+          console.log('📊 대시보드 - 교육 신청 데이터:', applications);
           setStats(prev => ({
             ...prev,
-            educationApplications: applications.length
+            educationApplications: Array.isArray(applications) ? applications.length : 0
           }));
 
           // 최근 활동 추가 (교육 신청)
-          const educationActivities: RecentActivity[] = applications
+          const educationActivities: RecentActivity[] = (Array.isArray(applications) ? applications : [])
             .slice(0, 3)
             .map((app: any, index: number) => ({
               id: `education-${app.id}-${index}-${Math.random().toString(36).substring(2, 11)}`,
@@ -149,7 +151,7 @@ export default function AdminPage() {
       <div className={styles.dashboardGrid}>
         <div 
           className={styles.card}
-          onClick={() => router.push('/admin/content?tab=education')}
+          onClick={() => router.push('/admin/inquiries')}
           style={{ cursor: 'pointer' }}
         >
           <h3>교육 도입 신청</h3>
@@ -159,7 +161,7 @@ export default function AdminPage() {
         
         <div 
           className={styles.card}
-          onClick={() => router.push('/admin/content?tab=partner')}
+          onClick={() => router.push('/admin/inquiries')}
           style={{ cursor: 'pointer' }}
         >
           <h3>파트너 모집 신청</h3>
