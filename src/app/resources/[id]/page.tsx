@@ -397,7 +397,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                                 margin: 0,
                                 flexShrink: 0
                               }}>
-                                📚 차시 목록
+                                📚 학습 목록
                               </h3>
                               <div style={{ flex: 1, overflowY: 'auto' }}>
                                 {course.learningMaterials[0].lessons && course.learningMaterials[0].lessons.map((lesson) => {
@@ -435,17 +435,6 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                                       }}
                                     >
                                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                                        <div style={{
-                                          padding: '4px 10px',
-                                          backgroundColor: selectedLesson === lesson.id ? '#01c187' : '#e0e0e0',
-                                          color: selectedLesson === lesson.id ? '#fff' : '#666',
-                                          borderRadius: '20px',
-                                          fontSize: '12px',
-                                          fontWeight: '600',
-                                          flexShrink: 0
-                                        }}>
-                                          {lesson.order}차시
-                                        </div>
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                           <div style={{ 
                                             fontSize: '14px', 
@@ -528,7 +517,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                                         padding: '40px'
                                       }}>
                                         <h3 style={{ fontSize: '18px', marginBottom: '8px', margin: 0 }}>PDF를 불러올 수 없습니다</h3>
-                                        <p style={{ fontSize: '14px', margin: '8px 0 0 0' }}>이 차시에는 PDF 파일이 없습니다.</p>
+                                        <p style={{ fontSize: '14px', margin: '8px 0 0 0' }}>이 항목에는 PDF 파일이 없습니다.</p>
                                       </div>
                                     );
                                   }
@@ -544,7 +533,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                                   padding: '40px'
                                 }}>
                                   <h3 style={{ fontSize: '18px', marginBottom: '8px', margin: 0 }}>콘텐츠를 선택해주세요</h3>
-                                  <p style={{ fontSize: '14px', margin: '8px 0 0 0' }}>왼쪽에서 차시를 선택하면 PDF가 표시됩니다.</p>
+                                  <p style={{ fontSize: '14px', margin: '8px 0 0 0' }}>왼쪽에서 항목을 선택하면 PDF가 표시됩니다.</p>
                                 </div>
                               )}
                             </div>

@@ -47,6 +47,93 @@ interface Course {
   courseId?: number; // 속한 코스 ID
 }
 
+// 드래그 가능한 콘텐츠(레슨) 컴포넌트
+function SortableLessonItem({ lesson, courseId, onEdit, onDelete }: {
+  lesson: Lesson;
+  courseId: number;
+  onEdit: (lesson: Lesson) => void;
+  onDelete: (courseId: number, order: number) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: lesson.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? '#e3f2fd' : '#ffffff',
+  };
+
+  const typeColors: { [key: string]: { bg: string; text: string } } = {
+    '이론': { bg: '#E1BEE7', text: '#6A1B9A' },
+    '실습': { bg: '#C8E6C9', text: '#2E7D32' },
+    '게임': { bg: '#FFF9C4', text: '#F57F17' },
+    '토론': { bg: '#B3E5FC', text: '#01579B' },
+    '수료증': { bg: '#FFCDD2', text: '#C62828' }
+  };
+  const typeColor = typeColors[lesson.type || '이론'] || typeColors['이론'];
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        ...style,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '12px',
+        borderRadius: '8px',
+        border: '1px solid #e0e0e0',
+        position: 'relative'
+      }}
+    >
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'grab', color: '#999' }}
+        {...attributes}
+        {...listeners}
+      >
+        <FaGripVertical />
+      </div>
+      <div style={{ flex: 1, marginLeft: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+          <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{lesson.title}</p>
+          <span style={{
+            padding: '2px 8px',
+            backgroundColor: typeColor.bg,
+            color: typeColor.text,
+            borderRadius: '4px',
+            fontSize: '11px',
+            fontWeight: '600'
+          }}>
+            {lesson.type || '이론'}
+          </span>
+        </div>
+        {lesson.description && <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{lesson.description}</p>}
+      </div>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <button
+          onClick={() => onEdit(lesson)}
+          style={{ padding: '6px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+        >
+          수정
+        </button>
+        <button
+          onClick={() => onDelete(courseId, lesson.order)}
+          style={{ padding: '6px 12px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+        >
+          삭제
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // 드래그 가능한 행 컴포넌트
 function SortableRow({ course, onEdit, onDelete, onExpand, isExpanded, coursesList }: {
   course: Course;
@@ -119,9 +206,9 @@ function SortableRow({ course, onEdit, onDelete, onExpand, isExpanded, coursesLi
         <button
           className={styles.expandBtn}
           onClick={() => onExpand(course.id)}
-          title="차시 보기"
+          title="콘텐츠 보기"
         >
-          {isExpanded ? '▼' : '▶'} 차시
+          {isExpanded ? '▼' : '▶'} 콘텐츠
         </button>
         <button
           className={styles.editBtn}
@@ -218,6 +305,49 @@ export default function CoursesPage() {
     } catch (error: any) {
       console.error('❌ 순서 저장 실패:', error);
       alert('순서 저장에 실패했습니다. 백엔드 API를 확인해주세요.');
+    }
+  };
+
+  // 콘텐츠(레슨) 순서 변경 백엔드 저장
+  const saveLessonOrderToBackend = async (courseId: number, orderedLessons: Lesson[]) => {
+    try {
+      const orders = orderedLessons.map((lesson, index) => ({
+        id: lesson.id,
+        order: index + 1
+      }));
+
+      await api.patch(`/api/resources/${courseId}/lessons/reorder`, { orders });
+      console.log('✅ 콘텐츠 순서가 저장되었습니다');
+    } catch (error: any) {
+      console.error('❌ 콘텐츠 순서 저장 실패:', error);
+      // 백엔드 API가 없을 수 있으므로 경고만 표시
+      console.warn('백엔드 콘텐츠 순서 변경 API가 필요합니다: PATCH /api/resources/{id}/lessons/reorder');
+    }
+  };
+
+  // 콘텐츠(레슨) 드래그 종료 핸들러
+  const handleLessonDragEnd = (event: DragEndEvent, courseId: number) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setCourses((prevCourses) => {
+        return prevCourses.map((course) => {
+          if (course.id !== courseId || !course.lessons) return course;
+
+          const oldIndex = course.lessons.findIndex((lesson) => lesson.id === active.id);
+          const newIndex = course.lessons.findIndex((lesson) => lesson.id === over.id);
+
+          const newLessons = arrayMove(course.lessons, oldIndex, newIndex).map((lesson, idx) => ({
+            ...lesson,
+            order: idx + 1
+          }));
+
+          // 백엔드에 순서 변경 저장
+          saveLessonOrderToBackend(courseId, newLessons);
+
+          return { ...course, lessons: newLessons };
+        });
+      });
     }
   };
 
@@ -544,19 +674,23 @@ export default function CoursesPage() {
     }
   };
 
-  // 차시 추가 모달 열기
+  // 콘텐츠 추가 모달 열기
   const handleAddLesson = () => {
+    // 현재 강좌의 lessons 개수 + 1로 order 자동 설정
+    const currentCourse = courses.find(c => c.id === expandedCourseId);
+    const nextOrder = (currentCourse?.lessons?.length || 0) + 1;
+    
     setEditingLesson(null);
-    setLessonFormData({ order: 1, title: '', description: '', type: '이론' });
+    setLessonFormData({ order: nextOrder, title: '', description: '', type: '이론' });
     setLessonPdfFile(null);
     setShowLessonModal(true);
   };
 
-  // 차시 저장
+  // 콘텐츠 저장
   const handleSaveLesson = async (courseId: number) => {
     try {
       if (!lessonFormData.title || !lessonFormData.description) {
-        alert('차시 제목과 설명을 입력해주세요.');
+        alert('제목과 설명을 입력해주세요.');
         return;
       }
 
@@ -630,7 +764,7 @@ export default function CoursesPage() {
             console.log('파싱된 응답 데이터:', responseData);
             console.log('저장된 PDF URL:', responseData.pdfUrl || responseData.data?.pdfUrl || '없음');
 
-            alert(editingLesson ? '차시가 수정되었습니다.' : '차시가 추가되었습니다.');
+            alert(editingLesson ? '콘텐츠가 수정되었습니다.' : '콘텐츠가 추가되었습니다.');
             setShowLessonModal(false);
             setLessonFormData({ order: 1, title: '', description: '', type: '이론' });
             setLessonPdfFile(null);
@@ -638,17 +772,17 @@ export default function CoursesPage() {
             loadCourses();
           } catch (parseError) {
             console.error('응답 파싱 실패:', parseError);
-            alert('차시가 저장되었으나 응답 처리 중 오류가 발생했습니다.');
+            alert('콘텐츠가 저장되었으나 응답 처리 중 오류가 발생했습니다.');
             loadCourses();
           }
         } else {
           try {
             const errorData = JSON.parse(xhr.responseText);
             console.error('백엔드 에러:', errorData);
-            alert(`차시 저장에 실패했습니다: ${errorData.message || '알 수 없는 오류'}`);
+            alert(`콘텐츠 저장에 실패했습니다: ${errorData.message || '알 수 없는 오류'}`);
           } catch {
             console.error('응답 파싱 실패:', xhr.statusText);
-            alert(`차시 저장에 실패했습니다: ${xhr.statusText}`);
+            alert(`콘텐츠 저장에 실패했습니다: ${xhr.statusText}`);
           }
         }
         setIsUploading(false);
@@ -656,7 +790,7 @@ export default function CoursesPage() {
 
       xhr.addEventListener('error', () => {
         console.error('업로드 실패:', xhr.statusText);
-        alert('차시 저장 중 오류가 발생했습니다.');
+        alert('콘텐츠 저장 중 오류가 발생했습니다.');
         setIsUploading(false);
         setUploadProgress(0);
       });
@@ -689,26 +823,26 @@ export default function CoursesPage() {
       xhr.withCredentials = true;
       xhr.send(formData);
     } catch (error) {
-      console.error('차시 저장 실패:', error);
+      console.error('콘텐츠 저장 실패:', error);
       const errorMsg = error instanceof Error ? error.message : '알 수 없는 오류';
-      alert('차시 저장 중 오류가 발생했습니다: ' + errorMsg);
+      alert('콘텐츠 저장 중 오류가 발생했습니다: ' + errorMsg);
       setIsUploading(false);
       setUploadProgress(0);
     }
   };
 
-  // 차시 삭제
+  // 콘텐츠 삭제
   const handleDeleteLesson = async (courseId: number, order: number) => {
     if (confirm('정말 삭제하시겠습니까?')) {
       try {
         // Axios 사용 (인증 토큰 자동 포함)
         await api.delete(`/api/resources/${courseId}/lessons/${order}`);
-        alert('차시가 삭제되었습니다.');
+        alert('콘텐츠가 삭제되었습니다.');
         loadCourses();
       } catch (error: any) {
-        console.error('차시 삭제 실패:', error);
+        console.error('콘텐츠 삭제 실패:', error);
         const errorMsg = error.response?.data?.message || error.message || '알 수 없는 오류';
-        alert(`차시 삭제 중 오류가 발생했습니다: ${errorMsg}`);
+        alert(`콘텐츠 삭제 중 오류가 발생했습니다: ${errorMsg}`);
       }
     }
   };
@@ -949,61 +1083,41 @@ export default function CoursesPage() {
                           <tr style={{ backgroundColor: '#f9f9f9' }}>
                             <td colSpan={6} style={{ padding: '20px' }}>
                               <div style={{ marginBottom: '16px' }}>
-                                <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>차시 관리</h4>
+                                <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>학습 콘텐츠 관리</h4>
                                 {course.lessons && course.lessons.length > 0 ? (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    {course.lessons.map((lesson, idx) => {
-                                      const typeColors: { [key: string]: { bg: string; text: string } } = {
-                                        '이론': { bg: '#E1BEE7', text: '#6A1B9A' },
-                                        '실습': { bg: '#C8E6C9', text: '#2E7D32' },
-                                        '게임': { bg: '#FFF9C4', text: '#F57F17' },
-                                        '토론': { bg: '#B3E5FC', text: '#01579B' },
-                                        '수료증': { bg: '#FFCDD2', text: '#C62828' }
-                                      };
-                                      const typeColor = typeColors[lesson.type || '이론'] || typeColors['이론'];
-                                      
-                                      return (
-                                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e0e0e0', position: 'relative' }}>
-                                          <div style={{ flex: 1 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                              <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{lesson.order}차시</p>
-                                              <span style={{ 
-                                                padding: '2px 8px', 
-                                                backgroundColor: typeColor.bg, 
-                                                color: typeColor.text, 
-                                                borderRadius: '4px', 
-                                                fontSize: '11px', 
-                                                fontWeight: '600' 
-                                              }}>
-                                                {lesson.type || '이론'}
-                                              </span>
-                                            </div>
-                                            <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#565D6D' }}>제목: {lesson.title}</p>
-                                            {lesson.description && <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>{lesson.description}</p>}
-                                          </div>
-                                          <div style={{ display: 'flex', gap: '8px' }}>
-                                            <button
-                                              onClick={() => {
-                                                setEditingLesson(lesson);
-                                                setLessonFormData({ order: lesson.order, title: lesson.title, description: lesson.description, type: lesson.type || '이론' });
-                                                setLessonPdfFile(null);
-                                                setShowLessonModal(true);
-                                              }}
-                                              style={{ padding: '6px 12px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>수정</button>
-                                            <button
-                                              onClick={() => handleDeleteLesson(course.id, lesson.order)}
-                                              style={{ padding: '6px 12px', backgroundColor: '#FFEBEE', color: '#D32F2F', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>삭제</button>
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
+                                  <DndContext
+                                    sensors={sensors}
+                                    collisionDetection={closestCenter}
+                                    onDragEnd={(event) => handleLessonDragEnd(event, course.id)}
+                                  >
+                                    <SortableContext
+                                      items={course.lessons.map((l) => l.id)}
+                                      strategy={verticalListSortingStrategy}
+                                    >
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        {course.lessons.map((lesson) => (
+                                          <SortableLessonItem
+                                            key={lesson.id}
+                                            lesson={lesson}
+                                            courseId={course.id}
+                                            onEdit={(lesson) => {
+                                              setEditingLesson(lesson);
+                                              setLessonFormData({ order: lesson.order, title: lesson.title, description: lesson.description, type: lesson.type || '이론' });
+                                              setLessonPdfFile(null);
+                                              setShowLessonModal(true);
+                                            }}
+                                            onDelete={handleDeleteLesson}
+                                          />
+                                        ))}
+                                      </div>
+                                    </SortableContext>
+                                  </DndContext>
                                 ) : (
-                                  <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>등록된 차시가 없습니다.</p>
+                                  <p style={{ margin: 0, fontSize: '14px', color: '#999' }}>등록된 콘텐츠가 없습니다.</p>
                                 )}
                                 <button
                                   onClick={() => handleAddLesson()}
-                                  style={{ marginTop: '12px', padding: '8px 16px', backgroundColor: '#04AD74', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>+ 차시 추가</button>
+                                  style={{ marginTop: '12px', padding: '8px 16px', backgroundColor: '#04AD74', color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>+ 콘텐츠 추가</button>
                               </div>
                             </td>
                           </tr>
@@ -1212,12 +1326,12 @@ export default function CoursesPage() {
         </div>
       )}
 
-      {/* 차시 관리 모달 */}
+      {/* 콘텐츠 관리 모달 */}
       {showLessonModal && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
-              <h3>{editingLesson ? '차시 수정' : '차시 추가'}</h3>
+              <h3>{editingLesson ? '콘텐츠 수정' : '콘텐츠 추가'}</h3>
               <button
                 className={styles.modalCloseBtn}
                 onClick={() => setShowLessonModal(false)}
@@ -1228,17 +1342,7 @@ export default function CoursesPage() {
             </div>
             <div className={styles.modalBody}>
               <div className={styles.formGroup}>
-                <label>차시 번호</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={lessonFormData.order}
-                  onChange={(e) => setLessonFormData({ ...lessonFormData, order: parseInt(e.target.value) })}
-                  placeholder="차시 번호를 입력하세요"
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>차시 타입</label>
+                <label>타입</label>
                 <select
                   value={lessonFormData.type}
                   onChange={(e) => setLessonFormData({ ...lessonFormData, type: e.target.value })}
@@ -1252,12 +1356,12 @@ export default function CoursesPage() {
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label>차시 제목</label>
+                <label>제목</label>
                 <input
                   type="text"
                   value={lessonFormData.title}
                   onChange={(e) => setLessonFormData({ ...lessonFormData, title: e.target.value })}
-                  placeholder="차시 제목을 입력하세요"
+                  placeholder="제목을 입력하세요"
                 />
               </div>
               <div className={styles.formGroup}>
@@ -1265,7 +1369,7 @@ export default function CoursesPage() {
                 <textarea
                   value={lessonFormData.description}
                   onChange={(e) => setLessonFormData({ ...lessonFormData, description: e.target.value })}
-                  placeholder="차시 설명을 입력하세요"
+                  placeholder="설명을 입력하세요"
                   rows={4}
                 />
               </div>
