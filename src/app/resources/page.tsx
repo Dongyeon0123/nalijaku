@@ -7,7 +7,7 @@ import baseStyles from '../education-intro/page.module.css';
 import styles from './page.module.css';
 import { FiSearch } from 'react-icons/fi';
 import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
-import { IoCartOutline, IoChevronDown } from 'react-icons/io5';
+import { IoCartOutline, IoChevronDown, IoChevronForward, IoChevronBack } from 'react-icons/io5';
 import { MdDragIndicator } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
@@ -446,6 +446,18 @@ export default function ResourcesPage() {
           )}
         </div>
 
+        {/* 장바구니 토글 버튼 (사이드바 닫혔을 때) */}
+        {!isCartOpen && cartItems.length > 0 && (
+          <button
+            className={styles.cartToggleButton}
+            onClick={() => setIsCartOpen(true)}
+            aria-label="장바구니 열기"
+          >
+            <IoChevronBack size={24} />
+            <div className={styles.cartBadge}>{cartItems.length}</div>
+          </button>
+        )}
+
         {/* 장바구니 사이드바 */}
         <div 
           className={`${styles.cartSidebar} ${isCartOpen ? styles.cartOpen : ''}`}
@@ -474,8 +486,9 @@ export default function ResourcesPage() {
             <button
               className={styles.cartClose}
               onClick={() => setIsCartOpen(false)}
+              aria-label="장바구니 닫기"
             >
-              ✕
+              <IoChevronForward size={24} />
             </button>
           </div>
 
