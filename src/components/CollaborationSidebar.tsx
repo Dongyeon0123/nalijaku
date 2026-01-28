@@ -9,6 +9,7 @@ export default function CollaborationSidebar() {
   const pathname = usePathname();
   const [isDarkBackground, setIsDarkBackground] = React.useState(true);
   const isAdminPage = pathname?.startsWith('/admin');
+  const isHomePage = pathname === '/';
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -67,8 +68,8 @@ export default function CollaborationSidebar() {
     }
   }, []);
 
-  // 관리자 페이지에서는 고객센터 버튼 숨김
-  if (isAdminPage) {
+  // 홈 페이지가 아니거나 관리자 페이지에서는 고객센터 버튼 숨김
+  if (!isHomePage || isAdminPage) {
     return null;
   }
 

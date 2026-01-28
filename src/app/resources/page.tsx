@@ -7,7 +7,8 @@ import baseStyles from '../education-intro/page.module.css';
 import styles from './page.module.css';
 import { FiSearch } from 'react-icons/fi';
 import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
-import { IoCartOutline } from 'react-icons/io5';
+import { IoCartOutline, IoChevronDown } from 'react-icons/io5';
+import { MdDragIndicator } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 
@@ -54,6 +55,8 @@ interface Lesson {
 
 interface CartItem extends Course {
   quantity: number;
+  selectedModules?: number[]; // 선택된 모듈(레슨) ID 배열
+  droneOption?: 'none' | 'purchase' | 'rental'; // 드론 교구 옵션
 }
 
 export default function ResourcesPage() {
@@ -61,6 +64,9 @@ export default function ResourcesPage() {
   const [selectedCategory, setSelectedCategory] = React.useState('전체');
   const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
+  const [expandedItems, setExpandedItems] = React.useState<number[]>([]); // 펼쳐진 아이템 ID 배열
+  const [cartWidth, setCartWidth] = React.useState(400); // 장바구니 너비
+  const [isResizing, setIsResizing] = React.useState(false);
   const [coursesData, setCoursesData] = React.useState<Course[]>([]);
   const [categories, setCategories] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -181,7 +187,12 @@ export default function ResourcesPage() {
           item.id === courseId ? { ...item, quantity: item.quantity + 1 } : item
         ));
       } else {
-        setCartItems([...cartItems, { ...course, quantity: 1 }]);
+        setCartItems([...cartItems, { 
+          ...course, 
+          quantity: 1,
+          selectedModules: [],
+          droneOption: 'none'
+        }]);
       }
       setIsCartOpen(true);
     }
@@ -190,6 +201,95 @@ export default function ResourcesPage() {
   const handleRemoveFromCart = (courseId: number) => {
     setCartItems(cartItems.filter(item => item.id !== courseId));
   };
+
+  // 모듈 선택 토글
+  const handleModuleToggle = (courseId: number, moduleId: number) => {
+    setCartItems(cartItems.map(item => {
+      if (item.id === courseId) {
+        const selectedModules = item.selectedModules || [];
+        const isSelected = selectedModules.includes(moduleId);
+        return {
+          ...item,
+          selectedModules: isSelected
+            ? selectedModules.filter(id => id !== moduleId)
+            : [...selectedModules, moduleId]
+        };
+      }
+      return item;
+    }));
+  };
+
+  // 드론 교구 옵션 변경
+  const handleDroneOptionChange = (courseId: number, option: 'none' | 'purchase' | 'rental') => {
+    setCartItems(cartItems.map(item =>
+      item.id === courseId ? { ...item, droneOption: option } : item
+    ));
+  };
+
+  // 아코디언 토글
+  const toggleExpanded = (courseId: number) => {
+    setExpandedItems(prev =>
+      prev.includes(courseId)
+        ? prev.filter(id => id !== courseId)
+        : [...prev, courseId]
+    );
+  };
+
+  // 총 가격 계산
+  const calculateTotalPrice = () => {
+    let total = 0;
+    cartItems.forEach(item => {
+      // 선택된 모듈 가격 합산
+      const selectedModules = item.selectedModules || [];
+      const modules = item.learningMaterials || [];
+      selectedModules.forEach(moduleId => {
+        const module = modules.find(m => m.id === moduleId);
+        if (module && module.price) {
+          total += module.price;
+        }
+      });
+
+      // 드론 교구 가격 추가 (현재는 0원)
+      if (item.droneOption === 'purchase') {
+        total += 0; // 구매 가격
+      } else if (item.droneOption === 'rental') {
+        total += 0; // 대여 가격
+      }
+    });
+    return total;
+  };
+
+  // 리사이즈 핸들러
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  React.useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      
+      const newWidth = window.innerWidth - e.clientX;
+      // 최소 300px, 최대 800px
+      if (newWidth >= 300 && newWidth <= 800) {
+        setCartWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   const handleCreateClass = () => {
     if (cartItems.length === 0) {
@@ -347,7 +447,24 @@ export default function ResourcesPage() {
         </div>
 
         {/* 장바구니 사이드바 */}
-        <div className={`${styles.cartSidebar} ${isCartOpen ? styles.cartOpen : ''}`}>
+        <div 
+          className={`${styles.cartSidebar} ${isCartOpen ? styles.cartOpen : ''}`}
+          style={{ width: `${cartWidth}px` }}
+        >
+          {/* 리사이즈 핸들 */}
+          <div 
+            className={styles.resizeHandle}
+            onMouseDown={handleMouseDown}
+          >
+            <div className={styles.resizeButton}>
+              <div className={styles.resizeDots}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+          
           <div className={styles.cartHeader}>
             <div>
               <span style={{ fontSize: '24px', fontWeight: 600 }}>수업 쇼핑 카트 확인</span>
@@ -367,22 +484,124 @@ export default function ResourcesPage() {
               <p className={styles.emptyCart}>장바구니가 비어있습니다.</p>
             ) : (
               <div className={styles.cartItems}>
-                {cartItems.map((item) => (
-                  <div key={item.id} className={styles.cartItem}>
-                    <div className={styles.cartItemInfo}>
-                      <h4>{item.title}</h4>
+                {cartItems.map((item) => {
+                  const isDrone = item.category === '드론';
+                  const modules = item.learningMaterials || [];
+                  const isExpanded = expandedItems.includes(item.id);
+                  
+                  return (
+                    <div key={item.id} className={styles.cartItem}>
+                      {/* 헤더 (항상 보임) */}
+                      <div 
+                        className={styles.cartItemHeader}
+                        onClick={() => toggleExpanded(item.id)}
+                      >
+                        <div className={styles.cartItemTitle}>
+                          <h4>{item.title}</h4>
+                          <span className={styles.itemCount}>
+                            {modules.length > 0 && `${modules.length}개 모듈`}
+                            {isDrone && modules.length > 0 && ' • '}
+                            {isDrone && '드론 교구 옵션'}
+                          </span>
+                        </div>
+                        <IoChevronDown 
+                          className={`${styles.chevronIcon} ${isExpanded ? styles.chevronExpanded : ''}`}
+                          size={20}
+                        />
+                      </div>
+
+                      {/* 펼쳐지는 내용 */}
+                      <div className={`${styles.cartItemContent} ${isExpanded ? styles.contentExpanded : ''}`}>
+                        <div className={styles.cartItemInfo}>
+                          {/* 모듈 선택 */}
+                          {modules.length > 0 && (
+                            <div className={styles.moduleSelection}>
+                              <p className={styles.moduleTitle}>모듈 선택:</p>
+                              {modules.map((module, index) => (
+                                <label key={module.id} className={styles.moduleCheckbox}>
+                                  <input
+                                    type="checkbox"
+                                    checked={(item.selectedModules || []).includes(module.id)}
+                                    onChange={() => handleModuleToggle(item.id, module.id)}
+                                  />
+                                  <span className={styles.moduleName}>
+                                    {module.title || `모듈 ${index + 1}`}
+                                  </span>
+                                  <span className={styles.modulePrice}>
+                                    {module.price ? `${module.price.toLocaleString()}원` : '0원'}
+                                  </span>
+                                </label>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* 드론 교구 옵션 */}
+                          {isDrone && (
+                            <div className={styles.droneOptions}>
+                              <p className={styles.droneTitle}>드론 교구:</p>
+                              <div className={styles.droneRadioGroup}>
+                                <label className={styles.droneRadio}>
+                                  <input
+                                    type="radio"
+                                    name={`drone-${item.id}`}
+                                    checked={item.droneOption === 'none'}
+                                    onChange={() => handleDroneOptionChange(item.id, 'none')}
+                                  />
+                                  <span>선택 안함</span>
+                                </label>
+                                <label className={styles.droneRadio}>
+                                  <input
+                                    type="radio"
+                                    name={`drone-${item.id}`}
+                                    checked={item.droneOption === 'purchase'}
+                                    onChange={() => handleDroneOptionChange(item.id, 'purchase')}
+                                  />
+                                  <span>교구 구매 (0원)</span>
+                                </label>
+                                <label className={styles.droneRadio}>
+                                  <input
+                                    type="radio"
+                                    name={`drone-${item.id}`}
+                                    checked={item.droneOption === 'rental'}
+                                    onChange={() => handleDroneOptionChange(item.id, 'rental')}
+                                  />
+                                  <span>교구 대여 (0원)</span>
+                                </label>
+                              </div>
+                            </div>
+                          )}
+
+                          <button
+                            className={styles.removeBtn}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveFromCart(item.id);
+                            }}
+                          >
+                            제거
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <button
-                      className={styles.removeBtn}
-                      onClick={() => handleRemoveFromCart(item.id)}
-                    >
-                      제거
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
+
+          {/* 총 가격 표시 */}
+          {cartItems.length > 0 && (
+            <div style={{ padding: '0 20px' }}>
+              <div className={styles.totalPriceSection}>
+                <div className={styles.totalPriceRow}>
+                  <span className={styles.totalPriceLabel}>총 금액</span>
+                  <span className={styles.totalPriceValue}>
+                    {calculateTotalPrice().toLocaleString()}원
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div style={{ width: '100%', textAlign: 'center' }}>
             <p style={{ fontSize: '14px', color: 'grey' }}>위 수업들을 바탕으로<br></br>기관별 맞춤형 수업을 제작해드릴게요 !</p>

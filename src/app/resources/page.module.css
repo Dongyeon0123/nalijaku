@@ -777,21 +777,76 @@
 /* 장바구니 사이드바 */
 .cartSidebar {
   position: fixed;
-  left: -400px;
+  right: -100%;
   top: 0;
-  width: 350px;
   height: 100vh;
   background: #ffffff;
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  transition: left 0.3s ease;
+  transition: right 0.3s ease;
   z-index: 1000;
-  border-right: 1px solid #e0e0e0;
+  border-left: 1px solid #e0e0e0;
 }
 
 .cartSidebar.cartOpen {
-  left: 0;
+  right: 0;
+}
+
+/* 리사이즈 핸들 */
+.resizeHandle {
+  position: absolute;
+  left: -16px;
+  top: 0;
+  width: 32px;
+  height: 100%;
+  cursor: ew-resize;
+  background: transparent;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resizeButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 60px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  cursor: ew-resize;
+}
+
+.resizeHandle:hover .resizeButton {
+  border-color: #04AD74;
+  box-shadow: 0 2px 12px rgba(4, 173, 116, 0.3);
+}
+
+.resizeDots {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+}
+
+.resizeDots span {
+  width: 3px;
+  height: 3px;
+  background: #999;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.resizeHandle:hover .resizeDots span {
+  background: #04AD74;
 }
 
 .cartHeader {
@@ -850,23 +905,74 @@
 
 .cartItem {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
+  flex-direction: column;
   background: #f8f8f8;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.cartItemInfo {
+.cartItem:hover {
+  border-color: #04AD74;
+  box-shadow: 0 2px 8px rgba(4, 173, 116, 0.1);
+}
+
+/* 헤더 (항상 보임) */
+.cartItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.cartItemHeader:hover {
+  background: #f0f0f0;
+}
+
+.cartItemTitle {
   flex: 1;
 }
 
-.cartItemInfo h4 {
+.cartItemTitle h4 {
   font-size: 14px;
   font-weight: 600;
   color: #383838;
   margin: 0 0 4px 0;
+}
+
+.itemCount {
+  font-size: 12px;
+  color: #888;
+}
+
+.chevronIcon {
+  color: #666;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.chevronExpanded {
+  transform: rotate(180deg);
+}
+
+/* 펼쳐지는 콘텐츠 */
+.cartItemContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.contentExpanded {
+  max-height: 1000px;
+  padding: 0 16px 16px 16px;
+}
+
+.cartItemInfo {
+  width: 100%;
 }
 
 .cartItemInfo p {
@@ -875,20 +981,163 @@
   margin: 0;
 }
 
+/* 모듈 선택 스타일 */
+.moduleSelection {
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.moduleTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #383838;
+  margin: 0 0 8px 0;
+}
+
+.moduleCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.moduleCheckbox:hover {
+  color: #04AD74;
+}
+
+.moduleCheckbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #04AD74;
+  flex-shrink: 0;
+}
+
+.moduleName {
+  flex: 1;
+  user-select: none;
+}
+
+.modulePrice {
+  font-weight: 600;
+  color: #04AD74;
+  margin-left: auto;
+  user-select: none;
+}
+
+/* 드론 교구 옵션 스타일 */
+.droneOptions {
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #fff8e1;
+  border-radius: 6px;
+  border: 1px solid #ffe082;
+  animation: fadeIn 0.3s ease;
+}
+
+.droneTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #383838;
+  margin: 0 0 8px 0;
+}
+
+.droneRadioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.droneRadio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.droneRadio:hover {
+  color: #04AD74;
+}
+
+.droneRadio input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #04AD74;
+}
+
+.droneRadio span {
+  user-select: none;
+}
+
 .removeBtn {
   background: #ff6b6b;
   color: #ffffff;
   border: none;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
-  transition: background 0.2s ease;
-  margin-left: 8px;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-top: 8px;
 }
 
 .removeBtn:hover {
   background: #ff5252;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+/* 총 가격 섹션 */
+.totalPriceSection {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 2px solid #04AD74;
+  box-sizing: border-box;
+}
+
+.totalPriceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.totalPriceLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #383838;
+}
+
+.totalPriceValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: #04AD74;
 }
 
 .createClassBtn {

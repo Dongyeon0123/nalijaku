@@ -8,6 +8,12 @@ import styles from './page.module.css';
 import { BiMessageDetail } from "react-icons/bi";
 import { useSearchParams } from 'next/navigation';
 
+interface Material {
+  id: number;
+  title: string;
+  price?: number;
+}
+
 interface CartItem {
   id: number;
   category: string;
@@ -17,6 +23,9 @@ interface CartItem {
   title: string;
   subtitle: string;
   quantity: number;
+  selectedModules?: number[];
+  droneOption?: 'none' | 'purchase' | 'rental';
+  learningMaterials?: Material[];
 }
 
 function EducationIntroContent() {
@@ -42,6 +51,31 @@ function EducationIntroContent() {
 
   const handleRemoveItem = (itemId: number) => {
     setCartItems(cartItems.filter(item => item.id !== itemId));
+  };
+
+  // 총 가격 계산
+  const calculateTotalPrice = () => {
+    let total = 0;
+    cartItems.forEach(item => {
+      const selectedModules = item.selectedModules || [];
+      const materials = item.learningMaterials || [];
+      
+      // 선택된 모듈 가격 합산
+      selectedModules.forEach(moduleId => {
+        const module = materials.find(m => m.id === moduleId);
+        if (module && module.price) {
+          total += module.price;
+        }
+      });
+
+      // 드론 교구 가격 추가 (현재는 0원)
+      if (item.droneOption === 'purchase') {
+        total += 0; // 구매 가격
+      } else if (item.droneOption === 'rental') {
+        total += 0; // 대여 가격
+      }
+    });
+    return total;
   };
 
   const [formData, setFormData] = React.useState({
@@ -111,7 +145,13 @@ function EducationIntroContent() {
           formData.boothEntrustment && 'boothEntrustment',
           formData.other && (formData.otherText || 'other')
         ].filter(Boolean),
-        courseIds: cartItems.map(item => item.id)
+        courseIds: cartItems.map(item => item.id),
+        // 세부 선택사항 추가
+        courseDetails: cartItems.map(item => ({
+          courseId: item.id,
+          selectedModules: item.selectedModules || [],
+          droneOption: item.droneOption || 'none'
+        }))
       };
 
       const response = await api.post('/api/inquiries', payload);
@@ -179,33 +219,85 @@ function EducationIntroContent() {
                   {cartItems.length > 0 && (
                     <div style={{ marginBottom: '30px', padding: '15px', backgroundColor: '#f8f8f8', borderRadius: '8px', border: '1px solid #e0e0e0', width: '70%' }}>
                       <h3 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#383838' }}>선택된 학습자료</h3>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {cartItems.map((item) => (
-                          <div key={item.id} style={{ padding: '8px', backgroundColor: '#ffffff', borderRadius: '6px', border: '1px solid #e0e0e0', fontSize: '13px', color: '#606060', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <div style={{ fontWeight: '600', color: '#383838', marginBottom: '4px' }}>{item.title}</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {cartItems.map((item) => {
+                          const selectedModules = item.selectedModules || [];
+                          const materials = item.learningMaterials || [];
+                          const isDrone = item.category === '드론';
+                          
+                          return (
+                            <div key={item.id} style={{ padding: '12px', backgroundColor: '#ffffff', borderRadius: '6px', border: '1px solid #e0e0e0' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ fontWeight: '600', color: '#383838', fontSize: '14px', marginBottom: '4px' }}>{item.title}</div>
+                                  <div style={{ fontSize: '11px', color: '#999', marginBottom: '8px' }}>{item.category}</div>
+                                  
+                                  {/* 선택된 모듈 표시 */}
+                                  {selectedModules.length > 0 && (
+                                    <div style={{ marginTop: '8px' }}>
+                                      <div style={{ fontSize: '12px', fontWeight: '600', color: '#04AD74', marginBottom: '4px' }}>📚 선택된 모듈:</div>
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        {selectedModules.map((moduleId) => {
+                                          const module = materials.find(m => m.id === moduleId);
+                                          return module ? (
+                                            <div key={moduleId} style={{ fontSize: '11px', color: '#606060', paddingLeft: '8px' }}>
+                                              • {module.title} {module.price ? `(${module.price.toLocaleString()}원)` : ''}
+                                            </div>
+                                          ) : null;
+                                        })}
+                                      </div>
+                                    </div>
+                                  )}
+                                  
+                                  {/* 드론 교구 옵션 표시 */}
+                                  {isDrone && item.droneOption && item.droneOption !== 'none' && (
+                                    <div style={{ marginTop: '8px' }}>
+                                      <div style={{ fontSize: '12px', fontWeight: '600', color: '#7B1FA2', marginBottom: '4px' }}>🚁 드론 교구:</div>
+                                      <div style={{ fontSize: '11px', color: '#606060', paddingLeft: '8px' }}>
+                                        • {item.droneOption === 'purchase' ? '교구 구매' : '교구 대여'}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                                <button
+                                  onClick={() => handleRemoveItem(item.id)}
+                                  style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: '12px',
+                                    cursor: 'pointer',
+                                    color: 'grey',
+                                    padding: '4px 8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'color 0.2s ease',
+                                    flexShrink: 0
+                                  }}
+                                  onMouseEnter={(e) => (e.currentTarget.style.color = '#ff5252')}
+                                  onMouseLeave={(e) => (e.currentTarget.style.color = 'grey')}
+                                >
+                                  ✕
+                                </button>
+                              </div>
                             </div>
-                            <button
-                              onClick={() => handleRemoveItem(item.id)}
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                fontSize: '12px',
-                                cursor: 'pointer',
-                                color: 'grey',
-                                padding: '4px 8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                transition: 'color 0.2s ease'
-                              }}
-                              onMouseEnter={(e) => (e.currentTarget.style.color = '#ff5252')}
-                              onMouseLeave={(e) => (e.currentTarget.style.color = '#ff6b6b')}
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
+                          );
+                        })}
+                      </div>
+                      
+                      {/* 총 가격 표시 */}
+                      <div style={{ 
+                        marginTop: '16px', 
+                        paddingTop: '16px', 
+                        borderTop: '2px solid #e0e0e0',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <span style={{ fontSize: '15px', fontWeight: '700', color: '#383838' }}>총 금액</span>
+                        <span style={{ fontSize: '18px', fontWeight: '700', color: '#04AD74' }}>
+                          {calculateTotalPrice().toLocaleString()}원
+                        </span>
                       </div>
                     </div>
                   )}
