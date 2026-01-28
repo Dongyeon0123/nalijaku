@@ -556,7 +556,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
       </div>
 
       {isMounted && isLoginOpen && createPortal(
-        <div className={styles.modalOverlay} onClick={handleCloseModal}>
+        <div className={styles.modalOverlay}>
           {modalType === 'login' ? (
             <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
               <div className={styles.modalHeader}>
@@ -689,7 +689,7 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                 {signupStep === 1 && (
                   <>
                     <div className={styles.experienceRow}>
-                      <p className={styles.experienceLabel}>드론 강의 경험 <span style={{ color: 'red' }}>*</span></p>
+                      <p className={styles.experienceLabel}>강의 경험 <span style={{ color: 'red' }}>*</span></p>
                       <div className={styles.toggleGroup}>
                         <button
                           type="button"
