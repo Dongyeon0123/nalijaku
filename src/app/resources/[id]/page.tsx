@@ -8,6 +8,32 @@ import styles from './page.module.css';
 import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
 import api from '@/lib/axios';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+// PDFViewer를 동적 import (SSR 방지)
+const PDFViewer = dynamic(() => import('@/components/PDFViewer'), {
+  ssr: false,
+  loading: () => (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100%',
+      gap: '20px'
+    }}>
+      <div style={{
+        width: '50px',
+        height: '50px',
+        border: '4px solid #f0f0f0',
+        borderTop: '4px solid #04AD74',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite'
+      }} />
+      <p style={{ color: '#666', fontSize: '14px' }}>PDF 뷰어 로딩 중...</p>
+    </div>
+  )
+});
 
 
 interface MaterialDetailProps {
@@ -58,6 +84,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
   const [selectedLesson, setSelectedLesson] = React.useState<number | null>(1);
   const [course, setCourse] = React.useState<Course | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [pdfLoading, setPdfLoading] = React.useState(false);
   const resolvedParams = React.use(params);
   const router = useRouter();
 
@@ -151,6 +178,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
 
   // 차시 버튼 클릭 핸들러
   const handleLessonClick = React.useCallback((lesson: { id: number }) => {
+    setPdfLoading(true);
     setSelectedLesson(lesson.id);
   }, []);
 
@@ -496,13 +524,14 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                                   
                                   if (selectedLessonData && selectedLessonData.pdfUrl) {
                                     const fullPdfUrl = `https://api.nallijaku.com${selectedLessonData.pdfUrl}`;
-                                    const pdfViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullPdfUrl)}&embedded=true`;
                                     
                                     return (
-                                      <iframe
-                                        src={pdfViewerUrl}
-                                        style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
-                                        title="PDF Viewer"
+                                      <PDFViewer
+                                        key={selectedLesson}
+                                        pdfUrl={fullPdfUrl}
+                                        onLoadComplete={() => {
+                                          setPdfLoading(false);
+                                        }}
                                       />
                                     );
                                   } else {
