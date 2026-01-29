@@ -400,31 +400,50 @@ export default function MyPage() {
       }
     });
 
-    // 강사비 추가 (항상)
-    const instructorPrice = 50000;
-    const instructorSupplyPrice = instructorPrice;
+    // 총 수업시간 계산 (모든 선택된 모듈의 duration 합계)
+    let totalHours = 0;
+    courses.forEach((course) => {
+      const courseDetail = (inquiry as any).courseDetails?.find((cd: any) => cd.courseId === course.id);
+      const selectedModules = courseDetail?.selectedModules || [];
+      
+      if (selectedModules.length > 0 && course.learningMaterials) {
+        selectedModules.forEach((moduleId: number) => {
+          const module = course.learningMaterials?.find((m: any) => m.id === moduleId);
+          if (module && module.duration) {
+            const durationHours = parseInt(module.duration.replace(/[^0-9]/g, '')) || 0;
+            totalHours += durationHours;
+          }
+        });
+      }
+    });
+
+    console.log('📊 총 수업시간:', totalHours);
+
+    // 강사비 추가 (2시간당 60,000원 = 시간당 30,000원)
+    const instructorPricePerHour = 30000;
+    const instructorSupplyPrice = totalHours * instructorPricePerHour;
     const instructorTax = Math.round(instructorSupplyPrice * 0.1);
     courseItems.push({
       no: itemNo++,
-      title: '강사',
-      duration: '-',
-      unitPrice: instructorPrice,
+      title: '주강사',
+      duration: `${totalHours}시간`,
+      unitPrice: instructorPricePerHour,
       quantity: 1,
       supplyPrice: instructorSupplyPrice,
       tax: instructorTax,
       total: instructorSupplyPrice + instructorTax
     });
 
-    // 보조강사비 추가 (학생 수 15명 초과 시)
+    // 보조강사비 추가 (학생 수 15명 초과 시, 2시간당 20,000원 = 시간당 10,000원)
     if (inquiry.studentCount > 15) {
-      const assistantPrice = 30000;
-      const assistantSupplyPrice = assistantPrice;
+      const assistantPricePerHour = 10000;
+      const assistantSupplyPrice = totalHours * assistantPricePerHour;
       const assistantTax = Math.round(assistantSupplyPrice * 0.1);
       courseItems.push({
         no: itemNo++,
         title: '보조강사',
-        duration: '-',
-        unitPrice: assistantPrice,
+        duration: `${totalHours}시간`,
+        unitPrice: assistantPricePerHour,
         quantity: 1,
         supplyPrice: assistantSupplyPrice,
         tax: assistantTax,
