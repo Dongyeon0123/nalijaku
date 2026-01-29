@@ -32,7 +32,6 @@ export default function PDFViewer({ pdfUrl, onLoadComplete }: PDFViewerProps) {
         setLoading(true);
         setError('');
 
-        // PDF 문서 로드
         const loadingTask = pdfjsLib.getDocument(pdfUrl);
         const pdf = await loadingTask.promise;
         
@@ -41,7 +40,6 @@ export default function PDFViewer({ pdfUrl, onLoadComplete }: PDFViewerProps) {
         pdfDocRef.current = pdf;
         setNumPages(pdf.numPages);
         
-        // 첫 페이지 렌더링
         await renderPage(pdf, 1);
         
         setLoading(false);
@@ -72,10 +70,8 @@ export default function PDFViewer({ pdfUrl, onLoadComplete }: PDFViewerProps) {
       const page = await pdf.getPage(pageNumber);
       const viewport = page.getViewport({ scale });
 
-      // 기존 캔버스 제거
       canvasContainerRef.current.innerHTML = '';
 
-      // 새 캔버스 생성
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       
@@ -124,6 +120,10 @@ export default function PDFViewer({ pdfUrl, onLoadComplete }: PDFViewerProps) {
     }
   };
 
+  const handleOpenNewWindow = () => {
+    window.open(pdfUrl, '_blank', 'width=1200,height=800');
+  };
+
   if (error) {
     return (
       <div style={{
@@ -148,7 +148,6 @@ export default function PDFViewer({ pdfUrl, onLoadComplete }: PDFViewerProps) {
       height: '100%',
       backgroundColor: '#f5f5f5'
     }}>
-      {/* 컨트롤 바 */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -159,7 +158,6 @@ export default function PDFViewer({ pdfUrl, onLoadComplete }: PDFViewerProps) {
         gap: '16px',
         flexShrink: 0
       }}>
-        {/* 페이지 네비게이션 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
             onClick={() => handlePageChange(currentPage - 1)}
@@ -176,7 +174,7 @@ export default function PDFViewer({ pdfUrl, onLoadComplete }: PDFViewerProps) {
               transition: 'all 0.2s'
             }}
           >
-            ←
+            ← 이전
           </button>
           <span style={{ fontSize: '14px', fontWeight: '600', color: '#333', minWidth: '80px', textAlign: 'center' }}>
             {currentPage} / {numPages}
@@ -196,11 +194,10 @@ export default function PDFViewer({ pdfUrl, onLoadComplete }: PDFViewerProps) {
               transition: 'all 0.2s'
             }}
           >
-            →
+            다음 →
           </button>
         </div>
 
-        {/* 줌 컨트롤 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
             onClick={handleZoomOut}
@@ -240,9 +237,34 @@ export default function PDFViewer({ pdfUrl, onLoadComplete }: PDFViewerProps) {
             +
           </button>
         </div>
+
+        <button
+          onClick={handleOpenNewWindow}
+          style={{
+            padding: '6px 16px',
+            backgroundColor: '#2196F3',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600',
+            transition: 'all 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#1976D2';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#2196F3';
+          }}
+        >
+          새 창으로 열기
+        </button>
       </div>
 
-      {/* PDF 캔버스 컨테이너 */}
       <div 
         ref={canvasContainerRef}
         style={{
