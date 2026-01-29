@@ -310,6 +310,20 @@ export default function ResourcesPage() {
       alert('장바구니에 자료를 추가해주세요.');
       return;
     }
+    
+    // 모듈이 있는 강좌에서 모듈을 선택하지 않은 경우 체크
+    const itemsWithoutModules = cartItems.filter(item => {
+      const hasModules = item.learningMaterials && item.learningMaterials.length > 0;
+      const selectedModules = item.selectedModules || [];
+      return hasModules && selectedModules.length === 0;
+    });
+    
+    if (itemsWithoutModules.length > 0) {
+      const titles = itemsWithoutModules.map(item => `"${item.title}"`).join(', ');
+      alert(`다음 강좌의 모듈을 선택해주세요:\n\n${titles}\n\n장바구니에서 강좌를 펼쳐 모듈을 선택할 수 있습니다.`);
+      return;
+    }
+    
     // 장바구니 데이터를 URL 쿼리 파라미터로 인코딩
     const cartData = JSON.stringify(cartItems);
     const encodedCart = encodeURIComponent(cartData);
