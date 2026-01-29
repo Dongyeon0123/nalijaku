@@ -194,6 +194,8 @@ export default function ResourcesPage() {
           selectedModules: [],
           droneOption: 'none'
         }]);
+        // 새로 추가된 아이템은 자동으로 펼쳐지게
+        setExpandedItems([...expandedItems, courseId]);
       }
       setIsCartOpen(true);
     }
@@ -252,13 +254,15 @@ export default function ResourcesPage() {
   const calculateTotalPrice = () => {
     let total = 0;
     cartItems.forEach(item => {
-      // 선택된 모듈 가격 합산
+      // 선택된 모듈 가격 합산 (price * duration)
       const selectedModules = item.selectedModules || [];
       const modules = item.learningMaterials || [];
       selectedModules.forEach(moduleId => {
         const module = modules.find(m => m.id === moduleId);
         if (module && module.price) {
-          total += module.price;
+          // duration에서 숫자만 추출 (예: "2시간" -> 2)
+          const durationHours = module.duration ? parseInt(module.duration.replace(/[^0-9]/g, '')) || 0 : 0;
+          total += module.price * durationHours;
         }
       });
 
@@ -558,21 +562,29 @@ export default function ResourcesPage() {
                           {modules.length > 0 && (
                             <div className={styles.moduleSelection}>
                               <p className={styles.moduleTitle}>모듈 선택:</p>
-                              {modules.map((module, index) => (
-                                <label key={module.id} className={styles.moduleCheckbox}>
-                                  <input
-                                    type="checkbox"
-                                    checked={(item.selectedModules || []).includes(module.id)}
-                                    onChange={() => handleModuleToggle(item.id, module.id)}
-                                  />
-                                  <span className={styles.moduleName}>
-                                    {module.title || `모듈 ${index + 1}`}
-                                  </span>
-                                  <span className={styles.modulePrice}>
-                                    {module.price ? `${module.price.toLocaleString()}원` : '0원'}
-                                  </span>
-                                </label>
-                              ))}
+                              {modules.map((module, index) => {
+                                // duration에서 숫자만 추출 (예: "2시간" -> 2)
+                                const durationHours = module.duration ? parseInt(module.duration.replace(/[^0-9]/g, '')) || 0 : 0;
+                                const totalPrice = (module.price || 0) * durationHours;
+                                
+                                return (
+                                  <label key={module.id} className={styles.moduleCheckbox}>
+                                    <input
+                                      type="checkbox"
+                                      checked={(item.selectedModules || []).includes(module.id)}
+                                      onChange={() => handleModuleToggle(item.id, module.id)}
+                                    />
+                                    <div className={styles.moduleInfo}>
+                                      <span className={styles.moduleName}>
+                                        {module.title || `모듈 ${index + 1}`}
+                                      </span>
+                                      <span className={styles.modulePrice}>
+                                        {module.duration || '0시간'} {totalPrice.toLocaleString()}원
+                                      </span>
+                                    </div>
+                                  </label>
+                                );
+                              })}
                             </div>
                           )}
 

@@ -1055,7 +1055,7 @@
 
 .moduleCheckbox {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   padding: 6px 0;
   font-size: 13px;
@@ -1074,17 +1074,26 @@
   cursor: pointer;
   accent-color: #04AD74;
   flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.moduleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
 }
 
 .moduleName {
-  flex: 1;
   user-select: none;
+  font-weight: 500;
+  color: #333;
 }
 
 .modulePrice {
+  font-size: 12px;
   font-weight: 600;
   color: #04AD74;
-  margin-left: auto;
   user-select: none;
 }
 

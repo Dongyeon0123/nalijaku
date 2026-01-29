@@ -79,6 +79,7 @@ interface Inquiry {
       id: number;
       title: string;
       price?: number;
+      duration?: string;
     }>;
   }>;
   courseDetails?: Array<{
@@ -340,14 +341,20 @@ export default function MyPage() {
         selectedModules.forEach((moduleId: number) => {
           const module = course.learningMaterials?.find((m: any) => m.id === moduleId);
           if (module) {
-            const unitPrice = module.price || 0;
+            console.log('📊 모듈 데이터:', module);
+            console.log('📊 duration:', module.duration);
+            
+            // duration에서 숫자만 추출 (예: "2시간" -> 2)
+            const durationHours = module.duration ? parseInt(module.duration.replace(/[^0-9]/g, '')) || 1 : 1;
+            const pricePerUnit = module.price || 0; // (40분)당 가격
             const quantity = inquiry.studentCount;
-            const supplyPrice = unitPrice * quantity;
+            const supplyPrice = durationHours * pricePerUnit; // 학생 수 제외
             const tax = Math.round(supplyPrice * 0.1);
             courseItems.push({
               no: itemNo++,
               title: `${course.title} - ${module.title}`,
-              unitPrice,
+              duration: module.duration || '1시간',
+              unitPrice: pricePerUnit,
               quantity,
               supplyPrice,
               tax,
@@ -359,11 +366,12 @@ export default function MyPage() {
         // 선택된 모듈이 없으면 코스 전체 가격
         const unitPrice = course.price || 0;
         const quantity = inquiry.studentCount;
-        const supplyPrice = unitPrice * quantity;
+        const supplyPrice = unitPrice; // 학생 수 제외
         const tax = Math.round(supplyPrice * 0.1);
         courseItems.push({
           no: itemNo++,
           title: course.title,
+          duration: '-',
           unitPrice,
           quantity,
           supplyPrice,
@@ -382,6 +390,7 @@ export default function MyPage() {
         courseItems.push({
           no: itemNo++,
           title: `${course.title} - ${droneTitle}`,
+          duration: '-',
           unitPrice: dronePrice,
           quantity: droneQuantity,
           supplyPrice,
@@ -390,6 +399,38 @@ export default function MyPage() {
         });
       }
     });
+
+    // 강사비 추가 (항상)
+    const instructorPrice = 50000;
+    const instructorSupplyPrice = instructorPrice;
+    const instructorTax = Math.round(instructorSupplyPrice * 0.1);
+    courseItems.push({
+      no: itemNo++,
+      title: '강사',
+      duration: '-',
+      unitPrice: instructorPrice,
+      quantity: 1,
+      supplyPrice: instructorSupplyPrice,
+      tax: instructorTax,
+      total: instructorSupplyPrice + instructorTax
+    });
+
+    // 보조강사비 추가 (학생 수 15명 초과 시)
+    if (inquiry.studentCount > 15) {
+      const assistantPrice = 30000;
+      const assistantSupplyPrice = assistantPrice;
+      const assistantTax = Math.round(assistantSupplyPrice * 0.1);
+      courseItems.push({
+        no: itemNo++,
+        title: '보조강사',
+        duration: '-',
+        unitPrice: assistantPrice,
+        quantity: 1,
+        supplyPrice: assistantSupplyPrice,
+        tax: assistantTax,
+        total: assistantSupplyPrice + assistantTax
+      });
+    }
 
     const totalSupplyPrice = courseItems.reduce((sum, item) => sum + item.supplyPrice, 0);
     const totalTax = courseItems.reduce((sum, item) => sum + item.tax, 0);
@@ -592,7 +633,7 @@ export default function MyPage() {
 
     // Row 17: 견적 내역 헤더
     ws.mergeCells('B17:C17');
-    const headers = ['No', '품목 (강의명)', '', '단가', '수량', '공급가액', '세액(10%)', '합계'];
+    const headers = ['No', '품목 (강의명)', '', '수업시간(h)', '(40분)당', '공급가액', '세액(10%)', '합계'];
     headers.forEach((h, i) => {
       const cell = ws.getCell(17, i + 1);
       cell.value = h;
@@ -616,13 +657,15 @@ export default function MyPage() {
       ws.getCell(`B${r}`).value = item.title;
       ws.getCell(`B${r}`).border = thinBorder;
       
-      ws.getCell(`D${r}`).value = item.unitPrice;
-      ws.getCell(`D${r}`).numFmt = '#,##0';
-      ws.getCell(`D${r}`).alignment = { horizontal: 'right' };
+      // D열: 수업시간(h) - duration
+      ws.getCell(`D${r}`).value = item.duration;
+      ws.getCell(`D${r}`).alignment = { horizontal: 'center' };
       ws.getCell(`D${r}`).border = thinBorder;
       
-      ws.getCell(`E${r}`).value = item.quantity;
-      ws.getCell(`E${r}`).alignment = { horizontal: 'center' };
+      // E열: (40분)당 - 모듈 가격
+      ws.getCell(`E${r}`).value = item.unitPrice;
+      ws.getCell(`E${r}`).numFmt = '#,##0';
+      ws.getCell(`E${r}`).alignment = { horizontal: 'right' };
       ws.getCell(`E${r}`).border = thinBorder;
       
       ws.getCell(`F${r}`).value = item.supplyPrice;
