@@ -25,6 +25,7 @@ interface CartItem {
   quantity: number;
   selectedModules?: number[];
   droneOption?: 'none' | 'purchase' | 'rental';
+  droneQuantity?: number;
   learningMaterials?: Material[];
 }
 
@@ -68,11 +69,12 @@ function EducationIntroContent() {
         }
       });
 
-      // 드론 교구 가격 추가 (현재는 0원)
+      // 드론 교구 가격 추가 (개수 반영)
+      const droneQuantity = item.droneQuantity || 0;
       if (item.droneOption === 'purchase') {
-        total += 0; // 구매 가격
+        total += 25000 * droneQuantity;
       } else if (item.droneOption === 'rental') {
-        total += 0; // 대여 가격
+        total += 10000 * droneQuantity;
       }
     });
     return total;
@@ -118,6 +120,43 @@ function EducationIntroContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // 필수 입력 항목 검증
+    if (!formData.schoolName.trim()) {
+      alert('기관명을 입력해주세요.');
+      document.getElementById('schoolName')?.focus();
+      return;
+    }
+    
+    if (!formData.contactPerson.trim()) {
+      alert('담당자명을 입력해주세요.');
+      document.getElementById('contactPerson')?.focus();
+      return;
+    }
+    
+    if (!formData.phone.trim()) {
+      alert('연락처를 입력해주세요.');
+      document.getElementById('phone')?.focus();
+      return;
+    }
+    
+    if (!formData.email.trim()) {
+      alert('이메일 주소를 입력해주세요.');
+      document.getElementById('email')?.focus();
+      return;
+    }
+    
+    if (!formData.studentCount.trim() || parseInt(formData.studentCount) <= 0) {
+      alert('예상 학생 수를 입력해주세요.');
+      document.getElementById('studentCount')?.focus();
+      return;
+    }
+    
+    if (!formData.preferredDate.trim()) {
+      alert('희망 일정을 입력해주세요.');
+      document.getElementById('preferredDate')?.focus();
+      return;
+    }
+    
     if (!formData.privacyAgreement) {
       alert('개인정보 수집 및 이용에 동의해주세요.');
       return;
@@ -150,14 +189,18 @@ function EducationIntroContent() {
         courseDetails: cartItems.map(item => ({
           courseId: item.id,
           selectedModules: item.selectedModules || [],
-          droneOption: item.droneOption || 'none'
+          droneOption: item.droneOption || 'none',
+          droneQuantity: item.droneQuantity || 0
         }))
       };
+
+      // 디버깅: 전송 데이터 확인
+      console.log('📤 전송 데이터:', JSON.stringify(payload, null, 2));
 
       const response = await api.post('/api/inquiries', payload);
 
       if (response.data.success) {
-        console.log('교육 도입 신청 성공:', response.data);
+        console.log('✅ 교육 도입 신청 성공:', response.data);
         alert('교육 도입 신청이 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
         // 홈으로 리다이렉션
         window.location.href = '/';
@@ -165,9 +208,18 @@ function EducationIntroContent() {
         alert('신청 중 오류가 발생했습니다: ' + (response.data.message || '알 수 없는 오류'));
       }
     } catch (error: any) {
-      console.error('교육 도입 신청 오류:', error);
+      console.error('❌ 교육 도입 신청 오류:', error);
+      
+      // 디버깅: 에러 상세 정보
+      console.log('📋 에러 응답:', error.response?.data);
+      console.log('📋 에러 상태:', error.response?.status);
+      console.log('📋 에러 헤더:', error.response?.headers);
+      
       if (error.response?.status === 401) {
         alert('로그인이 필요합니다. 로그인 후 다시 시도해주세요.');
+      } else if (error.response?.status === 400) {
+        const errorMsg = error.response?.data?.message || error.response?.data?.error || '요청 데이터가 올바르지 않습니다.';
+        alert(`신청 중 오류가 발생했습니다: ${errorMsg}\n\n콘솔을 확인해주세요.`);
       } else {
         alert('신청 중 오류가 발생했습니다. 백엔드 API(/api/inquiries)가 구현되어 있는지 확인해주세요.');
       }
@@ -254,7 +306,10 @@ function EducationIntroContent() {
                                     <div style={{ marginTop: '8px' }}>
                                       <div style={{ fontSize: '12px', fontWeight: '600', color: '#7B1FA2', marginBottom: '4px' }}>🚁 드론 교구:</div>
                                       <div style={{ fontSize: '11px', color: '#606060', paddingLeft: '8px' }}>
-                                        • {item.droneOption === 'purchase' ? '교구 구매' : '교구 대여'}
+                                        • {item.droneOption === 'purchase' ? '교구 구매' : '교구 대여'} × {item.droneQuantity || 1}개
+                                        <span style={{ color: '#04AD74', fontWeight: '600', marginLeft: '4px' }}>
+                                          ({((item.droneOption === 'purchase' ? 25000 : 10000) * (item.droneQuantity || 1)).toLocaleString()}원)
+                                        </span>
                                       </div>
                                     </div>
                                   )}

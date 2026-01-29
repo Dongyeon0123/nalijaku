@@ -75,6 +75,17 @@ interface Inquiry {
     title: string;
     category: string;
     price?: number;
+    learningMaterials?: Array<{
+      id: number;
+      title: string;
+      price?: number;
+    }>;
+  }>;
+  courseDetails?: Array<{
+    courseId: number;
+    selectedModules: number[];
+    droneOption: 'none' | 'purchase' | 'rental';
+    droneQuantity?: number;
   }>;
   createdAt: string;
 }
@@ -314,13 +325,70 @@ export default function MyPage() {
       ? inquiry.courses 
       : [{ id: 0, title: '교육 프로그램', category: '기타', price: 0 }];
 
-    // 강좌별 금액 계산
-    const courseItems = courses.map((course, idx) => {
-      const unitPrice = course.price || 0;
-      const quantity = inquiry.studentCount;
-      const supplyPrice = unitPrice * quantity;
-      const tax = Math.round(supplyPrice * 0.1);
-      return { no: idx + 1, title: course.title, unitPrice, quantity, supplyPrice, tax, total: supplyPrice + tax };
+    // 강좌별 금액 계산 (선택된 모듈 + 드론 교구 포함)
+    const courseItems: any[] = [];
+    let itemNo = 1;
+
+    courses.forEach((course) => {
+      // courseDetails에서 해당 코스의 세부 정보 찾기
+      const courseDetail = (inquiry as any).courseDetails?.find((cd: any) => cd.courseId === course.id);
+      const selectedModules = courseDetail?.selectedModules || [];
+      const droneOption = courseDetail?.droneOption || 'none';
+
+      // 선택된 모듈이 있으면 모듈별로 항목 추가
+      if (selectedModules.length > 0 && course.learningMaterials) {
+        selectedModules.forEach((moduleId: number) => {
+          const module = course.learningMaterials?.find((m: any) => m.id === moduleId);
+          if (module) {
+            const unitPrice = module.price || 0;
+            const quantity = inquiry.studentCount;
+            const supplyPrice = unitPrice * quantity;
+            const tax = Math.round(supplyPrice * 0.1);
+            courseItems.push({
+              no: itemNo++,
+              title: `${course.title} - ${module.title}`,
+              unitPrice,
+              quantity,
+              supplyPrice,
+              tax,
+              total: supplyPrice + tax
+            });
+          }
+        });
+      } else {
+        // 선택된 모듈이 없으면 코스 전체 가격
+        const unitPrice = course.price || 0;
+        const quantity = inquiry.studentCount;
+        const supplyPrice = unitPrice * quantity;
+        const tax = Math.round(supplyPrice * 0.1);
+        courseItems.push({
+          no: itemNo++,
+          title: course.title,
+          unitPrice,
+          quantity,
+          supplyPrice,
+          tax,
+          total: supplyPrice + tax
+        });
+      }
+
+      // 드론 교구 옵션 추가
+      if (course.category === '드론' && droneOption !== 'none') {
+        const dronePrice = droneOption === 'purchase' ? 25000 : 10000;
+        const droneTitle = droneOption === 'purchase' ? '드론 교구 구매' : '드론 교구 대여';
+        const droneQuantity = courseDetail?.droneQuantity || 1;
+        const supplyPrice = dronePrice * droneQuantity;
+        const tax = Math.round(supplyPrice * 0.1);
+        courseItems.push({
+          no: itemNo++,
+          title: `${course.title} - ${droneTitle}`,
+          unitPrice: dronePrice,
+          quantity: droneQuantity,
+          supplyPrice,
+          tax,
+          total: supplyPrice + tax
+        });
+      }
     });
 
     const totalSupplyPrice = courseItems.reduce((sum, item) => sum + item.supplyPrice, 0);
@@ -1254,22 +1322,102 @@ export default function MyPage() {
                         <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '8px' }}>
                           선택한 강좌 ({inquiry.courses.length}개)
                         </span>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                          {inquiry.courses.map((course) => (
-                            <span
-                              key={course.id}
-                              style={{
-                                padding: '4px 12px',
-                                backgroundColor: '#E0F2FE',
-                                color: '#0369A1',
-                                borderRadius: '16px',
-                                fontSize: '0.8rem',
-                                fontWeight: '500'
-                              }}
-                            >
-                              {course.title}
-                            </span>
-                          ))}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {inquiry.courses.map((course) => {
+                            // courseDetails에서 해당 코스의 세부 정보 찾기
+                            const courseDetail = inquiry.courseDetails?.find(
+                              (cd) => cd.courseId === course.id
+                            );
+                            const selectedModules = courseDetail?.selectedModules || [];
+                            const droneOption = courseDetail?.droneOption || 'none';
+                            const isDrone = course.category === '드론';
+
+                            return (
+                              <div
+                                key={course.id}
+                                style={{
+                                  padding: '12px',
+                                  backgroundColor: '#f9fafb',
+                                  border: '1px solid #e5e7eb',
+                                  borderRadius: '8px'
+                                }}
+                              >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                  <span style={{
+                                    padding: '4px 12px',
+                                    backgroundColor: '#E0F2FE',
+                                    color: '#0369A1',
+                                    borderRadius: '16px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '500'
+                                  }}>
+                                    {course.title}
+                                  </span>
+                                  {course.category && (
+                                    <span style={{
+                                      padding: '4px 10px',
+                                      backgroundColor: '#E8F5E9',
+                                      color: '#2E7D32',
+                                      borderRadius: '12px',
+                                      fontSize: '0.75rem',
+                                      fontWeight: '600'
+                                    }}>
+                                      {course.category}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* 선택된 모듈 표시 */}
+                                {selectedModules.length > 0 && course.learningMaterials && (
+                                  <div style={{
+                                    marginTop: '8px',
+                                    padding: '10px',
+                                    backgroundColor: 'white',
+                                    borderRadius: '6px',
+                                    border: '1px solid #e5e7eb'
+                                  }}>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#04AD74', marginBottom: '6px' }}>
+                                      📚 선택된 모듈:
+                                    </div>
+                                    {selectedModules.map((moduleId) => {
+                                      const module = course.learningMaterials?.find((m) => m.id === moduleId);
+                                      return module ? (
+                                        <div key={moduleId} style={{ fontSize: '0.85rem', color: '#374151', padding: '4px 0', paddingLeft: '8px' }}>
+                                          • {module.title}
+                                          {module.price && (
+                                            <span style={{ color: '#04AD74', fontWeight: '600', marginLeft: '4px' }}>
+                                              ({module.price.toLocaleString()}원)
+                                            </span>
+                                          )}
+                                        </div>
+                                      ) : null;
+                                    })}
+                                  </div>
+                                )}
+
+                                {/* 드론 교구 옵션 표시 */}
+                                {isDrone && droneOption !== 'none' && (
+                                  <div style={{
+                                    marginTop: '8px',
+                                    padding: '10px',
+                                    backgroundColor: '#FFF8E1',
+                                    border: '1px solid #FFE082',
+                                    borderRadius: '6px'
+                                  }}>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#7B1FA2', marginBottom: '4px' }}>
+                                      🚁 드론 교구:
+                                    </div>
+                                    <div style={{ fontSize: '0.85rem', color: '#374151', paddingLeft: '8px' }}>
+                                      {droneOption === 'purchase' ? '교구 구매' : '교구 대여'} × {courseDetail?.droneQuantity || 1}개
+                                      <span style={{ color: '#04AD74', fontWeight: '600', marginLeft: '4px' }}>
+                                        ({((droneOption === 'purchase' ? 25000 : 10000) * (courseDetail?.droneQuantity || 1)).toLocaleString()}원)
+                                      </span>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     )}

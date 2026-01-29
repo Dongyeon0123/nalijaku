@@ -1219,3 +1219,90 @@
     left: 0;
   }
 }
+
+/* 드론 교구 개수 선택 */
+.droneQuantitySection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.quantityLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #383838;
+  margin: 0;
+}
+
+.quantityControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quantityBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #04AD74;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quantityBtn:hover:not(:disabled) {
+  background: #00A169;
+  transform: scale(1.05);
+}
+
+.quantityBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.quantityInput {
+  width: 50px;
+  height: 28px;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #383838;
+  padding: 0 4px;
+}
+
+.quantityInput:focus {
+  outline: none;
+  border-color: #04AD74;
+}
+
+/* 숫자 입력 스피너 제거 */
+.quantityInput::-webkit-inner-spin-button,
+.quantityInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.quantityInput[type=number] {
+  -moz-appearance: textfield;
+}
+
+.quantityPrice {
+  font-size: 13px;
+  font-weight: 700;
+  color: #04AD74;
+  margin-left: auto;
+}

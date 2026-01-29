@@ -365,3 +365,94 @@
     flex-direction: column;
   }
 }
+
+/* 강좌 세부 정보 스타일 */
+.courseItem {
+  padding: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.courseHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.categoryBadge {
+  padding: 4px 10px;
+  background: #E8F5E9;
+  color: #2E7D32;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.modulesList {
+  margin-top: 8px;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.modulesLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #04AD74;
+  margin-bottom: 6px;
+}
+
+.moduleItem {
+  font-size: 0.85rem;
+  color: #374151;
+  padding: 4px 0;
+  padding-left: 8px;
+}
+
+.modulePrice {
+  color: #04AD74;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.droneOption {
+  margin-top: 8px;
+  padding: 10px;
+  background: #FFF8E1;
+  border: 1px solid #FFE082;
+  border-radius: 6px;
+}
+
+.droneLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #7B1FA2;
+  margin-bottom: 4px;
+}
+
+.droneValue {
+  font-size: 0.85rem;
+  color: #374151;
+  padding-left: 8px;
+}
+
+/* 삭제 버튼 */
+.deleteBtn {
+  padding: 6px 14px;
+  background: #DC2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.deleteBtn:hover {
+  background: #B91C1C;
+}

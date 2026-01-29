@@ -57,6 +57,7 @@ interface CartItem extends Course {
   quantity: number;
   selectedModules?: number[]; // 선택된 모듈(레슨) ID 배열
   droneOption?: 'none' | 'purchase' | 'rental'; // 드론 교구 옵션
+  droneQuantity?: number; // 드론 교구 개수
 }
 
 export default function ResourcesPage() {
@@ -222,7 +223,19 @@ export default function ResourcesPage() {
   // 드론 교구 옵션 변경
   const handleDroneOptionChange = (courseId: number, option: 'none' | 'purchase' | 'rental') => {
     setCartItems(cartItems.map(item =>
-      item.id === courseId ? { ...item, droneOption: option } : item
+      item.id === courseId ? { 
+        ...item, 
+        droneOption: option,
+        droneQuantity: option === 'none' ? 0 : (item.droneQuantity || 1) // 옵션 선택 시 기본 1개
+      } : item
+    ));
+  };
+
+  // 드론 교구 개수 변경
+  const handleDroneQuantityChange = (courseId: number, quantity: number) => {
+    if (quantity < 1) return;
+    setCartItems(cartItems.map(item =>
+      item.id === courseId ? { ...item, droneQuantity: quantity } : item
     ));
   };
 
@@ -249,11 +262,12 @@ export default function ResourcesPage() {
         }
       });
 
-      // 드론 교구 가격 추가 (현재는 0원)
+      // 드론 교구 가격 추가 (개수 반영)
+      const droneQuantity = item.droneQuantity || 0;
       if (item.droneOption === 'purchase') {
-        total += 0; // 구매 가격
+        total += 25000 * droneQuantity;
       } else if (item.droneOption === 'rental') {
-        total += 0; // 대여 가격
+        total += 10000 * droneQuantity;
       }
     });
     return total;
@@ -569,7 +583,7 @@ export default function ResourcesPage() {
                                     checked={item.droneOption === 'purchase'}
                                     onChange={() => handleDroneOptionChange(item.id, 'purchase')}
                                   />
-                                  <span>교구 구매 (0원)</span>
+                                  <span>교구 구매 (25,000원)</span>
                                 </label>
                                 <label className={styles.droneRadio}>
                                   <input
@@ -578,9 +592,53 @@ export default function ResourcesPage() {
                                     checked={item.droneOption === 'rental'}
                                     onChange={() => handleDroneOptionChange(item.id, 'rental')}
                                   />
-                                  <span>교구 대여 (0원)</span>
+                                  <span>교구 대여 (10,000원)</span>
                                 </label>
                               </div>
+                              
+                              {/* 드론 교구 개수 선택 */}
+                              {item.droneOption && item.droneOption !== 'none' && (
+                                <div className={styles.droneQuantitySection}>
+                                  <label className={styles.quantityLabel}>개수:</label>
+                                  <div className={styles.quantityControl}>
+                                    <button
+                                      className={styles.quantityBtn}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDroneQuantityChange(item.id, (item.droneQuantity || 1) - 1);
+                                      }}
+                                      disabled={(item.droneQuantity || 1) <= 1}
+                                    >
+                                      -
+                                    </button>
+                                    <input
+                                      type="number"
+                                      className={styles.quantityInput}
+                                      value={item.droneQuantity || 1}
+                                      onChange={(e) => {
+                                        const value = parseInt(e.target.value);
+                                        if (!isNaN(value) && value >= 1) {
+                                          handleDroneQuantityChange(item.id, value);
+                                        }
+                                      }}
+                                      min="1"
+                                      onClick={(e) => e.stopPropagation()}
+                                    />
+                                    <button
+                                      className={styles.quantityBtn}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDroneQuantityChange(item.id, (item.droneQuantity || 1) + 1);
+                                      }}
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                  <span className={styles.quantityPrice}>
+                                    = {((item.droneOption === 'purchase' ? 25000 : 10000) * (item.droneQuantity || 1)).toLocaleString()}원
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           )}
 

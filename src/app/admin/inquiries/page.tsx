@@ -21,6 +21,17 @@ interface Inquiry {
     id: number;
     title: string;
     category?: string;
+    learningMaterials?: Array<{
+      id: number;
+      title: string;
+      price?: number;
+    }>;
+  }>;
+  courseDetails?: Array<{
+    courseId: number;
+    selectedModules: number[];
+    droneOption: 'none' | 'purchase' | 'rental';
+    droneQuantity?: number;
   }>;
   createdAt: string;
   updatedAt?: string;
@@ -140,6 +151,25 @@ export default function InquiriesPage() {
     }
   };
 
+  const handleInquiryDelete = async (inquiryId: number) => {
+    if (!confirm('정말 이 문의를 삭제하시겠습니까?')) {
+      return;
+    }
+    
+    try {
+      await api.delete(`/api/admin/inquiries/${inquiryId}`);
+      setInquiries(inquiries.filter(inq => inq.id !== inquiryId));
+      if (selectedInquiry?.id === inquiryId) {
+        setShowInquiryModal(false);
+        setSelectedInquiry(null);
+      }
+      alert('문의가 삭제되었습니다.');
+    } catch (error) {
+      console.error('문의 삭제 실패:', error);
+      alert('문의 삭제에 실패했습니다.');
+    }
+  };
+
   const handlePartnerStatusChange = async (partnerId: number, newStatus: string) => {
     try {
       // 프론트엔드 상태 -> 백엔드 상태 매핑
@@ -158,6 +188,25 @@ export default function InquiriesPage() {
     } catch (error) {
       console.error('상태 변경 실패:', error);
       alert('상태 변경에 실패했습니다.');
+    }
+  };
+
+  const handlePartnerDelete = async (partnerId: number) => {
+    if (!confirm('정말 이 파트너 신청을 삭제하시겠습니까?')) {
+      return;
+    }
+    
+    try {
+      await api.delete(`/api/partner-applications/${partnerId}`);
+      setPartners(partners.filter(p => p.id !== partnerId));
+      if (selectedPartner?.id === partnerId) {
+        setShowPartnerModal(false);
+        setSelectedPartner(null);
+      }
+      alert('파트너 신청이 삭제되었습니다.');
+    } catch (error) {
+      console.error('파트너 신청 삭제 실패:', error);
+      alert('파트너 신청 삭제에 실패했습니다.');
     }
   };
 
@@ -314,15 +363,23 @@ export default function InquiriesPage() {
                       <td>{getInquiryStatusBadge(inquiry.status)}</td>
                       <td>{new Date(inquiry.createdAt).toLocaleDateString('ko-KR')}</td>
                       <td>
-                        <button
-                          className={styles.detailBtn}
-                          onClick={() => {
-                            setSelectedInquiry(inquiry);
-                            setShowInquiryModal(true);
-                          }}
-                        >
-                          상세보기
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            className={styles.detailBtn}
+                            onClick={() => {
+                              setSelectedInquiry(inquiry);
+                              setShowInquiryModal(true);
+                            }}
+                          >
+                            상세보기
+                          </button>
+                          <button
+                            className={styles.deleteBtn}
+                            onClick={() => handleInquiryDelete(inquiry.id)}
+                          >
+                            삭제
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -395,15 +452,23 @@ export default function InquiriesPage() {
                       <td>{getPartnerStatusBadge(partner.status)}</td>
                       <td>{new Date(partner.createdAt).toLocaleDateString('ko-KR')}</td>
                       <td>
-                        <button
-                          className={styles.detailBtn}
-                          onClick={() => {
-                            setSelectedPartner(partner);
-                            setShowPartnerModal(true);
-                          }}
-                        >
-                          상세보기
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            className={styles.detailBtn}
+                            onClick={() => {
+                              setSelectedPartner(partner);
+                              setShowPartnerModal(true);
+                            }}
+                          >
+                            상세보기
+                          </button>
+                          <button
+                            className={styles.deleteBtn}
+                            onClick={() => handlePartnerDelete(partner.id)}
+                          >
+                            삭제
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -466,11 +531,59 @@ export default function InquiriesPage() {
                 <div className={styles.coursesSection}>
                   <label>선택한 강좌</label>
                   <div className={styles.coursesList}>
-                    {selectedInquiry.courses.map((course) => (
-                      <span key={course.id} className={styles.courseTag}>
-                        {course.title}
-                      </span>
-                    ))}
+                    {selectedInquiry.courses.map((course) => {
+                      // courseDetails에서 해당 코스의 세부 정보 찾기
+                      const courseDetail = selectedInquiry.courseDetails?.find(
+                        (cd) => cd.courseId === course.id
+                      );
+                      const selectedModules = courseDetail?.selectedModules || [];
+                      const droneOption = courseDetail?.droneOption || 'none';
+                      const isDrone = course.category === '드론';
+
+                      return (
+                        <div key={course.id} className={styles.courseItem}>
+                          <div className={styles.courseHeader}>
+                            <span className={styles.courseTag}>{course.title}</span>
+                            {course.category && (
+                              <span className={styles.categoryBadge}>{course.category}</span>
+                            )}
+                          </div>
+                          
+                          {/* 선택된 모듈 표시 */}
+                          {selectedModules.length > 0 && course.learningMaterials && (
+                            <div className={styles.modulesList}>
+                              <div className={styles.modulesLabel}>📚 선택된 모듈:</div>
+                              {selectedModules.map((moduleId) => {
+                                const module = course.learningMaterials?.find((m) => m.id === moduleId);
+                                return module ? (
+                                  <div key={moduleId} className={styles.moduleItem}>
+                                    • {module.title}
+                                    {module.price && (
+                                      <span className={styles.modulePrice}>
+                                        ({module.price.toLocaleString()}원)
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : null;
+                              })}
+                            </div>
+                          )}
+
+                          {/* 드론 교구 옵션 표시 */}
+                          {isDrone && droneOption !== 'none' && (
+                            <div className={styles.droneOption}>
+                              <div className={styles.droneLabel}>🚁 드론 교구:</div>
+                              <div className={styles.droneValue}>
+                                {droneOption === 'purchase' ? '교구 구매' : '교구 대여'} × {courseDetail?.droneQuantity || 1}개
+                                <span style={{ color: '#04AD74', fontWeight: '600', marginLeft: '4px' }}>
+                                  ({((droneOption === 'purchase' ? 25000 : 10000) * (courseDetail?.droneQuantity || 1)).toLocaleString()}원)
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
