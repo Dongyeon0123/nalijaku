@@ -107,8 +107,30 @@ export const login = async (data: LoginData): Promise<ApiResponse> => {
     return response.data;
   } catch (error: any) {
     console.log('💥 로그인 에러:', error);
-    const errorMessage = error.response?.data?.message || error.message || '로그인 중 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    console.log('📋 에러 응답:', error.response?.data);
+    console.log('📋 에러 상태:', error.response?.status);
+    
+    const errorData = error.response?.data;
+    const errorMessage = errorData?.message || errorData?.error || error.message || '';
+    const statusCode = error.response?.status;
+    
+    // "Bad credentials" 메시지 감지 (아이디/비밀번호 오류) - 최우선 체크
+    if (errorMessage.toLowerCase().includes('bad credentials') || 
+        errorMessage.toLowerCase().includes('credentials')) {
+      throw new Error('아이디 또는 비밀번호를 잘못 입력했습니다.');
+    }
+    
+    // 401 에러인 경우 (인증 실패)
+    if (statusCode === 401) {
+      throw new Error('아이디 또는 비밀번호를 잘못 입력했습니다.');
+    }
+    
+    // 500 에러인 경우 (서버 내부 오류)
+    if (statusCode === 500) {
+      throw new Error(`서버 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`);
+    }
+    
+    throw new Error(errorMessage || '로그인 중 오류가 발생했습니다.');
   }
 };
 

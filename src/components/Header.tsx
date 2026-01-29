@@ -730,11 +730,27 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
                     <p>연락처 <span style={{ color: 'red' }}>*</span></p>
                     <input
                       type="tel"
-                      placeholder="연락처를 입력하세요."
+                      placeholder="010-0000-0000"
                       value={signupForm.phone}
-                      onChange={(e) => setSignupForm(prev => ({ ...prev, phone: e.target.value }))}
+                      onChange={(e) => {
+                        const numbers = e.target.value.replace(/[^0-9]/g, '');
+                        let formatted = numbers;
+                        
+                        if (numbers.length <= 3) {
+                          formatted = numbers;
+                        } else if (numbers.length <= 7) {
+                          formatted = `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+                        } else if (numbers.length <= 11) {
+                          formatted = `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+                        } else {
+                          formatted = `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+                        }
+                        
+                        setSignupForm(prev => ({ ...prev, phone: formatted }));
+                      }}
+                      maxLength={13}
                     />
-                    <p className={styles.exampleText}>숫자만 입력해 주세요. ex) 01012345678</p>
+                    <p className={styles.exampleText}>하이픈(-)은 자동으로 입력됩니다.</p>
                     <div className={styles.checkboxGroup}>
                       <label className={styles.checkboxLabel}>
                         <input

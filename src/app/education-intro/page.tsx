@@ -103,10 +103,32 @@ function EducationIntroContent() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // 전화번호 자동 포맷팅
+    if (name === 'phone') {
+      const numbers = value.replace(/[^0-9]/g, '');
+      let formatted = numbers;
+      
+      if (numbers.length <= 3) {
+        formatted = numbers;
+      } else if (numbers.length <= 7) {
+        formatted = `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+      } else if (numbers.length <= 11) {
+        formatted = `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+      } else {
+        formatted = `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: formatted
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,6 +242,9 @@ function EducationIntroContent() {
       } else if (error.response?.status === 400) {
         const errorMsg = error.response?.data?.message || error.response?.data?.error || '요청 데이터가 올바르지 않습니다.';
         alert(`신청 중 오류가 발생했습니다: ${errorMsg}\n\n콘솔을 확인해주세요.`);
+      } else if (error.response?.status === 500) {
+        const errorMsg = error.response?.data?.message || error.response?.data?.error || '서버 내부 오류가 발생했습니다.';
+        alert(`서버 오류가 발생했습니다.\n\n${errorMsg}\n\n백엔드 개발자에게 문의해주세요.\n콘솔에서 상세 정보를 확인할 수 있습니다.`);
       } else {
         alert('신청 중 오류가 발생했습니다. 백엔드 API(/api/inquiries)가 구현되어 있는지 확인해주세요.');
       }
@@ -402,6 +427,7 @@ function EducationIntroContent() {
                       onChange={handleInputChange}
                       required
                       placeholder="010-0000-0000"
+                      maxLength={13}
                     />
                   </div>
 
