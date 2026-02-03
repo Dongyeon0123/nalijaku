@@ -265,7 +265,7 @@ export default function PDFViewer({ pdfUrl, onLoadComplete }: PDFViewerProps) {
         </button>
       </div>
 
-      <div 
+      <div
         ref={canvasContainerRef}
         style={{
           flex: 1,

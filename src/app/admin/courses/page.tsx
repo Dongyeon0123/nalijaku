@@ -283,6 +283,7 @@ export default function CoursesPage() {
     level: '',
     courseId: 0, // 속한 코스 ID (0은 독립 강좌)
   });
+  const [syllabusPdfFile, setSyllabusPdfFile] = useState<File | null>(null); // 강의계획서 PDF 파일
 
   // 드래그 앤 드롭 센서 설정
   const sensors = useSensors(
@@ -611,6 +612,7 @@ export default function CoursesPage() {
     setEditingCourse(null);
     setImageFile(null);
     setImagePreview('');
+    setSyllabusPdfFile(null); // 강의계획서 PDF 초기화
     setFormData({
       category: '',
       image: '',
@@ -633,6 +635,7 @@ export default function CoursesPage() {
     setEditingCourse(course);
     setImageFile(null);
     setImagePreview(course.image);
+    setSyllabusPdfFile(null); // 강의계획서 PDF 초기화
     setFormData({
       category: course.category,
       image: course.image,
@@ -912,6 +915,52 @@ export default function CoursesPage() {
           console.log('🖼️ formData의 이미지 사용:', imageUrl);
         }
 
+        // 강의계획서 PDF 업로드
+        let syllabusPdfUrl = (editingCourse as any).syllabusPdf || '';
+        if (syllabusPdfFile) {
+          try {
+            const pdfFormData = new FormData();
+            
+            // 파일명 정리: 특수문자 제거, 공백을 언더스코어로 변경
+            const timestamp = Date.now();
+            const sanitizedFileName = `syllabus_${timestamp}.pdf`;
+            const renamedFile = new File([syllabusPdfFile], sanitizedFileName, { type: syllabusPdfFile.type });
+            
+            pdfFormData.append('file', renamedFile);
+
+            console.log('📋 강의계획서 PDF 업로드 시작:', sanitizedFileName);
+            
+            const pdfUploadResponse = await api.post('/api/resources/upload-pdf', pdfFormData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            const pdfUploadResult = pdfUploadResponse.data;
+            console.log('📋 강의계획서 PDF 업로드 응답:', pdfUploadResult);
+            
+            syllabusPdfUrl = pdfUploadResult.filePath || pdfUploadResult.data?.filePath || pdfUploadResult.url || pdfUploadResult.data?.url;
+            console.log('📋 최종 강의계획서 PDF URL:', syllabusPdfUrl);
+          } catch (pdfError: any) {
+            console.error('❌ 강의계획서 PDF 업로드 실패:', pdfError);
+            console.error('  - 에러 메시지:', pdfError.response?.data?.message || pdfError.message);
+            
+            // PDF 업로드 실패 시 사용자에게 알림
+            const continueWithoutPdf = confirm(
+              '강의계획서 PDF 업로드에 실패했습니다.\n\n' +
+              '에러: ' + (pdfError.response?.data?.message || pdfError.message) + '\n\n' +
+              '강의계획서 없이 강좌를 저장하시겠습니까?\n' +
+              '(나중에 수정에서 다시 업로드할 수 있습니다)'
+            );
+            
+            if (!continueWithoutPdf) {
+              setUploading(false);
+              return;
+            }
+            
+            // 사용자가 계속 진행을 선택하면 syllabusPdfUrl은 빈 문자열로 유지
+            syllabusPdfUrl = '';
+          }
+        }
+
         const requestData = {
           category: formData.category, // 한글 카테고리 이름 그대로 전송
           title: formData.title,
@@ -925,11 +974,13 @@ export default function CoursesPage() {
           image: imageUrl,
           thumbnail: imageUrl, // 학습자료실 호환성을 위해 thumbnail 필드도 추가
           courseId: formData.courseId === 0 ? null : (formData.courseId || null), // 코스 ID (0이면 null로 전송)
+          syllabusPdf: syllabusPdfUrl || null, // 강의계획서 PDF URL
         };
 
         console.log('강좌 수정 요청 데이터:', requestData);
         console.log('  - 카테고리:', requestData.category);
         console.log('  - 코스 ID:', formData.courseId, '→', requestData.courseId || '독립 강좌');
+        console.log('  - 강의계획서 PDF:', requestData.syllabusPdf || '없음');
         const response = await api.put(`/api/resources/${editingCourse.id}`, requestData);
         console.log('강좌 수정 API 응답:', response.data);
         console.log('  - 응답 데이터의 courseId:', response.data?.data?.courseId);
@@ -964,6 +1015,52 @@ export default function CoursesPage() {
           return;
         }
 
+        // 강의계획서 PDF 업로드 (추가 시)
+        let syllabusPdfUrl = '';
+        if (syllabusPdfFile) {
+          try {
+            const pdfFormData = new FormData();
+            
+            // 파일명 정리: 특수문자 제거, 공백을 언더스코어로 변경
+            const timestamp = Date.now();
+            const sanitizedFileName = `syllabus_${timestamp}.pdf`;
+            const renamedFile = new File([syllabusPdfFile], sanitizedFileName, { type: syllabusPdfFile.type });
+            
+            pdfFormData.append('file', renamedFile);
+
+            console.log('📋 강의계획서 PDF 업로드 시작:', sanitizedFileName);
+            
+            const pdfUploadResponse = await api.post('/api/resources/upload-pdf', pdfFormData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            const pdfUploadResult = pdfUploadResponse.data;
+            console.log('📋 강의계획서 PDF 업로드 응답:', pdfUploadResult);
+            
+            syllabusPdfUrl = pdfUploadResult.filePath || pdfUploadResult.data?.filePath || pdfUploadResult.url || pdfUploadResult.data?.url;
+            console.log('📋 최종 강의계획서 PDF URL:', syllabusPdfUrl);
+          } catch (pdfError: any) {
+            console.error('❌ 강의계획서 PDF 업로드 실패:', pdfError);
+            console.error('  - 에러 메시지:', pdfError.response?.data?.message || pdfError.message);
+            
+            // PDF 업로드 실패 시 사용자에게 알림
+            const continueWithoutPdf = confirm(
+              '강의계획서 PDF 업로드에 실패했습니다.\n\n' +
+              '에러: ' + (pdfError.response?.data?.message || pdfError.message) + '\n\n' +
+              '강의계획서 없이 강좌를 저장하시겠습니까?\n' +
+              '(나중에 수정에서 다시 업로드할 수 있습니다)'
+            );
+            
+            if (!continueWithoutPdf) {
+              setUploading(false);
+              return;
+            }
+            
+            // 사용자가 계속 진행을 선택하면 syllabusPdfUrl은 빈 문자열로 유지
+            syllabusPdfUrl = '';
+          }
+        }
+
         const multipartFormData = new FormData();
         multipartFormData.append('categoryId', String(categoryId)); // 카테고리 ID 전송
         multipartFormData.append('title', formData.title);
@@ -980,6 +1077,11 @@ export default function CoursesPage() {
           multipartFormData.append('courseId', String(formData.courseId));
         }
         
+        // 강의계획서 PDF URL 추가
+        if (syllabusPdfUrl) {
+          multipartFormData.append('syllabusPdf', syllabusPdfUrl);
+        }
+        
         if (imageFile) {
           multipartFormData.append('file', imageFile);
         } else if (formData.image) {
@@ -991,6 +1093,7 @@ export default function CoursesPage() {
         console.log('  - 카테고리 이름:', formData.category);
         console.log('  - 코스 ID (formData):', formData.courseId);
         console.log('  - 코스 ID (전송):', formData.courseId && formData.courseId > 0 ? formData.courseId : '독립 강좌');
+        console.log('  - 강의계획서 PDF:', syllabusPdfUrl || '없음');
         const response = await api.post('/api/resources', multipartFormData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -1324,6 +1427,53 @@ export default function CoursesPage() {
                   placeholder="이미지 설명을 입력하세요"
                 />
               </div>
+              
+              {/* 강의계획서 PDF 업로드 */}
+              <div className={styles.formGroup}>
+                <label>강의계획서 PDF (선택사항)</label>
+                {editingCourse && (editingCourse as any).syllabusPdf && (
+                  <div style={{ marginBottom: '12px', padding: '12px', backgroundColor: '#E8F5E9', borderRadius: '6px', border: '1px solid #4CAF50' }}>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: '600', color: '#2E7D32' }}>
+                      📋 현재 강의계획서
+                    </p>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#555' }}>
+                      {((editingCourse as any).syllabusPdf as string).split('/').pop()}
+                    </p>
+                    <a
+                      href={`https://api.nallijaku.com${(editingCourse as any).syllabusPdf}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-block',
+                        padding: '6px 12px',
+                        backgroundColor: '#4CAF50',
+                        color: '#fff',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        textDecoration: 'none',
+                        fontWeight: '600',
+                      }}
+                    >
+                      다운로드
+                    </a>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => setSyllabusPdfFile(e.target.files?.[0] || null)}
+                  disabled={uploading}
+                />
+                <p style={{ fontSize: '12px', color: '#999', margin: '8px 0 0 0' }}>
+                  {editingCourse && (editingCourse as any).syllabusPdf ? '새 파일을 선택하면 기존 파일이 대체됩니다.' : '강의계획서 PDF 파일을 업로드하세요 (최대 100MB)'}
+                </p>
+                {syllabusPdfFile && (
+                  <p style={{ fontSize: '12px', color: '#1976D2', margin: '8px 0 0 0', fontWeight: '600' }}>
+                    ✓ 새 파일 선택됨: {syllabusPdfFile.name} ({(syllabusPdfFile.size / (1024 * 1024)).toFixed(2)}MB)
+                  </p>
+                )}
+              </div>
+              
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
                   <label>난이도</label>

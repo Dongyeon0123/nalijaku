@@ -272,44 +272,6 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                             <p style={{ fontSize: '16px', color: '#666', lineHeight: '1.6', margin: '0' }}>
                               {course.description}
                             </p>
-                            
-                            {/* 강의계획서 버튼 */}
-                            <button
-                              onClick={() => {
-                                // 코스의 강의계획서 PDF URL (백엔드에서 제공하는 경우)
-                                // 임시로 알림 표시
-                                alert('강의계획서가 준비 중입니다.');
-                              }}
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 20px',
-                                backgroundColor: '#01c187',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                color: '#fff',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                boxShadow: '0 2px 4px rgba(1, 193, 135, 0.3)',
-                                marginTop: '16px'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#00a876';
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 4px 8px rgba(1, 193, 135, 0.4)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = '#01c187';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 2px 4px rgba(1, 193, 135, 0.3)';
-                              }}
-                            >
-                              <span>📋</span>
-                              강의계획서
-                            </button>
                           </div>
 
                           <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '20px', color: '#333' }}>
@@ -400,9 +362,64 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                               <h3 style={{ fontSize: '13px', fontWeight: '600', color: '#333', margin: '0 0 2px 0' }}>
                                 {course.title}
                               </h3>
-                              <p style={{ fontSize: '11px', color: '#666', lineHeight: '1.3', margin: '0' }}>
+                              <p style={{ fontSize: '11px', color: '#666', lineHeight: '1.3', margin: '0 0 10px 0' }}>
                                 {course.description}
                               </p>
+                              
+                              {/* 강의계획서 버튼 */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const syllabusPdf = (course.learningMaterials?.[0] as any)?.syllabusPdf;
+                                  if (syllabusPdf) {
+                                    const pdfUrl = `https://api.nallijaku.com${syllabusPdf}`;
+                                    
+                                    // 강좌 제목을 파일명으로 사용
+                                    const fileName = `${course.title}_강의계획서.pdf`;
+                                    
+                                    // a 태그를 사용하여 다운로드
+                                    const link = document.createElement('a');
+                                    link.href = pdfUrl;
+                                    link.download = fileName;
+                                    link.target = '_blank';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                  } else {
+                                    alert('강의계획서가 준비 중입니다.');
+                                  }
+                                }}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '6px',
+                                  width: '100%',
+                                  padding: '8px',
+                                  backgroundColor: '#01c187',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: '600',
+                                  color: '#fff',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease',
+                                  boxShadow: '0 2px 4px rgba(1, 193, 135, 0.3)'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#00a876';
+                                  e.currentTarget.style.transform = 'translateY(-2px)';
+                                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(1, 193, 135, 0.4)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#01c187';
+                                  e.currentTarget.style.transform = 'translateY(0)';
+                                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(1, 193, 135, 0.3)';
+                                }}
+                              >
+                                <span>📋</span>
+                                강의계획서
+                              </button>
                             </div>
 
                             {/* 차시 목록 박스 */}
