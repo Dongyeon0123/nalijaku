@@ -8,7 +8,6 @@ import styles from './page.module.css';
 import { FiSearch } from 'react-icons/fi';
 import { FaInstagram, FaYoutube, FaBloggerB } from 'react-icons/fa';
 import { IoCartOutline, IoChevronDown, IoChevronForward, IoChevronBack } from 'react-icons/io5';
-import { MdDragIndicator } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 
@@ -97,16 +96,25 @@ export default function ResourcesPage() {
 
         console.log('코스 API 호출');
 
-        // 코스 목록 가져오기
-        const response = await api.get('/api/courses');
+        // 코스 목록 가져오기 (캐시 무효화를 위해 타임스탬프 추가)
+        const timestamp = new Date().getTime();
+        const response = await api.get(`/api/courses?_t=${timestamp}`);
 
-        console.log('코스 로드 성공:', response.data);
+        console.log('✅ 코스 로드 성공:', response.data);
 
         const result = response.data;
 
         if (result.success && result.data) {
           // 백엔드 응답: { success, message, data: { courses: [...] } }
           const coursesArray = result.data.courses || result.data;
+          console.log('📚 코스 목록:', coursesArray.length, '개');
+          
+          // 첫 번째 코스의 썸네일 확인
+          if (coursesArray.length > 0) {
+            console.log('📸 첫 번째 코스 썸네일:', coursesArray[0].thumbnail);
+            console.log('📸 첫 번째 코스 updatedAt:', coursesArray[0].updatedAt);
+          }
+          
           setCoursesData(coursesArray);
         } else if (result.data && Array.isArray(result.data)) {
           setCoursesData(result.data);
@@ -390,19 +398,37 @@ export default function ResourcesPage() {
                   };
                   const categoryColor = categoryColors[course.category] || { bg: '#F5F5F5', text: '#666' };
 
-                  // 이미지 URL 처리
-                  const getImageUrl = (thumbnail: string) => {
+                  // 이미지 URL 처리 (캐시 버스팅 포함)
+                  const getImageUrl = (course: Course) => {
+                    const thumbnail = course.thumbnail || (course as any).image;
                     if (!thumbnail) return '/nallijaku.png';
+                    
+                    let imageUrl = '';
                     if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) {
-                      return thumbnail;
+                      imageUrl = thumbnail;
+                    } else if (thumbnail.startsWith('/uploads/')) {
+                      imageUrl = `https://api.nallijaku.com${thumbnail}`;
+                    } else if (thumbnail.startsWith('/')) {
+                      // /courses/ 같은 경로도 API 서버에서 가져와야 함
+                      if (thumbnail.startsWith('/courses/')) {
+                        imageUrl = `https://api.nallijaku.com${thumbnail}`;
+                      } else {
+                        return thumbnail; // public 폴더의 이미지는 캐시 버스팅 불필요
+                      }
+                    } else {
+                      imageUrl = `https://api.nallijaku.com/uploads/${thumbnail}`;
                     }
-                    if (thumbnail.startsWith('/uploads/')) {
-                      return `https://api.nallijaku.com${thumbnail}`;
-                    }
-                    if (thumbnail.startsWith('/')) {
-                      return thumbnail; // public 폴더의 이미지
-                    }
-                    return `https://api.nallijaku.com/uploads/${thumbnail}`;
+                    
+                    // 캐시 버스팅: updatedAt이 있으면 사용, 없으면 현재 시간 사용
+                    const cacheBuster = course.updatedAt 
+                      ? new Date(course.updatedAt).getTime() 
+                      : Date.now();
+                    
+                    // 이미 쿼리 파라미터가 있는지 확인
+                    const separator = imageUrl.includes('?') ? '&' : '?';
+                    const finalUrl = `${imageUrl}${separator}v=${cacheBuster}`;
+                    
+                    return finalUrl;
                   };
 
                   return (
@@ -414,11 +440,17 @@ export default function ResourcesPage() {
                     >
                       <div className={styles.imageContainer}>
                         <img
-                          src={getImageUrl(course.thumbnail)}
+                          src={getImageUrl(course)}
                           alt={course.title}
                           className={styles.materialImage}
                           onError={(e) => {
-                            console.warn('이미지 로드 실패:', course.thumbnail);
+                            const thumbnail = course.thumbnail || (course as any).image;
+                            console.error('❌ 이미지 로드 실패:');
+                            console.error('  - 코스 ID:', course.id);
+                            console.error('  - 코스 제목:', course.title);
+                            console.error('  - 썸네일 경로:', thumbnail);
+                            console.error('  - 시도한 URL:', (e.target as HTMLImageElement).src);
+                            console.error('  - 백엔드에 파일이 존재하지 않습니다!');
                             (e.target as HTMLImageElement).src = '/nallijaku.png';
                           }}
                         />

@@ -383,9 +383,17 @@ export default function CoursesPage() {
         formData.append('title', courseFormData.title);
         formData.append('description', courseFormData.description);
         formData.append('category', courseFormData.category);
+        
+        // 썸네일 처리: 새 파일이 있으면 전송, 없으면 기존 URL 전송
         if (courseFormData.thumbnail) {
           formData.append('thumbnail', courseFormData.thumbnail);
+          console.log('🖼️ 새 썸네일 파일 전송:', courseFormData.thumbnail);
+        } else if (editingCourseInModal.thumbnail) {
+          // 새 파일이 없으면 기존 URL을 전송 (백엔드가 URL 문자열도 받을 수 있다면)
+          formData.append('thumbnailUrl', editingCourseInModal.thumbnail);
+          console.log('🖼️ 기존 썸네일 URL 유지:', editingCourseInModal.thumbnail);
         }
+        
         if (courseFormData.difficulty) {
           formData.append('difficulty', courseFormData.difficulty);
         }
@@ -393,11 +401,18 @@ export default function CoursesPage() {
           formData.append('duration', courseFormData.duration);
         }
 
-        console.log('코스 수정 요청:', editingCourseInModal.id);
+        console.log('📤 코스 수정 요청:', editingCourseInModal.id);
+        console.log('  - 제목:', courseFormData.title);
+        console.log('  - 카테고리:', courseFormData.category);
+        console.log('  - 새 썸네일 파일:', courseFormData.thumbnail ? '있음' : '없음');
+        console.log('  - 기존 썸네일 URL:', editingCourseInModal.thumbnail);
 
-        await api.put(`/api/admin/courses/${editingCourseInModal.id}`, formData, {
+        const response = await api.put(`/api/admin/courses/${editingCourseInModal.id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
+
+        console.log('✅ 코스 수정 응답:', response.data);
+        console.log('  - 응답 썸네일:', response.data?.data?.thumbnail || response.data?.thumbnail);
 
         alert('코스가 수정되었습니다!');
         setEditingCourseInModal(null);
@@ -409,7 +424,10 @@ export default function CoursesPage() {
           difficulty: '',
           duration: ''
         });
-        loadCoursesForManagement();
+        
+        // 코스 목록 새로고침
+        await loadCoursesForManagement();
+        
         return;
       }
 
@@ -459,9 +477,12 @@ export default function CoursesPage() {
       // 코스 목록 새로고침
       loadCoursesForManagement();
     } catch (error: any) {
-      console.error('코스 생성 실패:', error);
-      const errorMsg = error.response?.data?.message || error.message || '코스 생성에 실패했습니다.';
-      alert(`코스 생성 실패\n\n${errorMsg}`);
+      console.error('❌ 코스 생성/수정 실패:', error);
+      console.error('  - 에러 응답:', error.response?.data);
+      console.error('  - 에러 상태:', error.response?.status);
+      
+      const errorMsg = error.response?.data?.message || error.message || '코스 생성/수정에 실패했습니다.';
+      alert(`코스 ${editingCourseInModal ? '수정' : '생성'} 실패\n\n${errorMsg}\n\n개발자 도구 콘솔을 확인해주세요.`);
     }
   };
 
@@ -676,9 +697,22 @@ export default function CoursesPage() {
 
   // 콘텐츠 추가 모달 열기
   const handleAddLesson = () => {
-    // 현재 강좌의 lessons 개수 + 1로 order 자동 설정
+    // 현재 강좌의 lessons에서 최대 order 값을 찾아서 +1
     const currentCourse = courses.find(c => c.id === expandedCourseId);
-    const nextOrder = (currentCourse?.lessons?.length || 0) + 1;
+    const lessons = currentCourse?.lessons || [];
+    
+    // 기존 콘텐츠가 있으면 최대 order + 1, 없으면 1
+    const maxOrder = lessons.length > 0 
+      ? Math.max(...lessons.map(l => l.order)) 
+      : 0;
+    const nextOrder = maxOrder + 1;
+    
+    console.log('📝 새 콘텐츠 추가:');
+    console.log('  - 강좌 ID:', expandedCourseId);
+    console.log('  - 기존 콘텐츠 수:', lessons.length);
+    console.log('  - 기존 order 목록:', lessons.map(l => l.order));
+    console.log('  - 최대 order:', maxOrder);
+    console.log('  - 새 order:', nextOrder);
     
     setEditingLesson(null);
     setLessonFormData({ order: nextOrder, title: '', description: '', type: '이론' });
@@ -860,14 +894,22 @@ export default function CoursesPage() {
           const uploadFormData = new FormData();
           uploadFormData.append('file', imageFile);
 
+          console.log('🖼️ 이미지 업로드 시작:', imageFile.name);
+          
           const uploadResponse = await api.post('/api/resources/upload-image', uploadFormData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
 
           const uploadResult = uploadResponse.data;
+          console.log('🖼️ 이미지 업로드 응답:', uploadResult);
+          
           imageUrl = uploadResult.filePath || uploadResult.data?.filePath || uploadResult.url || uploadResult.data?.url;
+          console.log('🖼️ 최종 이미지 URL:', imageUrl);
         } else if (!imageUrl) {
           imageUrl = editingCourse.image;
+          console.log('🖼️ 기존 이미지 사용:', imageUrl);
+        } else {
+          console.log('🖼️ formData의 이미지 사용:', imageUrl);
         }
 
         const requestData = {
@@ -881,6 +923,7 @@ export default function CoursesPage() {
           level: formData.level,
           alt: formData.alt,
           image: imageUrl,
+          thumbnail: imageUrl, // 학습자료실 호환성을 위해 thumbnail 필드도 추가
           courseId: formData.courseId === 0 ? null : (formData.courseId || null), // 코스 ID (0이면 null로 전송)
         };
 
@@ -1505,6 +1548,36 @@ export default function CoursesPage() {
                   <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
                     썸네일 이미지 <span style={{ color: 'red' }}>*</span>
                   </label>
+                  
+                  {/* 기존 썸네일 미리보기 (수정 모드) */}
+                  {editingCourseInModal && editingCourseInModal.thumbnail && !courseFormData.thumbnail && (
+                    <div style={{ marginBottom: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '6px' }}>
+                      <p style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>현재 썸네일:</p>
+                      <img 
+                        src={editingCourseInModal.thumbnail.startsWith('http') 
+                          ? editingCourseInModal.thumbnail 
+                          : `https://api.nallijaku.com${editingCourseInModal.thumbnail}`
+                        }
+                        alt="현재 썸네일"
+                        style={{ maxWidth: '200px', maxHeight: '120px', borderRadius: '4px' }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/nallijaku.png';
+                        }}
+                      />
+                      <p style={{ fontSize: '11px', color: '#999', marginTop: '5px' }}>
+                        새 이미지를 선택하지 않으면 기존 이미지가 유지됩니다.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* 새 썸네일 미리보기 */}
+                  {courseFormData.thumbnail && (
+                    <div style={{ marginBottom: '10px', padding: '10px', backgroundColor: '#e3f2fd', borderRadius: '6px' }}>
+                      <p style={{ fontSize: '12px', color: '#1976d2', marginBottom: '5px' }}>새 썸네일 선택됨:</p>
+                      <p style={{ fontSize: '12px', color: '#666' }}>{(courseFormData.thumbnail as File).name}</p>
+                    </div>
+                  )}
+                  
                   <input
                     type="file"
                     accept="image/*"
@@ -1512,6 +1585,7 @@ export default function CoursesPage() {
                       const file = e.target.files?.[0];
                       if (file) {
                         setCourseFormData({ ...courseFormData, thumbnail: file });
+                        console.log('🖼️ 새 썸네일 선택:', file.name);
                       }
                     }}
                     style={{

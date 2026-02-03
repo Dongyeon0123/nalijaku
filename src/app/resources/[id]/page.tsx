@@ -139,7 +139,7 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
               title: materialData.title,
               description: materialData.description || materialData.subtitle,
               category: materialData.category,
-              thumbnail: materialData.image,
+              thumbnail: materialData.image || materialData.thumbnail,
               instructor: materialData.instructor,
               difficulty: materialData.level,
               duration: materialData.duration,
