@@ -14,6 +14,7 @@ import Review from '@/components/Review';
 import Team from '@/components/Team';
 import Contact from '@/components/Contact';
 import News from '@/components/News';
+import RecruitmentPopup from '@/components/RecruitmentPopup';
 
 export default function Home() {
   React.useEffect(() => {
@@ -30,6 +31,7 @@ export default function Home() {
       width: '100vw',
       maxWidth: '100%'
     }}>
+      <RecruitmentPopup />
       <SidebarNav />
       
       <div className="mainContent">        
