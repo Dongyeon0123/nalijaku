@@ -370,21 +370,14 @@ export default function MaterialDetailPage({ params }: MaterialDetailProps) {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const syllabusPdf = (course.learningMaterials?.[0] as any)?.syllabusPdf;
+                                  const material = course.learningMaterials?.[0];
+                                  const syllabusPdf = (material as any)?.syllabusPdf;
+                                  
                                   if (syllabusPdf) {
                                     const pdfUrl = `https://api.nallijaku.com${syllabusPdf}`;
                                     
-                                    // 강좌 제목을 파일명으로 사용
-                                    const fileName = `${course.title}_강의계획서.pdf`;
-                                    
-                                    // a 태그를 사용하여 다운로드
-                                    const link = document.createElement('a');
-                                    link.href = pdfUrl;
-                                    link.download = fileName;
-                                    link.target = '_blank';
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    document.body.removeChild(link);
+                                    // 새 탭에서 PDF 열기 (브라우저 내장 뷰어로 보여주고 다운로드 가능)
+                                    window.open(pdfUrl, '_blank');
                                   } else {
                                     alert('강의계획서가 준비 중입니다.');
                                   }

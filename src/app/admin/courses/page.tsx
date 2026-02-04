@@ -284,6 +284,7 @@ export default function CoursesPage() {
     courseId: 0, // 속한 코스 ID (0은 독립 강좌)
   });
   const [syllabusPdfFile, setSyllabusPdfFile] = useState<File | null>(null); // 강의계획서 PDF 파일
+  const [syllabusPdfOriginalName, setSyllabusPdfOriginalName] = useState<string>(''); // 원본 파일명 저장
 
   // 드래그 앤 드롭 센서 설정
   const sensors = useSensors(
@@ -613,6 +614,7 @@ export default function CoursesPage() {
     setImageFile(null);
     setImagePreview('');
     setSyllabusPdfFile(null); // 강의계획서 PDF 초기화
+    setSyllabusPdfOriginalName(''); // 원본 파일명 초기화
     setFormData({
       category: '',
       image: '',
@@ -636,6 +638,7 @@ export default function CoursesPage() {
     setImageFile(null);
     setImagePreview(course.image);
     setSyllabusPdfFile(null); // 강의계획서 PDF 초기화
+    setSyllabusPdfOriginalName((course as any).syllabusPdfOriginalName || ''); // 원본 파일명 로드
     setFormData({
       category: course.category,
       image: course.image,
@@ -917,8 +920,13 @@ export default function CoursesPage() {
 
         // 강의계획서 PDF 업로드
         let syllabusPdfUrl = (editingCourse as any).syllabusPdf || '';
+        let originalFileName = syllabusPdfOriginalName; // 기존 원본 파일명 유지
+        
         if (syllabusPdfFile) {
           try {
+            // 원본 파일명 저장
+            originalFileName = syllabusPdfFile.name;
+            
             const pdfFormData = new FormData();
             
             // 파일명 정리: 특수문자 제거, 공백을 언더스코어로 변경
@@ -929,6 +937,7 @@ export default function CoursesPage() {
             pdfFormData.append('file', renamedFile);
 
             console.log('📋 강의계획서 PDF 업로드 시작:', sanitizedFileName);
+            console.log('📋 원본 파일명:', originalFileName);
             
             const pdfUploadResponse = await api.post('/api/resources/upload-pdf', pdfFormData, {
               headers: { 'Content-Type': 'multipart/form-data' }
@@ -958,6 +967,7 @@ export default function CoursesPage() {
             
             // 사용자가 계속 진행을 선택하면 syllabusPdfUrl은 빈 문자열로 유지
             syllabusPdfUrl = '';
+            originalFileName = '';
           }
         }
 
@@ -975,6 +985,7 @@ export default function CoursesPage() {
           thumbnail: imageUrl, // 학습자료실 호환성을 위해 thumbnail 필드도 추가
           courseId: formData.courseId === 0 ? null : (formData.courseId || null), // 코스 ID (0이면 null로 전송)
           syllabusPdf: syllabusPdfUrl || null, // 강의계획서 PDF URL
+          syllabusPdfOriginalName: originalFileName || null, // 원본 파일명
         };
 
         console.log('강좌 수정 요청 데이터:', requestData);
@@ -1017,8 +1028,13 @@ export default function CoursesPage() {
 
         // 강의계획서 PDF 업로드 (추가 시)
         let syllabusPdfUrl = '';
+        let originalFileName = '';
+        
         if (syllabusPdfFile) {
           try {
+            // 원본 파일명 저장
+            originalFileName = syllabusPdfFile.name;
+            
             const pdfFormData = new FormData();
             
             // 파일명 정리: 특수문자 제거, 공백을 언더스코어로 변경
@@ -1029,6 +1045,7 @@ export default function CoursesPage() {
             pdfFormData.append('file', renamedFile);
 
             console.log('📋 강의계획서 PDF 업로드 시작:', sanitizedFileName);
+            console.log('📋 원본 파일명:', originalFileName);
             
             const pdfUploadResponse = await api.post('/api/resources/upload-pdf', pdfFormData, {
               headers: { 'Content-Type': 'multipart/form-data' }
@@ -1058,6 +1075,7 @@ export default function CoursesPage() {
             
             // 사용자가 계속 진행을 선택하면 syllabusPdfUrl은 빈 문자열로 유지
             syllabusPdfUrl = '';
+            originalFileName = '';
           }
         }
 
@@ -1077,9 +1095,10 @@ export default function CoursesPage() {
           multipartFormData.append('courseId', String(formData.courseId));
         }
         
-        // 강의계획서 PDF URL 추가
+        // 강의계획서 PDF URL 및 원본 파일명 추가
         if (syllabusPdfUrl) {
           multipartFormData.append('syllabusPdf', syllabusPdfUrl);
+          multipartFormData.append('syllabusPdfOriginalName', originalFileName);
         }
         
         if (imageFile) {
