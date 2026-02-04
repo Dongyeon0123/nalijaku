@@ -1647,42 +1647,40 @@ export default function MyPage() {
                       </div>
                     )}
                     
-                    {inquiry.status === 'completed' && (
-                      <div style={{ display: 'flex', gap: '12px' }}>
-                        <button
-                          style={{
-                            flex: 1,
-                            padding: '12px',
-                            backgroundColor: '#04AD74',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '0.9rem',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                          }}
-                          onClick={() => downloadQuotation(inquiry)}
-                        >
-                          📄 견적서 다운로드
-                        </button>
-                        <button
-                          style={{
-                            flex: 1,
-                            padding: '12px',
-                            backgroundColor: '#3B82F6',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '0.9rem',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                          }}
-                          onClick={() => alert('강의계획서 다운로드 기능 준비 중')}
-                        >
-                          📋 강의계획서 다운로드
-                        </button>
-                      </div>
-                    )}
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button
+                        style={{
+                          flex: 1,
+                          padding: '12px',
+                          backgroundColor: '#04AD74',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '0.9rem',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => downloadQuotation(inquiry)}
+                      >
+                        📄 견적서 다운로드
+                      </button>
+                      <button
+                        style={{
+                          flex: 1,
+                          padding: '12px',
+                          backgroundColor: '#3B82F6',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '0.9rem',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => alert('강의계획서 다운로드 기능 준비 중')}
+                      >
+                        📋 강의계획서 다운로드
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
