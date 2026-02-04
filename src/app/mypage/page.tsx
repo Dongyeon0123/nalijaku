@@ -53,6 +53,12 @@ interface CourseGroup {
     subtitle?: string;
     thumbnail?: string;
     category?: string;
+    contents?: Array<{
+      id: number;
+      title: string;
+      duration?: string;
+      price?: number;
+    }>;
   }>;
   createdAt: string;
   updatedAt: string;
@@ -1148,8 +1154,8 @@ export default function MyPage() {
                           key={idx}
                           style={{
                             display: 'flex',
-                            alignItems: 'center',
-                            gap: '16px',
+                            flexDirection: 'column',
+                            gap: '12px',
                             padding: '20px',
                             backgroundColor: 'white',
                             borderRadius: '12px',
@@ -1157,74 +1163,135 @@ export default function MyPage() {
                             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                           }}
                         >
-                          {course.thumbnail ? (
-                            <img
-                              src={course.thumbnail.startsWith('http') 
-                                ? course.thumbnail 
-                                : `https://api.nallijaku.com${course.thumbnail}`
-                              }
-                              alt={course.title}
-                              style={{
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                            {course.thumbnail ? (
+                              <img
+                                src={course.thumbnail.startsWith('http') 
+                                  ? course.thumbnail 
+                                  : `https://api.nallijaku.com${course.thumbnail}`
+                                }
+                                alt={course.title}
+                                style={{
+                                  width: '100px',
+                                  height: '100px',
+                                  objectFit: 'cover',
+                                  borderRadius: '12px',
+                                  flexShrink: 0
+                                }}
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <div style={{
                                 width: '100px',
                                 height: '100px',
-                                objectFit: 'cover',
                                 borderRadius: '12px',
+                                background: 'white',
+                                border: '1px solid #22c55e',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#16a34a',
+                                fontSize: '32px',
+                                fontWeight: 'bold',
                                 flexShrink: 0
-                              }}
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = 'none';
-                              }}
-                            />
-                          ) : (
-                            <div style={{
-                              width: '100px',
-                              height: '100px',
-                              borderRadius: '12px',
-                              background: 'white',
-                              border: '1px solid #22c55e',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: '#16a34a',
-                              fontSize: '32px',
-                              fontWeight: 'bold',
-                              flexShrink: 0
-                            }}>
-                              {course.title.charAt(0)}
-                            </div>
-                          )}
-                          <div style={{ flex: 1 }}>
-                            <div style={{ 
-                              fontSize: '20px', 
-                              fontWeight: '700',
-                              marginBottom: '8px',
-                              color: '#1f2937'
-                            }}>
-                              {idx + 1}. {course.title}
-                            </div>
-                            {course.subtitle && (
-                              <div style={{ 
-                                fontSize: '14px', 
-                                color: '#6b7280',
-                                marginBottom: '8px'
                               }}>
-                                {course.subtitle}
+                                {course.title.charAt(0)}
                               </div>
                             )}
-                            {course.category && (
-                              <span style={{
-                                display: 'inline-block',
-                                padding: '4px 12px',
-                                borderRadius: '6px',
-                                fontSize: '12px',
-                                fontWeight: '600',
-                                backgroundColor: '#e0e7ff',
-                                color: '#4338ca'
+                            <div style={{ flex: 1 }}>
+                              <div style={{ 
+                                fontSize: '20px', 
+                                fontWeight: '700',
+                                marginBottom: '8px',
+                                color: '#1f2937'
                               }}>
-                                {course.category}
-                              </span>
-                            )}
+                                {idx + 1}. {course.title}
+                              </div>
+                              {course.subtitle && (
+                                <div style={{ 
+                                  fontSize: '14px', 
+                                  color: '#6b7280',
+                                  marginBottom: '8px'
+                                }}>
+                                  {course.subtitle}
+                                </div>
+                              )}
+                              {course.category && (
+                                <span style={{
+                                  display: 'inline-block',
+                                  padding: '4px 12px',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: '600',
+                                  backgroundColor: '#e0e7ff',
+                                  color: '#4338ca'
+                                }}>
+                                  {course.category}
+                                </span>
+                              )}
+                            </div>
                           </div>
+
+                          {/* 콘텐츠 목록 */}
+                          {course.contents && course.contents.length > 0 && (
+                            <div style={{
+                              marginTop: '12px',
+                              padding: '16px',
+                              backgroundColor: '#f9fafb',
+                              borderRadius: '8px',
+                              border: '1px solid #e5e7eb'
+                            }}>
+                              <div style={{ 
+                                fontSize: '14px', 
+                                fontWeight: '600', 
+                                color: '#374151',
+                                marginBottom: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                              }}>
+                                📖 포함된 콘텐츠 ({course.contents.length}개)
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {course.contents.map((content, contentIdx) => (
+                                  <div
+                                    key={contentIdx}
+                                    style={{
+                                      padding: '12px',
+                                      backgroundColor: 'white',
+                                      borderRadius: '6px',
+                                      border: '1px solid #e5e7eb',
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center'
+                                    }}
+                                  >
+                                    <div style={{ flex: 1 }}>
+                                      <div style={{ 
+                                        fontSize: '14px', 
+                                        fontWeight: '600', 
+                                        color: '#1f2937',
+                                        marginBottom: '4px'
+                                      }}>
+                                        {contentIdx + 1}. {content.title}
+                                      </div>
+                                      <div style={{ 
+                                        fontSize: '12px', 
+                                        color: '#6b7280',
+                                        display: 'flex',
+                                        gap: '12px'
+                                      }}>
+                                        {content.duration && <span>⏱️ {content.duration}</span>}
+                                        {content.price && <span>💰 {content.price.toLocaleString()}원</span>}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

@@ -34,6 +34,15 @@ interface Material {
   title: string;
   subtitle: string;
   instructor: string;
+  learningMaterials?: Array<{
+    id: number;
+    title: string;
+    description?: string;
+    type?: string;
+    order?: number;
+    duration?: string;
+    price?: number;
+  }>;
 }
 
 interface CourseGroup {
@@ -50,6 +59,12 @@ interface CourseGroup {
     subtitle?: string;
     thumbnail?: string;
     category?: string;
+    contents?: Array<{
+      id: number;
+      title: string;
+      duration?: string;
+      price?: number;
+    }>;
   }>;
   createdAt: string;
   updatedAt: string;
@@ -85,6 +100,8 @@ export default function InstructorsManagementPage() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loadingMaterials, setLoadingMaterials] = useState(false);
   const [selectedMaterials, setSelectedMaterials] = useState<number[]>([]);
+  const [selectedContents, setSelectedContents] = useState<{ [materialId: number]: number[] }>({});
+  const [expandedMaterials, setExpandedMaterials] = useState<Set<number>>(new Set());
   const [assignmentDetails, setAssignmentDetails] = useState({
     schoolName: '',      // 학교/기관 이름 추가
     studentCount: 0,
@@ -134,7 +151,20 @@ export default function InstructorsManagementPage() {
       const result = response.data;
       const materialsData = result.success ? result.data : (Array.isArray(result.data) ? result.data : []);
       console.log('📚 학습자료 목록:', materialsData);
-      setMaterials(materialsData);
+      
+      // 각 학습자료를 Material 형식으로 변환 (learningMaterials는 나중에 추가)
+      const formattedMaterials = materialsData.map((item: any) => ({
+        id: item.id,
+        category: item.category,
+        subCategory: item.subCategory,
+        image: item.image,
+        title: item.title,
+        subtitle: item.subtitle,
+        instructor: item.instructor,
+        learningMaterials: [] // 일단 빈 배열로 설정
+      }));
+      
+      setMaterials(formattedMaterials);
     } catch (error) {
       console.error('학습자료 목록 로드 실패:', error);
       alert('학습자료 목록을 불러올 수 없습니다.');
@@ -152,6 +182,8 @@ export default function InstructorsManagementPage() {
     });
     setAssigningInstructor(instructor);
     setSelectedMaterials([]);
+    setSelectedContents({});
+    setExpandedMaterials(new Set());
     setAssignmentDetails({
       schoolName: '',
       studentCount: 0,
@@ -166,6 +198,8 @@ export default function InstructorsManagementPage() {
     setShowAssignModal(false);
     setAssigningInstructor(null);
     setSelectedMaterials([]);
+    setSelectedContents({});
+    setExpandedMaterials(new Set());
     setAssignmentDetails({
       schoolName: '',
       studentCount: 0,
@@ -174,12 +208,122 @@ export default function InstructorsManagementPage() {
     });
   };
 
-  const handleMaterialToggle = (materialId: number) => {
+  const handleMaterialToggle = async (materialId: number) => {
+    console.log('🎯 강좌 선택/해제:', materialId);
+    
     setSelectedMaterials(prev => {
       if (prev.includes(materialId)) {
+        console.log('❌ 강좌 선택 해제:', materialId);
+        // 선택 해제 시 해당 강좌의 콘텐츠 선택도 초기화하고 확장 상태도 제거
+        setSelectedContents(prevContents => {
+          const newContents = { ...prevContents };
+          delete newContents[materialId];
+          return newContents;
+        });
+        setExpandedMaterials(prevExpanded => {
+          const newExpanded = new Set(prevExpanded);
+          newExpanded.delete(materialId);
+          return newExpanded;
+        });
         return prev.filter(id => id !== materialId);
       } else {
+        console.log('✅ 강좌 선택:', materialId);
+        // 선택 시 자동으로 확장하고 콘텐츠 로드
+        setExpandedMaterials(prevExpanded => {
+          const newExpanded = new Set(prevExpanded);
+          newExpanded.add(materialId);
+          return newExpanded;
+        });
+        
+        // 콘텐츠가 아직 로드되지 않았다면 로드
+        const material = materials.find(m => m.id === materialId);
+        console.log('📦 현재 강좌 정보:', material);
+        
+        if (material && (!material.learningMaterials || material.learningMaterials.length === 0)) {
+          console.log('🔄 콘텐츠 로드 필요 - API 호출 시작');
+          fetchMaterialContents(materialId);
+        } else {
+          console.log('✓ 콘텐츠 이미 로드됨:', material?.learningMaterials);
+        }
+        
         return [...prev, materialId];
+      }
+    });
+  };
+
+  const fetchMaterialContents = async (materialId: number) => {
+    try {
+      console.log('📖 콘텐츠 로드 시작 - API 호출:', `/api/resources/${materialId}`);
+      const response = await api.get(`/api/resources/${materialId}`);
+      const result = response.data;
+      const materialData = result.success ? result.data : result;
+      
+      console.log('📦 API 응답 전체:', result);
+      console.log('📦 콘텐츠 데이터:', materialData);
+      console.log('📚 lessons:', materialData.lessons);
+      
+      // lessons 배열을 learningMaterials로 변환
+      const lessons = materialData.lessons || [];
+      const learningMaterials = lessons.map((lesson: any) => ({
+        id: lesson.id,
+        title: lesson.materials || `${lesson.order}차시`,
+        description: lesson.description,
+        type: lesson.type,
+        order: lesson.order
+      }));
+      
+      if (learningMaterials.length === 0) {
+        console.warn('⚠️ lessons가 비어있거나 없습니다!');
+      } else {
+        console.log(`✅ ${learningMaterials.length}개의 차시 로드 성공`);
+        console.log('변환된 learningMaterials:', learningMaterials);
+      }
+      
+      // materials 배열 업데이트
+      setMaterials(prev => prev.map(m => {
+        if (m.id === materialId) {
+          const updated = {
+            ...m,
+            learningMaterials: learningMaterials
+          };
+          console.log('🔄 강좌 업데이트:', updated);
+          return updated;
+        }
+        return m;
+      }));
+    } catch (error: any) {
+      console.error('❌ 콘텐츠 로드 실패:', error);
+      console.error('에러 상태:', error.response?.status);
+      console.error('에러 응답:', error.response?.data);
+      console.error('에러 메시지:', error.message);
+    }
+  };
+
+  const toggleMaterialExpansion = (materialId: number) => {
+    setExpandedMaterials(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(materialId)) {
+        newSet.delete(materialId);
+      } else {
+        newSet.add(materialId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleContentToggle = (materialId: number, contentId: number) => {
+    setSelectedContents(prev => {
+      const materialContents = prev[materialId] || [];
+      if (materialContents.includes(contentId)) {
+        return {
+          ...prev,
+          [materialId]: materialContents.filter(id => id !== contentId)
+        };
+      } else {
+        return {
+          ...prev,
+          [materialId]: [...materialContents, contentId]
+        };
       }
     });
   };
@@ -215,6 +359,12 @@ export default function InstructorsManagementPage() {
     }
 
     try {
+      // 선택된 콘텐츠 정보 구성
+      const courseDetails = selectedMaterials.map(materialId => ({
+        materialId,
+        contentIds: selectedContents[materialId] || []
+      }));
+
       console.log('🚀 강의 그룹 할당 시작:', {
         instructorId: assigningInstructor.id,
         instructorName: assigningInstructor.name,
@@ -223,7 +373,8 @@ export default function InstructorsManagementPage() {
         studentCount: assignmentDetails.studentCount,
         startDate: assignmentDetails.startDate,
         endDate: assignmentDetails.endDate,
-        materialIds: selectedMaterials
+        materialIds: selectedMaterials,
+        courseDetails
       });
 
       console.log('📍 API 요청 URL:', `/api/instructors/${assigningInstructor.id}/class-groups`);
@@ -235,7 +386,8 @@ export default function InstructorsManagementPage() {
         studentCount: assignmentDetails.studentCount,
         startDate: assignmentDetails.startDate,
         endDate: assignmentDetails.endDate,
-        materialIds: selectedMaterials
+        materialIds: selectedMaterials,
+        courseDetails
       });
 
       console.log('✅ 강의 그룹 할당 성공:', response.data);
@@ -840,67 +992,149 @@ export default function InstructorsManagementPage() {
                         '환경': { bg: '#E8F5E9', text: '#2E7D32' }
                       };
                       const categoryColor = categoryColors[material.category] || { bg: '#F5F5F5', text: '#666' };
+                      const isExpanded = expandedMaterials.has(material.id);
+                      const isSelected = selectedMaterials.includes(material.id);
+                      const hasContents = material.learningMaterials && material.learningMaterials.length > 0;
 
                       return (
                         <div
                           key={material.id}
-                          onClick={() => handleMaterialToggle(material.id)}
                           style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: '16px',
                             borderBottom: '1px solid #f0f0f0',
-                            cursor: 'pointer',
-                            backgroundColor: selectedMaterials.includes(material.id) ? '#f0f7ff' : 'white',
+                            backgroundColor: isSelected ? '#f0f7ff' : 'white',
                             transition: 'background-color 0.2s'
                           }}
                         >
-                          <input
-                            type="checkbox"
-                            checked={selectedMaterials.includes(material.id)}
-                            onChange={() => {}}
+                          {/* 강좌 헤더 */}
+                          <div
+                            onClick={() => handleMaterialToggle(material.id)}
                             style={{
-                              width: '20px',
-                              height: '20px',
-                              marginRight: '16px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: '16px',
                               cursor: 'pointer'
                             }}
-                          />
-                          <img
-                            src={material.image.startsWith('http') ? material.image : `https://api.nallijaku.com${material.image}`}
-                            alt={material.title}
-                            style={{
-                              width: '80px',
-                              height: '80px',
-                              objectFit: 'cover',
-                              borderRadius: '8px',
-                              marginRight: '16px'
-                            }}
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/placeholder.png';
-                            }}
-                          />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ 
-                              display: 'inline-block',
-                              padding: '4px 12px',
-                              borderRadius: '12px',
-                              fontSize: '12px',
-                              fontWeight: '600',
-                              marginBottom: '8px',
-                              backgroundColor: categoryColor.bg,
-                              color: categoryColor.text
-                            }}>
-                              {material.category}
-                              {material.subCategory && ` - ${material.subCategory}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => {}}
+                              style={{
+                                width: '20px',
+                                height: '20px',
+                                marginRight: '16px',
+                                cursor: 'pointer'
+                              }}
+                            />
+                            <img
+                              src={material.image.startsWith('http') ? material.image : `https://api.nallijaku.com${material.image}`}
+                              alt={material.title}
+                              style={{
+                                width: '80px',
+                                height: '80px',
+                                objectFit: 'cover',
+                                borderRadius: '8px',
+                                marginRight: '16px'
+                              }}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/placeholder.png';
+                              }}
+                            />
+                              <div style={{ flex: 1 }}>
+                                <div style={{ 
+                                  display: 'inline-block',
+                                  padding: '4px 12px',
+                                  borderRadius: '12px',
+                                  fontSize: '12px',
+                                  fontWeight: '600',
+                                  marginBottom: '8px',
+                                  backgroundColor: categoryColor.bg,
+                                  color: categoryColor.text
+                                }}>
+                                  {material.category}
+                                  {material.subCategory && ` - ${material.subCategory}`}
+                                </div>
+                                <h4 style={{ margin: '4px 0', fontSize: '16px', fontWeight: '600' }}>
+                                  {material.title}
+                                </h4>
+                                <p style={{ margin: '4px 0', fontSize: '13px', color: '#666' }}>
+                                  {material.subtitle}
+                                </p>
+                                {hasContents && (
+                                  <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#1976D2', fontWeight: '600' }}>
+                                    📚 {material.learningMaterials?.length || 0}개의 콘텐츠 포함
+                                  </p>
+                                )}
                             </div>
-                            <h4 style={{ margin: '4px 0', fontSize: '16px', fontWeight: '600' }}>
-                              {material.title}
-                            </h4>
-                            <p style={{ margin: '4px 0', fontSize: '13px', color: '#666' }}>
-                              {material.subtitle}
-                            </p>
                           </div>
+
+                          {/* 콘텐츠 목록 (확장 시) */}
+                          {isExpanded && isSelected && hasContents && (
+                            <div style={{
+                              padding: '0 16px 16px 68px',
+                              backgroundColor: '#f8f9fa',
+                              borderTop: '1px solid #e0e0e0'
+                            }}>
+                              <p style={{ 
+                                fontSize: '13px', 
+                                fontWeight: '600', 
+                                color: '#333', 
+                                marginBottom: '12px',
+                                paddingTop: '12px'
+                              }}>
+                                📖 콘텐츠 선택 (선택사항)
+                              </p>
+                              {material.learningMaterials!.map(content => {
+                                const isContentSelected = (selectedContents[material.id] || []).includes(content.id);
+                                return (
+                                  <div
+                                    key={content.id}
+                                    onClick={() => handleContentToggle(material.id, content.id)}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      padding: '12px',
+                                      marginBottom: '8px',
+                                      backgroundColor: isContentSelected ? '#E3F2FD' : 'white',
+                                      border: `2px solid ${isContentSelected ? '#1976D2' : '#e0e0e0'}`,
+                                      borderRadius: '8px',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s'
+                                    }}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={isContentSelected}
+                                      onChange={() => {}}
+                                      style={{
+                                        width: '18px',
+                                        height: '18px',
+                                        marginRight: '12px',
+                                        cursor: 'pointer'
+                                      }}
+                                    />
+                                    <div style={{ flex: 1 }}>
+                                      <div style={{ fontSize: '14px', fontWeight: '600', color: '#333', marginBottom: '4px' }}>
+                                        {content.title}
+                                      </div>
+                                      {content.description && (
+                                        <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>
+                                          {content.description}
+                                        </div>
+                                      )}
+                                      <div style={{ fontSize: '11px', color: '#999', display: 'flex', gap: '8px' }}>
+                                        {content.type && <span>📌 {content.type}</span>}
+                                        {content.order && <span>🔢 {content.order}차시</span>}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                              <p style={{ fontSize: '11px', color: '#666', marginTop: '8px', fontStyle: 'italic' }}>
+                                * 콘텐츠를 선택하지 않으면 전체 강좌가 할당됩니다.
+                              </p>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -919,6 +1153,11 @@ export default function InstructorsManagementPage() {
                       <span style={{ fontSize: '14px', fontWeight: '600', color: '#333', display: 'block', marginBottom: '4px' }}>
                         선택된 강의: {selectedMaterials.length}개
                       </span>
+                      {Object.keys(selectedContents).length > 0 && (
+                        <span style={{ fontSize: '12px', color: '#1976D2', display: 'block', marginBottom: '4px' }}>
+                          선택된 콘텐츠: {Object.values(selectedContents).reduce((sum, arr) => sum + arr.length, 0)}개
+                        </span>
+                      )}
                       {assignmentDetails.studentCount > 0 && (
                         <span style={{ fontSize: '12px', color: '#666' }}>
                           수강 인원: {assignmentDetails.studentCount}명
@@ -927,7 +1166,11 @@ export default function InstructorsManagementPage() {
                     </div>
                     {selectedMaterials.length > 0 && (
                       <button
-                        onClick={() => setSelectedMaterials([])}
+                        onClick={() => {
+                          setSelectedMaterials([]);
+                          setSelectedContents({});
+                          setExpandedMaterials(new Set());
+                        }}
                         style={{
                           padding: '6px 12px',
                           fontSize: '12px',
@@ -938,7 +1181,7 @@ export default function InstructorsManagementPage() {
                           cursor: 'pointer'
                         }}
                       >
-                        선택 해제
+                        전체 선택 해제
                       </button>
                     )}
                   </div>
@@ -1286,65 +1529,121 @@ export default function InstructorsManagementPage() {
                                     key={idx}
                                     style={{
                                       display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '16px',
+                                      flexDirection: 'column',
+                                      gap: '12px',
                                       padding: '16px',
                                       backgroundColor: '#f9fafb',
                                       borderRadius: '8px',
                                       border: '1px solid #e5e7eb'
                                     }}
                                   >
-                                    {course.thumbnail && (
-                                      <img
-                                        src={course.thumbnail.startsWith('http') 
-                                          ? course.thumbnail 
-                                          : `https://api.nallijaku.com${course.thumbnail}`
-                                        }
-                                        alt={course.title}
-                                        style={{
-                                          width: '60px',
-                                          height: '60px',
-                                          objectFit: 'cover',
-                                          borderRadius: '8px',
-                                          flexShrink: 0
-                                        }}
-                                        onError={(e) => {
-                                          (e.target as HTMLImageElement).style.display = 'none';
-                                        }}
-                                      />
-                                    )}
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                      <div style={{ 
-                                        fontWeight: '600', 
-                                        marginBottom: '4px',
-                                        fontSize: '14px',
-                                        color: '#1f2937'
-                                      }}>
-                                        {idx + 1}. {course.title}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                      {course.thumbnail && (
+                                        <img
+                                          src={course.thumbnail.startsWith('http') 
+                                            ? course.thumbnail 
+                                            : `https://api.nallijaku.com${course.thumbnail}`
+                                          }
+                                          alt={course.title}
+                                          style={{
+                                            width: '60px',
+                                            height: '60px',
+                                            objectFit: 'cover',
+                                            borderRadius: '8px',
+                                            flexShrink: 0
+                                          }}
+                                          onError={(e) => {
+                                            (e.target as HTMLImageElement).style.display = 'none';
+                                          }}
+                                        />
+                                      )}
+                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ 
+                                          fontWeight: '600', 
+                                          marginBottom: '4px',
+                                          fontSize: '14px',
+                                          color: '#1f2937'
+                                        }}>
+                                          {idx + 1}. {course.title}
+                                        </div>
+                                        {course.subtitle && (
+                                          <div style={{ 
+                                            fontSize: '12px', 
+                                            color: '#6b7280',
+                                            marginBottom: '4px'
+                                          }}>
+                                            {course.subtitle}
+                                          </div>
+                                        )}
+                                        {course.category && (
+                                          <span style={{
+                                            display: 'inline-block',
+                                            padding: '2px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '11px',
+                                            fontWeight: '600',
+                                            backgroundColor: '#e0e7ff',
+                                            color: '#4338ca'
+                                          }}>
+                                            {course.category}
+                                          </span>
+                                        )}
                                       </div>
-                                      {course.subtitle && (
+                                    </div>
+
+                                    {/* 콘텐츠 목록 */}
+                                    {course.contents && course.contents.length > 0 && (
+                                      <div style={{
+                                        marginTop: '8px',
+                                        padding: '12px',
+                                        backgroundColor: 'white',
+                                        borderRadius: '6px',
+                                        border: '1px solid #e5e7eb'
+                                      }}>
                                         <div style={{ 
                                           fontSize: '12px', 
-                                          color: '#6b7280',
-                                          marginBottom: '4px'
+                                          fontWeight: '600', 
+                                          color: '#374151',
+                                          marginBottom: '8px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '4px'
                                         }}>
-                                          {course.subtitle}
+                                          📖 포함된 콘텐츠 ({course.contents.length}개)
                                         </div>
-                                      )}
-                                      {course.category && (
-                                        <span style={{
-                                          display: 'inline-block',
-                                          padding: '2px 8px',
-                                          borderRadius: '4px',
-                                          fontSize: '11px',
-                                          fontWeight: '600',
-                                          backgroundColor: '#e0e7ff',
-                                          color: '#4338ca'
-                                        }}>
-                                          {course.category}
-                                        </span>
-                                      )}
-                                    </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                          {course.contents.map((content, contentIdx) => (
+                                            <div
+                                              key={contentIdx}
+                                              style={{
+                                                padding: '8px',
+                                                backgroundColor: '#f9fafb',
+                                                borderRadius: '4px',
+                                                border: '1px solid #e5e7eb'
+                                              }}
+                                            >
+                                              <div style={{ 
+                                                fontSize: '12px', 
+                                                fontWeight: '600', 
+                                                color: '#1f2937',
+                                                marginBottom: '2px'
+                                              }}>
+                                                {contentIdx + 1}. {content.title}
+                                              </div>
+                                              <div style={{ 
+                                                fontSize: '11px', 
+                                                color: '#6b7280',
+                                                display: 'flex',
+                                                gap: '8px'
+                                              }}>
+                                                {content.duration && <span>⏱️ {content.duration}</span>}
+                                                {content.price && <span>💰 {content.price.toLocaleString()}원</span>}
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 ))
                               ) : (

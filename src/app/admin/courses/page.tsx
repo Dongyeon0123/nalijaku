@@ -25,7 +25,8 @@ import { CSS } from '@dnd-kit/utilities';
 interface Lesson {
   id: number;
   order: number;
-  title: string; // 차시 제목으로 변경
+  title?: string; // 차시 제목 (프론트엔드용)
+  materials?: string; // 백엔드에서 반환하는 제목 필드
   description: string;
   pdfUrl?: string;
   type?: string; // 이론, 실습, 게임
@@ -102,7 +103,7 @@ function SortableLessonItem({ lesson, courseId, onEdit, onDelete }: {
       </div>
       <div style={{ flex: 1, marginLeft: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-          <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{lesson.title}</p>
+          <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#383838' }}>{lesson.title || lesson.materials || '제목 없음'}</p>
           <span style={{
             padding: '2px 8px',
             backgroundColor: typeColor.bg,
@@ -511,7 +512,20 @@ export default function CoursesPage() {
         // 백엔드가 이제 한글 카테고리를 반환하므로 변환 불필요
         console.log('📚 강좌 목록 로드 완료:', result.data.length, '개');
         console.log('📚 첫 번째 강좌 courseId:', result.data[0]?.courseId);
-        setCourses(result.data);
+        
+        // lessons 데이터 정규화: materials 필드를 title로 매핑
+        const normalizedData = result.data.map((course: Course) => {
+          if (course.lessons && course.lessons.length > 0) {
+            const normalizedLessons = course.lessons.map((lesson: Lesson) => ({
+              ...lesson,
+              title: lesson.materials || lesson.title || '제목 없음'
+            }));
+            return { ...course, lessons: normalizedLessons };
+          }
+          return course;
+        });
+        
+        setCourses(normalizedData);
       }
 
       // 카테고리는 별도 API에서 가져오기
@@ -1267,7 +1281,12 @@ export default function CoursesPage() {
                                             courseId={course.id}
                                             onEdit={(lesson) => {
                                               setEditingLesson(lesson);
-                                              setLessonFormData({ order: lesson.order, title: lesson.title, description: lesson.description, type: lesson.type || '이론' });
+                                              setLessonFormData({ 
+                                                order: lesson.order, 
+                                                title: lesson.title || lesson.materials || '', 
+                                                description: lesson.description, 
+                                                type: lesson.type || '이론' 
+                                              });
                                               setLessonPdfFile(null);
                                               setShowLessonModal(true);
                                             }}
