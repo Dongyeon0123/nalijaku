@@ -56,8 +56,12 @@ interface CourseGroup {
     contents?: Array<{
       id: number;
       title: string;
+      description?: string;
+      type?: string;
+      order?: number;
       duration?: string;
       price?: number;
+      pdfUrl?: string;
     }>;
   }>;
   createdAt: string;
@@ -218,9 +222,61 @@ export default function MyPage() {
           const instructorCoursesResponse = await api.get(`/api/instructors/by-user/${userId}/courses`);
           
           console.log('✅ 강사 강의 목록 응답:', instructorCoursesResponse.data);
+          console.log('📊 응답 데이터 구조:', JSON.stringify(instructorCoursesResponse.data, null, 2));
           
           if (instructorCoursesResponse.data.success) {
-            setInstructorCourses(instructorCoursesResponse.data.data);
+            const courseGroups = instructorCoursesResponse.data.data;
+            console.log('📚 강의 그룹 수:', courseGroups.length);
+            
+            // lessons를 contents로 매핑
+            const normalizedGroups = courseGroups.map((group: any) => ({
+              ...group,
+              courses: group.courses?.map((course: any) => ({
+                ...course,
+                // lessons 배열을 contents로 변환
+                contents: course.lessons?.map((lesson: any) => ({
+                  id: lesson.id,
+                  title: lesson.materials || `${lesson.order}차시`,
+                  description: lesson.description,
+                  type: lesson.type,
+                  order: lesson.order,
+                  pdfUrl: lesson.pdfUrl
+                })) || []
+              })) || []
+            }));
+            
+            // 각 그룹의 강좌와 차시 정보 로그
+            normalizedGroups.forEach((group: any, idx: number) => {
+              console.log(`\n📖 그룹 ${idx + 1}: ${group.schoolName}`);
+              console.log(`  - 강좌 수: ${group.courses?.length || 0}`);
+              
+              if (group.courses && group.courses.length > 0) {
+                group.courses.forEach((course: any, courseIdx: number) => {
+                  console.log(`\n  📘 강좌 ${courseIdx + 1}: ${course.title}`);
+                  console.log(`    - ID: ${course.id}`);
+                  console.log(`    - 카테고리: ${course.category}`);
+                  console.log(`    - contents 존재: ${course.contents ? 'O' : 'X'}`);
+                  console.log(`    - contents 길이: ${course.contents?.length || 0}`);
+                  
+                  if (course.contents && course.contents.length > 0) {
+                    console.log(`    - 차시 목록:`);
+                    course.contents.forEach((content: any, contentIdx: number) => {
+                      console.log(`      ${contentIdx + 1}. ${content.title || '제목없음'}`);
+                      console.log(`         - ID: ${content.id}`);
+                      console.log(`         - 타입: ${content.type || '없음'}`);
+                      console.log(`         - 순서: ${content.order || '없음'}`);
+                      console.log(`         - 설명: ${content.description || '없음'}`);
+                    });
+                  } else {
+                    console.warn(`    ⚠️ 차시 정보가 없습니다!`);
+                  }
+                });
+              } else {
+                console.warn(`  ⚠️ 강좌가 없습니다!`);
+              }
+            });
+            
+            setInstructorCourses(normalizedGroups);
           }
         } catch (error: any) {
           console.error('❌ 강사 강의 목록 로드 실패:', error);
@@ -1252,7 +1308,7 @@ export default function MyPage() {
                                 alignItems: 'center',
                                 gap: '6px'
                               }}>
-                                📖 포함된 콘텐츠 ({course.contents.length}개)
+                                📖 할당된 차시 ({course.contents.length}개)
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 {course.contents.map((content, contentIdx) => (
@@ -1275,14 +1331,40 @@ export default function MyPage() {
                                         color: '#1f2937',
                                         marginBottom: '4px'
                                       }}>
-                                        {contentIdx + 1}. {content.title}
+                                        {content.title}
                                       </div>
+                                      {content.description && (
+                                        <div style={{ 
+                                          fontSize: '12px', 
+                                          color: '#6b7280',
+                                          marginBottom: '4px'
+                                        }}>
+                                          {content.description}
+                                        </div>
+                                      )}
                                       <div style={{ 
                                         fontSize: '12px', 
                                         color: '#6b7280',
                                         display: 'flex',
-                                        gap: '12px'
+                                        gap: '12px',
+                                        alignItems: 'center'
                                       }}>
+                                        {content.type && (
+                                          <span style={{
+                                            padding: '2px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '11px',
+                                            fontWeight: '600',
+                                            backgroundColor: content.type === '이론' ? '#E1BEE7' : 
+                                                           content.type === '실습' ? '#C8E6C9' : 
+                                                           content.type === '게임' ? '#FFF9C4' : '#B3E5FC',
+                                            color: content.type === '이론' ? '#6A1B9A' : 
+                                                   content.type === '실습' ? '#2E7D32' : 
+                                                   content.type === '게임' ? '#F57F17' : '#01579B'
+                                          }}>
+                                            {content.type}
+                                          </span>
+                                        )}
                                         {content.duration && <span>⏱️ {content.duration}</span>}
                                         {content.price && <span>💰 {content.price.toLocaleString()}원</span>}
                                       </div>

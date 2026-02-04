@@ -418,11 +418,55 @@ export default function InstructorsManagementPage() {
       const result = response.data;
       
       console.log('📦 API 응답:', result);
+      console.log('📊 응답 데이터 구조:', JSON.stringify(result, null, 2));
       
       const coursesData = result.success ? result.data : (Array.isArray(result.data) ? result.data : []);
-      console.log('📚 파싱된 강의 그룹 목록:', coursesData);
       
-      setAssignedCourses(coursesData);
+      console.log('📚 원본 강의 그룹:', coursesData);
+      
+      // lessons를 contents로 변환
+      const normalizedData = coursesData.map((group: any) => {
+        console.log(`\n🏫 그룹: ${group.schoolName}`);
+        console.log(`  - 강좌 수: ${group.courses?.length || 0}`);
+        
+        const normalizedCourses = group.courses?.map((course: any) => {
+          console.log(`\n  📘 강좌: ${course.title}`);
+          console.log(`    - lessons 존재: ${course.lessons ? 'O' : 'X'}`);
+          console.log(`    - lessons 길이: ${course.lessons?.length || 0}`);
+          
+          if (course.lessons && course.lessons.length > 0) {
+            console.log(`    - lessons 데이터:`, course.lessons);
+          }
+          
+          const contents = course.lessons?.map((lesson: any) => ({
+            id: lesson.id,
+            title: lesson.materials || lesson.title || '제목 없음',
+            description: lesson.description,
+            type: lesson.type,
+            order: lesson.order,
+            pdfUrl: lesson.pdfUrl
+          })) || [];
+          
+          console.log(`    - 변환된 contents 길이: ${contents.length}`);
+          if (contents.length > 0) {
+            console.log(`    - contents 데이터:`, contents);
+          }
+          
+          return {
+            ...course,
+            contents
+          };
+        }) || [];
+        
+        return {
+          ...group,
+          courses: normalizedCourses
+        };
+      });
+      
+      console.log('✅ 최종 정규화된 데이터:', normalizedData);
+      
+      setAssignedCourses(normalizedData);
     } catch (error: any) {
       console.error('❌ 할당된 강의 목록 로드 실패:', error);
       
@@ -1124,7 +1168,6 @@ export default function InstructorsManagementPage() {
                                       )}
                                       <div style={{ fontSize: '11px', color: '#999', display: 'flex', gap: '8px' }}>
                                         {content.type && <span>📌 {content.type}</span>}
-                                        {content.order && <span>🔢 {content.order}차시</span>}
                                       </div>
                                     </div>
                                   </div>
@@ -1363,7 +1406,7 @@ export default function InstructorsManagementPage() {
               </button>
             </div>
 
-            <div style={{ padding: '20px' }}>
+            <div className={styles.manageCourseModalContent}>
               {loadingAssignedCourses ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
                   강의 목록을 불러오는 중...
@@ -1373,13 +1416,13 @@ export default function InstructorsManagementPage() {
                   할당된 강의가 없습니다.
                 </div>
               ) : (
-                <div style={{ 
-                  maxHeight: '500px', 
-                  overflowY: 'auto',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '16px'
-                }}>
+                <div 
+                  style={{ 
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px'
+                  }}
+                >
                   {assignedCourses.map(group => {
                     const isExpanded = expandedGroups.has(group.id);
                     
@@ -1515,14 +1558,17 @@ export default function InstructorsManagementPage() {
                             }}>
                               📖 포함된 강의 목록
                             </h4>
-                            <div style={{ 
-                              display: 'flex', 
-                              flexDirection: 'column', 
-                              gap: '12px',
-                              maxHeight: '400px',
-                              overflowY: 'auto',
-                              paddingRight: '8px'
-                            }}>
+                            <div 
+                              className={styles.courseListScroll}
+                              style={{ 
+                                display: 'flex', 
+                                flexDirection: 'column', 
+                                gap: '12px',
+                                maxHeight: '400px',
+                                overflowY: 'auto',
+                                paddingRight: '8px'
+                              }}
+                            >
                               {group.courses && group.courses.length > 0 ? (
                                 group.courses.map((course, idx) => (
                                   <div 
@@ -1626,10 +1672,38 @@ export default function InstructorsManagementPage() {
                                                 fontSize: '12px', 
                                                 fontWeight: '600', 
                                                 color: '#1f2937',
-                                                marginBottom: '2px'
+                                                marginBottom: '4px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px'
                                               }}>
-                                                {contentIdx + 1}. {content.title}
+                                                <span>{content.title}</span>
+                                                {content.type && (
+                                                  <span style={{
+                                                    padding: '2px 6px',
+                                                    borderRadius: '4px',
+                                                    fontSize: '10px',
+                                                    fontWeight: '600',
+                                                    backgroundColor: content.type === '이론' ? '#E1BEE7' : 
+                                                                   content.type === '실습' ? '#C8E6C9' : 
+                                                                   content.type === '게임' ? '#FFF9C4' : '#B3E5FC',
+                                                    color: content.type === '이론' ? '#6A1B9A' : 
+                                                           content.type === '실습' ? '#2E7D32' : 
+                                                           content.type === '게임' ? '#F57F17' : '#01579B'
+                                                  }}>
+                                                    {content.type}
+                                                  </span>
+                                                )}
                                               </div>
+                                              {content.description && (
+                                                <div style={{ 
+                                                  fontSize: '11px', 
+                                                  color: '#6b7280',
+                                                  marginBottom: '4px'
+                                                }}>
+                                                  {content.description}
+                                                </div>
+                                              )}
                                               <div style={{ 
                                                 fontSize: '11px', 
                                                 color: '#6b7280',
