@@ -32,7 +32,7 @@ export default function RecruitmentPopup() {
   };
 
   const handleImageClick = () => {
-    window.open('https://forms.gle/6pLbXYqHtTHx88e9A', '_blank');
+    window.open('https://forms.gle/2p1DWHdw23st2eYA9', '_blank');
   };
 
   if (!isVisible) return null;
