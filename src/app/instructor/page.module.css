@@ -97,7 +97,7 @@
 }
 
 .scrollIndicator {
-    margin-top: 40px;
+    margin-top: 80px;
     animation: bounce 2s infinite;
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
@@ -139,7 +139,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 32px;
-    max-width: 1200px;
+    max-width: 900px;
     margin: 0 auto;
 }
 
