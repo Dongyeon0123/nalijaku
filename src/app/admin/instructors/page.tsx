@@ -62,8 +62,12 @@ interface CourseGroup {
     contents?: Array<{
       id: number;
       title: string;
+      description?: string;
+      type?: string;
+      order?: number;
       duration?: string;
       price?: number;
+      pdfUrl?: string;
     }>;
   }>;
   createdAt: string;
