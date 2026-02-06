@@ -10,511 +10,224 @@
 }
 
 .content {
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
-    padding: 60px 24px;
-    margin-top: 50px;
+    padding: 0;
+    margin-top: 80px;
 }
 
-.menuContainer {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #BCC1CAFF;
-}
-
-.menuItem {
-    font-size: 18px;
-    font-weight: 500;
-    color: #606060;
-    cursor: pointer;
-    padding-bottom: 8px;
-    padding-left: 16px;
-    padding-right: 16px;
-    border-bottom: 2px solid transparent;
-    transition: all 0.3s ease;
-}
-
-.menuItem:hover {
-    color: #383838;
-}
-
-.menuItem.active {
-    color: #0066ff;
-    border-bottom-color: #0066ff;
-    font-weight: 600;
-}
-
-.instructorContent {
-    text-align: center;
-    padding: 20px 0;
-}
-
-
-.backgroundContainer {
+.heroSection {
     position: relative;
-    display: inline-block;
     width: 100%;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: 1000px;
 }
 
-.profileCircle {
+.heroContent {
     position: absolute;
-    right: 40px;
-    top: 50%;
+    top: 40%;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
     transform: translateY(-50%);
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 4px solid #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-
-.leftContent {
-    position: absolute;
-    left: 40px;
-    top: 50%;
-    transform: translateY(-50%);
-    max-width: 400px;
-    text-align: left;
+.heroText {
+    text-align: center;
+    color: rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.subtitle {
-    font-size: 18px;
-    color: #606060;
-    margin: 0 0 8px 0;
-    font-weight: 500;
-}
-
-.mainTitle {
-    font-size: 32px;
+.heroTitle {
+    font-size: 28px;
     font-weight: 800;
-    color: #383838;
+    color: #01C187;
     margin: 0 0 12px 0;
-    line-height: 1.3;
 }
 
-.courseTag {
-    display: inline-block;
-    background-color: #F3F6FCFF;
-    color: #193162FF;
-    padding: 14px 36px;
-    border-radius: 20px;
-    font-size: 14px;
+.heroSubtitle {
+    font-size: 52px;
+    font-weight: 900;
+    color: #000000;
+    margin: 0 0 24px 0;
+}
+
+.heroDescription {
+    font-size: 22px;
     font-weight: 500;
-    margin-bottom: 40px;
-    margin-right: 10px;
+    color: #000000;
+    line-height: 1.8;
+    margin: 0 0 32px 0;
 }
 
-.detailLink {
-    display: inline-block;
-    color: #333333FF;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    margin-top: 10px;
-}
-
-.detailLink:hover {
-    color: #606060;
-}
-
-.subImageContainer {
-    margin-top: 20px;
-}
-
-.instructor {
-    margin-top: -10px;
-}
-
-.instructorHeader {
+.heroButton {
+    padding: 18px 40px;
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    min-width: 240px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-.instructorTitle {
-    font-size: 24px;
-    font-weight: 700;
-    color: #383838;
-    margin: 0;
+.heroButton svg {
+    margin-left: auto;
+    margin-right: -27px;
 }
 
-.registerButton {
-    padding: 12px 24px;
-    background-color: #ffffff;
-    color: #323842;
-    border: 1.5px solid #323842;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.registerButton:hover {
-    background-color: #323842;
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(50, 56, 66, 0.2);
+.heroButton:hover {
+    background-color: #333333;
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.scrollIndicator {
+    margin-top: 40px;
+    animation: bounce 2s infinite;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(10px);
+    }
+}
+
+.instructorSection {
+    padding: 80px 120px;
+    background-color: #ffffff;
+}
+
+.sectionHeader {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.sectionTitle {
+    font-size: 42px;
+    font-weight: 800;
+    color: #000000;
+    margin: 0 0 16px 0;
+}
+
+.sectionSubtitle {
+    font-size: 18px;
+    font-weight: 400;
+    color: #666666;
+    margin: 0;
 }
 
 .instructorGrid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .instructorCard {
     background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 0px;
-    min-height: 350px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
 }
 
 .instructorCard:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    transform: translateY(-4px);
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-@media (max-width: 1200px) {
-    .instructorGrid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+.cardImage {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background-color: #f5f5f5;
 }
 
-@media (max-width: 768px) {
-    .instructorGrid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 480px) {
-    .instructorGrid {
-        grid-template-columns: 1fr;
-    }
+.cardContent {
+    padding: 24px;
 }
 
 .cardHeader {
-    padding: 16px;
     display: flex;
     gap: 8px;
-    align-items: center;
+    margin-bottom: 12px;
 }
 
-.region {
-    font-size: 14px;
+.cardRegion {
+    padding: 6px 12px;
+    background-color: #E8F5E9;
+    color: #2E7D32;
+    border-radius: 6px;
+    font-size: 13px;
     font-weight: 600;
-    color: #04AD74;
-    background-color: #f0f8f5;
-    padding: 4px 8px;
-    border-radius: 4px;
 }
 
-.name {
-    margin-top: 1.2px;
-    font-size: 15px;
+.cardCategory {
+    padding: 6px 12px;
+    background-color: #E3F2FD;
+    color: #1565C0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.cardName {
+    font-size: 22px;
     font-weight: 700;
-    color: #383838;
+    color: #000000;
+    margin: 0 0 8px 0;
 }
 
-.cardSubtext {
-    text-align: center;
+.cardSubtitle {
     font-size: 14px;
-    color: #565D6DFF;
-    margin: 0 0 16px 0;
-    padding: 0 16px;
+    font-weight: 400;
+    color: #666666;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+    min-height: 44px;
 }
 
-.cardImageContainer {
-    display: flex;
-    justify-content: center;
-    padding: 0 16px 16px 16px;
-}
-
-.cardImageContainer img {
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #f0f0f0;
-}
-
-
-.inviteButton {
-    width: calc(100% - 32px);
-    margin: 0 16px 12px 16px;
-    padding: 10px 16px;
-    background-color: #04AD74;
+.cardButton {
+    width: 100%;
+    padding: 12px 24px;
+    background-color: #000000;
     color: #ffffff;
     border: none;
     border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.inviteButton:hover {
-    background-color: #00A169;
-}
-
-.cardButtonGroup {
-    display: flex;
-    gap: 8px;
-    padding: 0 16px 16px 16px;
-}
-
-.secondaryButton {
-    flex: 1;
-    padding: 10px 12px;
-    background-color: #F3F4F6;
-    color: #323742;
-    border: none;
-    border-radius: 8px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.secondaryButton:hover {
-    background-color: #E5E7EB;
+.cardButton:hover {
+    background-color: #333333;
 }
 
-
-/* 모바일 반응형 */
-@media (max-width: 768px) {
-    .content {
-        width: 95%;
-        padding: 40px 16px;
-        margin-top: 60px;
-        overflow-x: hidden;
-    }
-
-    .menuContainer {
-        gap: 15px;
-        margin-bottom: 8px;
-        padding-bottom: 12px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .menuItem {
-        font-size: 14px;
-        padding-left: 12px;
-        padding-right: 12px;
-        white-space: nowrap;
-    }
-
-    .backgroundContainer {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
-        border-radius: 20px;
-        padding: 40px 20px;
-        margin: 0 auto 30px;
-        width: 100%;
-        box-sizing: border-box;
-        box-shadow: 0 4px 20px rgba(4, 173, 116, 0.1);
-    }
-
-    .backgroundContainer>img {
-        display: none;
-    }
-
-    .leftContent {
-        position: static;
-        transform: none;
-        max-width: 100%;
-        text-align: center;
-        margin-bottom: 0;
-        order: 2;
-        width: 100%;
-    }
-
-    .subtitle {
-        font-size: 13px;
-        margin: 0 0 8px 0;
-        color: #04AD74;
-        font-weight: 600;
-    }
-
-    .mainTitle {
-        font-size: 22px;
-        margin: 0 0 12px 0;
-        line-height: 1.4;
-    }
-
-    .instructorName {
-        font-size: 14px;
-        margin: 0 0 14px 0;
-        color: #606060;
-    }
-
-    .courseTag {
-        display: inline-block;
-        padding: 8px 14px;
-        font-size: 11px;
-        margin-bottom: 16px;
-        margin-right: 6px;
-        background-color: #ffffff;
-        border: 1px solid #04AD74;
-        color: #04AD74;
-        border-radius: 16px;
-    }
-
-    .detailLink {
-        font-size: 13px;
-        margin-top: 12px;
-        color: #04AD74;
-        font-weight: 600;
-    }
-
-    .profileCircle {
-        position: static;
-        transform: none;
-        width: 140px;
-        height: 140px;
-        margin: 0 auto 25px;
-        order: 1;
-        border: 5px solid #ffffff;
-        box-shadow: 0 6px 16px rgba(4, 173, 116, 0.2);
-    }
-
-    .subImageContainer {
-        display: none;
-    }
-
-    .instructorHeader {
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
-        margin-bottom: 20px;
-    }
-
-    .instructorTitle {
-        font-size: 20px;
-    }
-
-    .registerButton {
-        width: 100%;
-        padding: 12px 16px;
-    }
-
-    .instructorGrid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-    }
-
-    .instructorCard {
-        min-height: 300px;
-    }
-
-    .cardHeader {
-        padding: 12px;
-    }
-
-    .region {
-        font-size: 12px;
-        padding: 3px 6px;
-    }
-
-    .name {
-        font-size: 13px;
-    }
-
-    .cardSubtext {
-        font-size: 12px;
-        margin: 0 0 12px 0;
-        padding: 0 12px;
-    }
-
-    .cardImageContainer {
-        padding: 0 12px 12px 12px;
-    }
-
-    .inviteButton {
-        width: calc(100% - 24px);
-        margin: 0 12px 10px 12px;
-        padding: 9px 12px;
-        font-size: 12px;
-    }
-
-    .cardButtonGroup {
-        gap: 6px;
-        padding: 0 12px 12px 12px;
-    }
-
-    .secondaryButton {
-        padding: 9px 10px;
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .content {
-        width: 90%;
-        padding: 30px 12px;
-        margin-top: 80px;
-    }
-
-    .menuContainer {
-        gap: 10px;
-        padding-bottom: 10px;
-    }
-
-    .menuItem {
-        font-size: 12px;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .mainTitle {
-        font-size: 20px;
-    }
-
-    .courseTag {
-        padding: 6px 12px;
-        font-size: 11px;
-        margin-bottom: 15px;
-    }
-
-    .profileCircle {
-        width: 120px;
-        height: 120px;
-        margin: 0 auto 20px;
-    }
-
-    .instructorGrid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .instructorCard {
-        min-height: 280px;
-    }
-
-    .instructorHeader {
-        margin-bottom: 15px;
-    }
-
-    .instructorTitle {
-        font-size: 18px;
-    }
-
-    .registerButton {
-        font-size: 13px;
-    }
+.loadingState,
+.emptyState {
+    text-align: center;
+    padding: 80px 20px;
+    color: #999999;
+    font-size: 16px;
 }
