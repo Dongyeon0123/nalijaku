@@ -34,8 +34,8 @@
 }
 
 .header.transparent:hover .curriculumButton {
-  border: 2px solid #00C187;
-  color: #00C187;
+  border: 2px solid #916AFF;
+  color: #916AFF;
   text-shadow: none;
 }
 
@@ -234,11 +234,11 @@
 
 .curriculumButton {
   padding: 8px 16px;
-  border: 2px solid #1a1a1a;
+  border: 2px solid #916AFF;
   border-radius: 6px;
   margin-bottom: -1px;
   background: #ffffff;
-  color: #1a1a1a;
+  color: #916AFF;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -246,8 +246,8 @@
 }
 
 .curriculumButton:hover {
-  background: #1a1a1a;
-  border-color: #1a1a1a;
+  background: #916AFF;
+  border-color: #916AFF;
   color: #ffffff;
 }
 
@@ -259,22 +259,22 @@
 }
 
 .header.transparent .curriculumButton:hover {
-  background: #1a1a1a;
-  border-color: #1a1a1a;
+  background: #916AFF;
+  border-color: #916AFF;
   color: white;
   text-shadow: none;
-  box-shadow: 0 0 15px rgba(26, 26, 26, 0.6);
+  box-shadow: 0 0 15px rgba(145, 106, 255, 0.6);
 }
 
 .header.scrolled .curriculumButton {
-  border: 2px solid #1a1a1a;
+  border: 2px solid #916AFF;
   background: #ffffff;
-  color: #1a1a1a;
+  color: #916AFF;
   text-shadow: none;
 }
 
 .header.scrolled .curriculumButton:hover {
-  background: #1a1a1a;
+  background: #916AFF;
   color: white;
 }
 
