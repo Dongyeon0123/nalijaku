@@ -13,6 +13,8 @@ export default function SidebarNav() {
 
   const allNavItems = [
     { id: 'home', label: 'Home', icon: IoHomeOutline },
+    { id: 'about', label: 'About Us', icon: IoHelpOutline },
+    { id: 'services', label: 'Services', icon: IoBookOutline },
     { id: 'cooperation', label: '협력 업체', icon: IoPeopleOutline },
     { id: 'customer', label: '고객사', icon: IoBusinessOutline },
     { id: 'review', label: '교육 후기', icon: IoHeartOutline },

@@ -12,6 +12,7 @@ import Contact from '@/components/Contact';
 import News from '@/components/News';
 import RecruitmentPopup from '@/components/RecruitmentPopup';
 import AboutUs from '@/components/AboutUs';
+import Services from '@/components/Services';
 
 export default function Home() {
   React.useEffect(() => {
@@ -48,6 +49,9 @@ export default function Home() {
           </section>
           <section id="about">
             <AboutUs />
+          </section>
+          <section id="services">
+            <Services />
           </section>
           <section id="cooperation">
             <Cooperation />

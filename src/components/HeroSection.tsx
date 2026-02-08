@@ -186,12 +186,12 @@ export default function HeroSection() {
     };
   }, [isMounted]);
 
-  const titleText = '날자, 비교과의 세계로 !';
-  const subtitleText = '학교·강사·학생을 연결하는 디지털 비교과 교육 플랫폼';
+  const titleText = '날리자, 학교 밖 배움을 학교 안으로';
+  const subtitleText = '스스로 질문하고 답을 찾는 힘, 교육용 AI 튜터 디지털 비교과 플랫폼';
   
   // 모바일에서 줄바꿈을 위한 텍스트 분리
-  const subtitlePart1 = '학교·강사·학생을 연결하는';
-  const subtitlePart2 = '디지털 비교과 교육 플랫폼';
+  const subtitlePart1 = '스스로 질문하고 답을 찾는 힘,';
+  const subtitlePart2 = '교육용 AI 튜터 디지털 비교과 플랫폼';
 
   return (
     <div ref={containerRef} className={styles.heroSection}>

@@ -1,0 +1,28 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  padding: 80px 20px;
+}
+
+.content {
+  max-width: 1200px;
+  width: 100%;
+  text-align: center;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #000000;
+  margin: 0 0 24px 0;
+}
+
+.description {
+  font-size: 20px;
+  color: #666666;
+  line-height: 1.8;
+  margin: 0;
+}
