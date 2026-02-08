@@ -108,28 +108,31 @@ export default function InstructorPage() {
                             <div className={styles.instructorGrid}>
                                 {instructors.map((instructor) => (
                                     <div key={instructor.id} className={styles.instructorCard}>
-                                        <div className={styles.cardImage}>
-                                            <img
-                                                src={instructor.imageUrl}
-                                                alt={instructor.name}
-                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                            />
-                                        </div>
-                                        <div className={styles.cardContent}>
-                                            <div className={styles.cardHeader}>
-                                                <span className={styles.cardRegion}>{instructor.region}</span>
-                                                {instructor.category && (
-                                                    <span className={styles.cardCategory}>{instructor.category}</span>
-                                                )}
+                                        <img
+                                            src={instructor.imageUrl}
+                                            alt={instructor.name}
+                                            className={styles.cardBackgroundImage}
+                                        />
+                                        <div className={styles.cardOverlay}>
+                                            <div className={styles.cardContent}>
+                                                <div className={styles.cardHeader}>
+                                                    <span className={styles.cardRegion}>{instructor.region}</span>
+                                                    {instructor.category && (
+                                                        <span className={styles.cardCategory}>{instructor.category}</span>
+                                                    )}
+                                                </div>
+                                                <h3 className={styles.cardName}>{instructor.name}</h3>
+                                                <p className={styles.cardSubtitle}>{instructor.profileDescription || instructor.subtitle}</p>
                                             </div>
-                                            <h3 className={styles.cardName}>{instructor.name}</h3>
-                                            <p className={styles.cardSubtitle}>{instructor.subtitle}</p>
-                                            <button 
-                                                className={styles.cardButton}
-                                                onClick={() => window.location.href = `/instructor/${instructor.id}`}
-                                            >
-                                                프로필 보기
-                                            </button>
+                                            <div style={{ padding: '24px', textAlign: 'right' }}>
+                                                <button 
+                                                    className={styles.cardButton}
+                                                    onClick={() => window.location.href = `/instructor/${instructor.id}`}
+                                                >
+                                                    <span className={styles.buttonText}>강사 프로필 더보기</span>
+                                                    <span className={styles.buttonIcon}>&gt;</span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
