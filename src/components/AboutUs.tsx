@@ -43,7 +43,7 @@ export default function AboutUs() {
           >
             <div className={`${styles.box} ${styles.box1}`}>
               <p className={styles.boxText}>
-                "복잡한 행정 업무는 줄이고, 믿을 수 있는<br></br><strong>'검증된 수업'</strong>만 바로 도입할 순 없을까?"
+                " 복잡한 행정 업무는 줄이고, 믿을 수 있는<br></br><span style={{fontWeight:"700", color:"#000000"}}>'검증된 수업'</span>만 바로 도입할 순 없을까 ? "
               </p>
               <img src="/AboutUs/about1.png" alt="About 1" className={`${styles.boxImage} ${styles.imageRight} ${styles.image1}`} />
             </div>
@@ -57,8 +57,8 @@ export default function AboutUs() {
             <div className={`${styles.box} ${styles.box2}`}>
               <img src="/AboutUs/about2.png" alt="About 2" className={`${styles.boxImage} ${styles.imageLeft}`} />
               <p className={styles.boxText}>
-                "나중에 우리 아이 입시, 진로 너무 막막해요...<br></br><strong>객관적인 데이터
-                  </strong>로 <strong>진로 방향</strong>을 잡아주는 수업 없을까요?"
+                " 나중에 우리 아이 입시, 진로 너무 막막해요...<br></br><span style={{fontWeight:"700", color:"#000000"}}>객관적인 데이터</span>
+                  로 <span style={{fontWeight:"700", color:"#000000"}}>진로 방향</span>을 잡아주는 수업 없을까요 ? "
               </p>
             </div>
           </div>
@@ -70,7 +70,7 @@ export default function AboutUs() {
           >
             <div className={`${styles.box} ${styles.box3}`}>
               <p className={styles.boxText}>
-                "제 생각을 직접 결과물로 만드는<br></br><strong>'진짜' 재미있는 수업</strong>을 하고 싶어요."
+                " 제 생각을 직접 결과물로 만드는<br></br><span style={{fontWeight:"700", color:"#000000"}}>'진짜' 재미있는 수업</span>을 하고 싶어요. "
               </p>
               <img src="/AboutUs/about3.png" alt="About 3" className={`${styles.boxImage} ${styles.imageRight}`} />
             </div>
@@ -91,9 +91,9 @@ export default function AboutUs() {
           >
             <h3 className={styles.platformTitle}>AI 기반<br></br>디지털 비교과<br></br>교육 플랫폼</h3>
             <p className={styles.platformDescription}>
-              드론, 창업, AI 활용 등 다양한 비교과 수업을<br></br>온라인 플랫폼을 통해 교육하고,
+              드론, 창업, AI 활용 등 다양한 비교과 수업을<br></br><span style={{fontWeight:"700", color:"#000000"}}>온라인 플랫폼</span>을 통해 교육하고,
             </p>
-            <p className={styles.platformDescription}>결과를 AI가 소중한 데이터 자산으로<br></br>만들어 드립니다.</p>
+            <p className={styles.platformDescription}>결과를 AI가 <span style={{fontWeight:"700", color:"#000000"}}>소중한 데이터 자산</span>으로<br></br>만들어 드립니다.</p>
           </div>
           <img 
             src="/AboutUs/book.png" 
