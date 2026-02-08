@@ -279,8 +279,8 @@ a .serviceButton {
 
 .secondaryButton {
   padding: 16px 32px;
-  background: #00C187;
-  border: 2px solid #00C187;
+  background: #916AFF;
+  border: 2px solid #916AFF;
   border-radius: 12px;
   color: #ffffff;
   font-size: 18px;
@@ -306,8 +306,8 @@ a .serviceButton {
 
 .secondaryButton:hover {
   background: #ffffff;
-  color: #00A876;
-  border-color: #00C187;
+  color: #916AFF;
+  border-color: #916AFF;
 }
 
 @media (max-width: 768px) {

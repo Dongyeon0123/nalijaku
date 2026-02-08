@@ -5,16 +5,13 @@ import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import Cooperation from '@/components/Cooperation';
 import Customer from '@/components/Customer';
-import Why from '@/components/Why';
-import Why2 from '@/components/Why2';
 import SidebarNav from '@/components/SidebarNav';
-import How from '@/components/How';
-import Who from '@/components/Who';
 import Review from '@/components/Review';
 import Team from '@/components/Team';
 import Contact from '@/components/Contact';
 import News from '@/components/News';
 import RecruitmentPopup from '@/components/RecruitmentPopup';
+import AboutUs from '@/components/AboutUs';
 
 export default function Home() {
   React.useEffect(() => {
@@ -49,23 +46,14 @@ export default function Home() {
             <HeroSection />
             <Header />
           </section>
+          <section id="about">
+            <AboutUs />
+          </section>
           <section id="cooperation">
             <Cooperation />
           </section>
           <section id="customer">
             <Customer />
-          </section>
-          <section id="why">
-            <Why />
-          </section>
-          <section id="why2">
-            <Why2 />
-          </section>
-          <section id="who">
-            <Who />
-          </section>
-          <section id="how" style={{ minHeight: '230vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: "url('/How/HOWBackImage.png')", backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'relative' }}>
-            <How />
           </section>
           <section id="review">
             <Review />

@@ -186,12 +186,12 @@ export default function HeroSection() {
     };
   }, [isMounted]);
 
-  const titleText = '드론과 꿈을 하늘로 날리자쿠!';
-  const subtitleText = '국내 최초 학교 & 기관 대상, AI/XR 기반 드론 교육 전문 플랫폼';
+  const titleText = '날자, 비교과의 세계로 !';
+  const subtitleText = '학교·강사·학생을 연결하는 디지털 비교과 교육 플랫폼';
   
   // 모바일에서 줄바꿈을 위한 텍스트 분리
-  const subtitlePart1 = '국내 최초 학교 & 기관 대상, AI/XR 기반 ';
-  const subtitlePart2 = '드론 교육 전문 플랫폼';
+  const subtitlePart1 = '학교·강사·학생을 연결하는';
+  const subtitlePart2 = '디지털 비교과 교육 플랫폼';
 
   return (
     <div ref={containerRef} className={styles.heroSection}>
