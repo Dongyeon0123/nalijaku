@@ -139,7 +139,7 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
-    max-width: 1100px;
+    max-width: 1150px;
     margin: 0 auto;
 }
 
@@ -149,7 +149,7 @@
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
-    height: 440px;
+    height: 450px;
     background-color: #235851;
 }
 
@@ -218,8 +218,14 @@
     text-align: left;
 }
 
-.cardSubtitle {
+.cardNameSuffix {
     font-size: 14px;
+    font-weight: 400;
+    color: #ffffff;
+}
+
+.cardSubtitle {
+    font-size: 12px;
     font-weight: 400;
     color: #e0e0e0;
     line-height: 1.6;
@@ -248,18 +254,18 @@
 }
 
 .buttonText {
-    text-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+    text-shadow: 0 2px 12px rgba(255, 255, 255, 0.6), 0 0 8px rgba(255, 255, 255, 0.4);
 }
 
 .buttonIcon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     background-color: rgba(128, 128, 128, 0.3);
     border-radius: 50%;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .cardButton:hover {
@@ -276,4 +282,186 @@
     padding: 80px 20px;
     color: #999999;
     font-size: 16px;
+}
+
+/* 모달 스타일 */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modalContent {
+    background-color: #ffffff;
+    border-radius: 24px;
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modalClose {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.modalClose:hover {
+    background-color: #ffffff;
+    transform: rotate(90deg);
+}
+
+.modalHeader {
+    background: linear-gradient(135deg, #235851 0%, #1a4139 100%);
+    padding: 60px 40px 40px;
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+
+.modalImageSection {
+    flex-shrink: 0;
+}
+
+.modalImage {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.modalHeaderInfo {
+    flex: 1;
+    color: white;
+}
+
+.modalTags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.modalRegion {
+    padding: 8px 16px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #235851;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.modalCategory {
+    padding: 8px 16px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.modalName {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 12px 0;
+}
+
+.modalNameSuffix {
+    font-size: 24px;
+    font-weight: 400;
+}
+
+.modalSubtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.modalBody {
+    padding: 40px;
+}
+
+.modalSection {
+    margin-bottom: 32px;
+}
+
+.modalSection:last-child {
+    margin-bottom: 0;
+}
+
+.modalSectionTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #235851;
+    margin: 0 0 16px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #235851;
+}
+
+.modalText {
+    font-size: 15px;
+    color: #333333;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.modalList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modalListItem {
+    padding: 16px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #235851;
+}
+
+.modalListTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #235851;
+    margin-bottom: 6px;
+}
+
+.modalListMeta {
+    font-size: 14px;
+    color: #666666;
+    margin-bottom: 8px;
+}
+
+.modalListDesc {
+    font-size: 14px;
+    color: #333333;
+    line-height: 1.6;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
 }

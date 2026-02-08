@@ -516,12 +516,8 @@ export default function Header({ forceLightMode = false }: HeaderProps) {
             학습 자료
           </button>
           <a 
-            href="#" 
+            href="/instructor" 
             className={styles.navLink}
-            onClick={(e) => {
-              e.preventDefault();
-              alert('준비중입니다.');
-            }}
           >
             강사 소개
           </a>

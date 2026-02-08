@@ -15,11 +15,37 @@ interface Instructor {
     subtitle: string;
     imageUrl: string;
     profileDescription?: string;
+    education?: Array<{
+        school: string;
+        major: string;
+        degree: string;
+        graduationYear: number;
+    }>;
+    certificates?: Array<{
+        name: string;
+        issuer: string;
+        issueDate: string;
+    }>;
+    experience?: Array<{
+        company: string;
+        position: string;
+        startDate: string;
+        endDate: string;
+        description: string;
+    }>;
+    awards?: Array<{
+        name: string;
+        issuer: string;
+        awardDate: string;
+        description: string;
+    }>;
 }
 
 export default function InstructorPage() {
     const [instructors, setInstructors] = React.useState<Instructor[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const [selectedInstructor, setSelectedInstructor] = React.useState<Instructor | null>(null);
+    const [showModal, setShowModal] = React.useState(false);
 
     React.useEffect(() => {
         document.body.style.margin = '0';
@@ -121,13 +147,19 @@ export default function InstructorPage() {
                                                         <span className={styles.cardCategory}>{instructor.category}</span>
                                                     )}
                                                 </div>
-                                                <h3 className={styles.cardName}>{instructor.name}</h3>
+                                                <h3 className={styles.cardName}>
+                                                    {instructor.name}
+                                                    <span className={styles.cardNameSuffix}> 선생님</span>
+                                                </h3>
                                                 <p className={styles.cardSubtitle}>{instructor.profileDescription || instructor.subtitle}</p>
                                             </div>
                                             <div style={{ padding: '24px', textAlign: 'right' }}>
                                                 <button 
                                                     className={styles.cardButton}
-                                                    onClick={() => window.location.href = `/instructor/${instructor.id}`}
+                                                    onClick={() => {
+                                                        setSelectedInstructor(instructor);
+                                                        setShowModal(true);
+                                                    }}
                                                 >
                                                     <span className={styles.buttonText}>강사 프로필 더보기</span>
                                                     <span className={styles.buttonIcon}>&gt;</span>
@@ -145,6 +177,131 @@ export default function InstructorPage() {
                     </div>
                 </div>
             </main>
+
+            {/* 강사 프로필 모달 */}
+            {showModal && selectedInstructor && (
+                <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <button className={styles.modalClose} onClick={() => setShowModal(false)}>
+                            ×
+                        </button>
+                        
+                        <div className={styles.modalHeader}>
+                            <div className={styles.modalImageSection}>
+                                <img
+                                    src={selectedInstructor.imageUrl}
+                                    alt={selectedInstructor.name}
+                                    className={styles.modalImage}
+                                />
+                            </div>
+                            <div className={styles.modalHeaderInfo}>
+                                <div className={styles.modalTags}>
+                                    <span className={styles.modalRegion}>{selectedInstructor.region}</span>
+                                    {selectedInstructor.category && (
+                                        <span className={styles.modalCategory}>{selectedInstructor.category}</span>
+                                    )}
+                                </div>
+                                <h2 className={styles.modalName}>
+                                    {selectedInstructor.name}
+                                    <span className={styles.modalNameSuffix}> 선생님</span>
+                                </h2>
+                                <p className={styles.modalSubtitle}>{selectedInstructor.subtitle}</p>
+                            </div>
+                        </div>
+
+                        <div className={styles.modalBody}>
+                            {selectedInstructor.profileDescription && (
+                                <div className={styles.modalSection}>
+                                    <h3 className={styles.modalSectionTitle}>💬 소개</h3>
+                                    <p className={styles.modalText}>{selectedInstructor.profileDescription}</p>
+                                </div>
+                            )}
+
+                            {selectedInstructor.education && selectedInstructor.education.length > 0 && (
+                                <div className={styles.modalSection}>
+                                    <h3 className={styles.modalSectionTitle}>🎓 학력</h3>
+                                    <div className={styles.modalList}>
+                                        {selectedInstructor.education.map((edu, index) => (
+                                            <div key={index} className={styles.modalListItem}>
+                                                <div className={styles.modalListTitle}>
+                                                    {edu.school} - {edu.major}
+                                                </div>
+                                                <div className={styles.modalListMeta}>
+                                                    {edu.degree} | {edu.graduationYear}년 졸업
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {selectedInstructor.experience && selectedInstructor.experience.length > 0 && (
+                                <div className={styles.modalSection}>
+                                    <h3 className={styles.modalSectionTitle}>💼 경력</h3>
+                                    <div className={styles.modalList}>
+                                        {selectedInstructor.experience.map((exp, index) => (
+                                            <div key={index} className={styles.modalListItem}>
+                                                <div className={styles.modalListTitle}>
+                                                    {exp.company} - {exp.position}
+                                                </div>
+                                                <div className={styles.modalListMeta}>
+                                                    {exp.startDate} ~ {exp.endDate}
+                                                </div>
+                                                {exp.description && (
+                                                    <div className={styles.modalListDesc}>
+                                                        {exp.description}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {selectedInstructor.certificates && selectedInstructor.certificates.length > 0 && (
+                                <div className={styles.modalSection}>
+                                    <h3 className={styles.modalSectionTitle}>📜 자격증</h3>
+                                    <div className={styles.modalList}>
+                                        {selectedInstructor.certificates.map((cert, index) => (
+                                            <div key={index} className={styles.modalListItem}>
+                                                <div className={styles.modalListTitle}>
+                                                    {cert.name}
+                                                </div>
+                                                <div className={styles.modalListMeta}>
+                                                    {cert.issuer} | {cert.issueDate}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {selectedInstructor.awards && selectedInstructor.awards.length > 0 && (
+                                <div className={styles.modalSection}>
+                                    <h3 className={styles.modalSectionTitle}>🏆 수상</h3>
+                                    <div className={styles.modalList}>
+                                        {selectedInstructor.awards.map((award, index) => (
+                                            <div key={index} className={styles.modalListItem}>
+                                                <div className={styles.modalListTitle}>
+                                                    {award.name}
+                                                </div>
+                                                <div className={styles.modalListMeta}>
+                                                    {award.issuer} | {award.awardDate}
+                                                </div>
+                                                {award.description && (
+                                                    <div className={styles.modalListDesc}>
+                                                        {award.description}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
