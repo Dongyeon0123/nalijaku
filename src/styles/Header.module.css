@@ -429,7 +429,7 @@
 
 .progressBar {
   height: 100%;
-  background: #00C187;
+  background: linear-gradient(to right, #00C187 0%, #916AFF 100%);
   width: 0%;
   transition: width 0.3s ease-out;
 }
