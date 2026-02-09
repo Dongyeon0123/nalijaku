@@ -179,6 +179,67 @@
     justify-content: space-between;
 }
 
+.categoryBadge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+    color: #ffffff;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(8px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.categoryBadge::before {
+    content: '🏷️';
+    font-size: 14px;
+}
+
+/* 카테고리별 색상 */
+.categoryAI {
+    background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+}
+
+.categoryAI::before {
+    content: '🤖';
+}
+
+.category창업 {
+    background: linear-gradient(135deg, #7B1FA2 0%, #9C27B0 100%);
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.4);
+}
+
+.category창업::before {
+    content: '💡';
+}
+
+.category드론 {
+    background: linear-gradient(135deg, #1976D2 0%, #2196F3 100%);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.category드론::before {
+    content: '🚁';
+}
+
+.category환경 {
+    background: linear-gradient(135deg, #388E3C 0%, #4CAF50 100%);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.category환경::before {
+    content: '🌱';
+}
+
 .cardContent {
     padding: 24px;
     text-align: left;
@@ -196,15 +257,6 @@
     background-color: #ffffff;
     color: #235851;
     border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.cardCategory {
-    padding: 6px 12px;
-    background-color: rgba(227, 242, 253, 0.9);
-    color: #1565C0;
-    border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
 }

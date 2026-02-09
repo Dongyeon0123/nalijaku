@@ -724,6 +724,7 @@ export default function InstructorsManagementPage() {
       }
       submitData.append('name', formData.name);
       submitData.append('region', formData.region);
+      submitData.append('category', formData.category);
       submitData.append('subtitle', formData.subtitle);
       submitData.append('profileDescription', formData.profileDescription || '');
       // 배열을 JSON 문자열로 변환
@@ -737,10 +738,11 @@ export default function InstructorsManagementPage() {
       }
 
       // FormData 내용 로깅
-      console.log('FormData 내용:');
+      console.log('📦 FormData 내용:');
       for (const [key, value] of submitData.entries()) {
         console.log(`  ${key}:`, value);
       }
+      console.log('📌 카테고리 값:', formData.category);
 
       const isEditing = !!editingInstructor;
       const method = isEditing ? 'PUT' : 'POST';
@@ -779,12 +781,23 @@ export default function InstructorsManagementPage() {
       console.log('data 내용:', JSON.stringify(result.data, null, 2));
       console.log('🆔 생성된 강사 ID:', result.data?.id);
       console.log('👤 연결된 사용자 ID:', result.data?.userId);
+      console.log('🏷️ 카테고리:', result.data?.category);
       console.log('profileDescription:', result.data?.profileDescription);
       console.log('education:', result.data?.education);
       console.log('certificates:', result.data?.certificates);
       console.log('💼 experience:', result.data?.experience);
       console.log('awards:', result.data?.awards);
-      alert(`강사가 ${isEditing ? '수정' : '등록'}되었습니다.\n강사 ID: ${result.data?.id}\n사용자 ID: ${result.data?.userId || formData.userId}`);
+      
+      if (!result.data?.category) {
+        console.warn('⚠️ 백엔드 응답에 category 필드가 없습니다!');
+        console.warn('📤 전송한 카테고리:', formData.category);
+        console.warn('백엔드 개발자에게 다음을 확인 요청하세요:');
+        console.warn('1. Instructor 엔티티에 category 필드가 있는지');
+        console.warn('2. API에서 category를 저장하고 있는지');
+        console.warn('3. 응답에 category를 포함하고 있는지');
+      }
+      
+      alert(`강사가 ${isEditing ? '수정' : '등록'}되었습니다.\n강사 ID: ${result.data?.id}\n사용자 ID: ${result.data?.userId || formData.userId}${result.data?.category ? `\n카테고리: ${result.data.category}` : '\n⚠️ 카테고리가 저장되지 않았습니다 (백엔드 확인 필요)'}`);
       handleCloseModal();
       fetchInstructors();
       } catch (error: any) {

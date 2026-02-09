@@ -140,12 +140,14 @@ export default function InstructorPage() {
                                             className={styles.cardBackgroundImage}
                                         />
                                         <div className={styles.cardOverlay}>
+                                            {instructor.category && (
+                                                <div className={`${styles.categoryBadge} ${styles[`category${instructor.category}`]}`}>
+                                                    {instructor.category}
+                                                </div>
+                                            )}
                                             <div className={styles.cardContent}>
                                                 <div className={styles.cardHeader}>
                                                     <span className={styles.cardRegion}>{instructor.region}</span>
-                                                    {instructor.category && (
-                                                        <span className={styles.cardCategory}>{instructor.category}</span>
-                                                    )}
                                                 </div>
                                                 <h3 className={styles.cardName}>
                                                     {instructor.name}
