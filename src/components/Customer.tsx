@@ -47,7 +47,7 @@ export default function Customer() {
       <div className={styles.container}>
         <h2 className={`${styles.title} ${styles.animateUp}`}>고객사</h2>
         <p className={`${styles.subtitle} ${styles.animateUp} ${styles.delay1}`}>
-          아이들과 선생님을 위해서 드론 교육 솔루션을<br></br> <span style={{color: '#00A169', fontWeight: 'bold'}}>함께</span> 만들어가고 있습니다
+          아이들과 선생님을 위해서 교육 솔루션을<br></br> <span style={{color: '#00A169', fontWeight: 'bold'}}>함께</span> 만들어가고 있습니다
         </p>
 
         <div className={`${styles.marquee} ${styles.rowTop} ${styles.animateUp} ${styles.delay2}`}>
