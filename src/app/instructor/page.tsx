@@ -46,6 +46,7 @@ export default function InstructorPage() {
     const [loading, setLoading] = React.useState(true);
     const [selectedInstructor, setSelectedInstructor] = React.useState<Instructor | null>(null);
     const [showModal, setShowModal] = React.useState(false);
+    const [visibleCards, setVisibleCards] = React.useState<Set<number>>(new Set());
 
     React.useEffect(() => {
         document.body.style.margin = '0';
@@ -81,6 +82,29 @@ export default function InstructorPage() {
 
         fetchInstructors();
     }, []);
+
+    // Intersection Observer로 스크롤 애니메이션
+    React.useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const cardId = parseInt(entry.target.getAttribute('data-card-id') || '0');
+                        setVisibleCards((prev) => new Set(prev).add(cardId));
+                    }
+                });
+            },
+            {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            }
+        );
+
+        const cards = document.querySelectorAll('[data-card-id]');
+        cards.forEach((card) => observer.observe(card));
+
+        return () => observer.disconnect();
+    }, [instructors]);
 
     return (
         <div className={styles.container}>
@@ -132,22 +156,22 @@ export default function InstructorPage() {
                             </div>
                         ) : instructors.length > 0 ? (
                             <div className={styles.instructorGrid}>
-                                {instructors.map((instructor) => (
-                                    <div key={instructor.id} className={styles.instructorCard}>
+                                {instructors.map((instructor, index) => (
+                                    <div 
+                                        key={instructor.id} 
+                                        className={`${styles.instructorCard} ${visibleCards.has(instructor.id) ? styles.visible : ''}`}
+                                        data-card-id={instructor.id}
+                                        style={{ animationDelay: `${index * 0.1}s` }}
+                                    >
                                         <img
                                             src={instructor.imageUrl}
                                             alt={instructor.name}
                                             className={styles.cardBackgroundImage}
                                         />
                                         <div className={styles.cardOverlay}>
-                                            {instructor.category && (
-                                                <div className={`${styles.categoryBadge} ${styles[`category${instructor.category}`]}`}>
-                                                    {instructor.category}
-                                                </div>
-                                            )}
                                             <div className={styles.cardContent}>
                                                 <div className={styles.cardHeader}>
-                                                    <span className={styles.cardRegion}>{instructor.region}</span>
+                                                    <span className={styles.cardRegion}>{instructor.category}</span>
                                                 </div>
                                                 <h3 className={styles.cardName}>
                                                     {instructor.name}

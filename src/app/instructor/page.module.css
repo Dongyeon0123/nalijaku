@@ -43,6 +43,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    animation: heroFadeIn 1s ease-out;
+}
+
+@keyframes heroFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .heroTitle {
@@ -50,6 +62,18 @@
     font-weight: 800;
     color: #01C187;
     margin: 0 0 12px 0;
+    animation: slideInFromTop 0.8s ease-out;
+}
+
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .heroSubtitle {
@@ -57,6 +81,7 @@
     font-weight: 900;
     color: #000000;
     margin: 0 0 24px 0;
+    animation: slideInFromTop 0.8s ease-out 0.2s both;
 }
 
 .heroDescription {
@@ -65,6 +90,7 @@
     color: #000000;
     line-height: 1.8;
     margin: 0 0 32px 0;
+    animation: slideInFromTop 0.8s ease-out 0.4s both;
 }
 
 .heroButton {
@@ -82,6 +108,18 @@
     align-items: center;
     min-width: 240px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    animation: slideInFromBottom 0.8s ease-out 0.6s both;
+}
+
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .heroButton svg {
@@ -97,8 +135,17 @@
 
 .scrollIndicator {
     margin-top: 80px;
-    animation: bounce 2s infinite;
+    animation: bounce 2s infinite, fadeInDelay 0.8s ease-out 0.8s both;
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes fadeInDelay {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes bounce {
@@ -118,6 +165,18 @@
 .sectionHeader {
     text-align: center;
     margin-bottom: 60px;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .sectionTitle {
@@ -150,11 +209,33 @@
     transition: all 0.3s ease;
     height: 450px;
     background-color: #235851;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: none;
+}
+
+.instructorCard.visible {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .instructorCard:hover {
     transform: translateY(-8px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.instructorCard.visible:hover {
+    transform: translateY(-8px);
 }
 
 .cardBackgroundImage {
