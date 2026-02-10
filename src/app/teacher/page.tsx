@@ -38,16 +38,49 @@ export default function AttendancePage() {
             setActiveTab(tab);
         }
 
-        // Service Worker 등록
+        // Service Worker 등록 및 업데이트 감지
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker
                 .register('/sw.js')
                 .then((registration) => {
-                    console.log('Service Worker 등록 성공:', registration);
+                    console.log('✅ Service Worker 등록 성공:', registration);
+
+                    // 업데이트 확인
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('🔄 새 버전 발견!');
+                        
+                        if (newWorker) {
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // 새 버전이 설치됨 - 사용자에게 알림
+                                    console.log('✨ 새 버전 설치 완료');
+                                    
+                                    // 자동으로 새 버전 활성화
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    
+                                    // 페이지 새로고침 (선택사항)
+                                    if (confirm('새 버전이 있습니다. 업데이트하시겠습니까?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                    // 주기적으로 업데이트 확인 (1시간마다)
+                    setInterval(() => {
+                        registration.update();
+                    }, 60 * 60 * 1000);
                 })
                 .catch((error) => {
-                    console.log('Service Worker 등록 실패:', error);
+                    console.log('❌ Service Worker 등록 실패:', error);
                 });
+
+            // Service Worker가 제어권을 가져갔을 때
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                console.log('🔄 Service Worker 업데이트됨');
+            });
         }
     }, []);
 
