@@ -30,6 +30,11 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // 로그인 요청은 인터셉터 무시
+    if (originalRequest.url?.includes('/auth/login')) {
+      return Promise.reject(error);
+    }
+
     // 401 에러이고, 재시도하지 않은 경우
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -42,7 +47,12 @@ api.interceptors.response.use(
           console.log('❌ Refresh Token이 없습니다. 로그아웃 처리');
           logout();
           if (typeof window !== 'undefined') {
-            window.location.href = '/';
+            // 출근부 페이지에서는 출근부 로그인으로
+            if (window.location.pathname.startsWith('/attendance')) {
+              window.location.href = '/attendance/login';
+            } else {
+              window.location.href = '/';
+            }
           }
           return Promise.reject(error);
         }
@@ -73,7 +83,12 @@ api.interceptors.response.use(
         logout();
         if (typeof window !== 'undefined') {
           alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-          window.location.href = '/';
+          // 출근부 페이지에서는 출근부 로그인으로
+          if (window.location.pathname.startsWith('/attendance')) {
+            window.location.href = '/attendance/login';
+          } else {
+            window.location.href = '/';
+          }
         }
         return Promise.reject(refreshError);
       }
