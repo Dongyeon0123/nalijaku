@@ -45,6 +45,9 @@ interface CourseGroup {
   studentCount: number;
   startDate: string;
   endDate: string;
+  dayOfWeek?: string[]; // 요일
+  startTime?: string; // 시작 시간
+  endTime?: string; // 종료 시간
   status: string;
   courseCount: number;
   courses: Array<{
@@ -1083,6 +1086,32 @@ export default function MyPage() {
                               </span>
                             </div>
                           )}
+
+                          {/* 강의 요일 */}
+                          {group.dayOfWeek && group.dayOfWeek.length > 0 && (
+                            <div style={{ 
+                              backgroundColor: '#eff6ff',
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              border: '1px solid #bfdbfe',
+                              marginTop: '8px'
+                            }}>
+                              <span style={{ color: '#1e40af', fontWeight: '500' }}>📆 매주 {group.dayOfWeek.join(', ')}</span>
+                            </div>
+                          )}
+
+                          {/* 강의 시간 */}
+                          {group.startTime && group.endTime && (
+                            <div style={{ 
+                              backgroundColor: '#fef3c7',
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              border: '1px solid #fde68a',
+                              marginTop: '8px'
+                            }}>
+                              <span style={{ color: '#92400e', fontWeight: '500' }}>⏰ {group.startTime} ~ {group.endTime}</span>
+                            </div>
+                          )}
                           
                           <div className={styles.courseMetrics}>
                             <div className={styles.metric} style={{
@@ -1167,6 +1196,30 @@ export default function MyPage() {
                         }}>
                           📅 {new Date(selectedCourse.startDate).toLocaleDateString('ko-KR')} ~ {new Date(selectedCourse.endDate).toLocaleDateString('ko-KR')}
                           <span style={{ color: '#16a34a' }}> ({Math.ceil((new Date(selectedCourse.endDate).getTime() - new Date(selectedCourse.startDate).getTime()) / (1000 * 60 * 60 * 24) + 1)}일)</span>
+                        </p>
+                      )}
+                      {selectedCourse.dayOfWeek && selectedCourse.dayOfWeek.length > 0 && (
+                        <p style={{
+                          backgroundColor: '#eff6ff',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          border: '1px solid #bfdbfe',
+                          color: '#1e40af',
+                          marginTop: '8px'
+                        }}>
+                          📆 매주 {selectedCourse.dayOfWeek.join(', ')}
+                        </p>
+                      )}
+                      {selectedCourse.startTime && selectedCourse.endTime && (
+                        <p style={{
+                          backgroundColor: '#fef3c7',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          border: '1px solid #fde68a',
+                          color: '#92400e',
+                          marginTop: '8px'
+                        }}>
+                          ⏰ {selectedCourse.startTime} ~ {selectedCourse.endTime}
                         </p>
                       )}
                     </div>

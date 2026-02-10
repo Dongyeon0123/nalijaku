@@ -51,6 +51,9 @@ interface CourseGroup {
   studentCount: number;
   startDate: string;
   endDate: string;
+  dayOfWeek?: string[]; // 요일
+  startTime?: string; // 시작 시간
+  endTime?: string; // 종료 시간
   status: string;
   courseCount: number;
   courses: Array<{
@@ -110,7 +113,10 @@ export default function InstructorsManagementPage() {
     schoolName: '',      // 학교/기관 이름 추가
     studentCount: 0,
     startDate: '',
-    endDate: ''
+    endDate: '',
+    dayOfWeek: [] as string[], // 요일 (복수 선택 가능)
+    startTime: '',      // 시작 시간
+    endTime: ''         // 종료 시간
   });
 
   // 강의 관리 모달 상태
@@ -192,7 +198,10 @@ export default function InstructorsManagementPage() {
       schoolName: '',
       studentCount: 0,
       startDate: '',
-      endDate: ''
+      endDate: '',
+      dayOfWeek: [],
+      startTime: '',
+      endTime: ''
     });
     setShowAssignModal(true);
     fetchMaterials();
@@ -353,12 +362,28 @@ export default function InstructorsManagementPage() {
       return;
     }
 
+    if (assignmentDetails.dayOfWeek.length === 0) {
+      alert('강의 요일을 선택해주세요.');
+      return;
+    }
+
+    if (!assignmentDetails.startTime || !assignmentDetails.endTime) {
+      alert('강의 시간을 입력해주세요.');
+      return;
+    }
+
     // 날짜 유효성 검사
     const startDate = new Date(assignmentDetails.startDate);
     const endDate = new Date(assignmentDetails.endDate);
     
     if (endDate < startDate) {
       alert('종료일은 시작일보다 이후여야 합니다.');
+      return;
+    }
+
+    // 시간 유효성 검사
+    if (assignmentDetails.endTime <= assignmentDetails.startTime) {
+      alert('종료 시간은 시작 시간보다 이후여야 합니다.');
       return;
     }
 
@@ -377,6 +402,9 @@ export default function InstructorsManagementPage() {
         studentCount: assignmentDetails.studentCount,
         startDate: assignmentDetails.startDate,
         endDate: assignmentDetails.endDate,
+        dayOfWeek: assignmentDetails.dayOfWeek,
+        startTime: assignmentDetails.startTime,
+        endTime: assignmentDetails.endTime,
         materialIds: selectedMaterials,
         courseDetails
       });
@@ -390,12 +418,15 @@ export default function InstructorsManagementPage() {
         studentCount: assignmentDetails.studentCount,
         startDate: assignmentDetails.startDate,
         endDate: assignmentDetails.endDate,
+        dayOfWeek: assignmentDetails.dayOfWeek,
+        startTime: assignmentDetails.startTime,
+        endTime: assignmentDetails.endTime,
         materialIds: selectedMaterials,
         courseDetails
       });
 
       console.log('✅ 강의 그룹 할당 성공:', response.data);
-      alert(`${assigningInstructor.name} 강사에게 "${assignmentDetails.schoolName}" 강의 그룹이 할당되었습니다.`);
+      alert(`${assigningInstructor.name} 강사에게 "${assignmentDetails.schoolName}" 강의 그룹이 할당되었습니다.\n\n📅 기간: ${assignmentDetails.startDate} ~ ${assignmentDetails.endDate}\n📆 요일: ${assignmentDetails.dayOfWeek.join(', ')}\n⏰ 시간: ${assignmentDetails.startTime} ~ ${assignmentDetails.endTime}`);
       handleCloseAssignModal();
     } catch (error: any) {
       console.error('❌ 강의 할당 실패:', error);
@@ -1026,6 +1057,112 @@ export default function InstructorsManagementPage() {
                     )}
                   </div>
                 </div>
+
+                {/* 요일 선택 */}
+                <div style={{ marginTop: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                    강의 요일 * (복수 선택 가능)
+                  </label>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {['월', '화', '수', '목', '금', '토', '일'].map((day) => {
+                      const isSelected = assignmentDetails.dayOfWeek.includes(day);
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => {
+                            setAssignmentDetails(prev => ({
+                              ...prev,
+                              dayOfWeek: isSelected
+                                ? prev.dayOfWeek.filter(d => d !== day)
+                                : [...prev.dayOfWeek, day]
+                            }));
+                          }}
+                          style={{
+                            padding: '8px 16px',
+                            border: `2px solid ${isSelected ? '#1976D2' : '#ddd'}`,
+                            borderRadius: '20px',
+                            backgroundColor: isSelected ? '#E3F2FD' : 'white',
+                            color: isSelected ? '#1976D2' : '#666',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {day}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 시간 선택 */}
+                <div style={{ display: 'flex', gap: '24px', marginTop: '16px', alignItems: 'flex-end' }}>
+                  <div style={{ flex: '0 0 140px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                      시작 시간 *
+                    </label>
+                    <input
+                      type="time"
+                      value={assignmentDetails.startTime}
+                      onChange={(e) => setAssignmentDetails(prev => ({ 
+                        ...prev, 
+                        startTime: e.target.value 
+                      }))}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        border: '1px solid #ddd',
+                        borderRadius: '6px',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+                  
+                  <div style={{ flex: '0 0 140px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                      종료 시간 *
+                    </label>
+                    <input
+                      type="time"
+                      value={assignmentDetails.endTime}
+                      onChange={(e) => setAssignmentDetails(prev => ({ 
+                        ...prev, 
+                        endTime: e.target.value 
+                      }))}
+                      min={assignmentDetails.startTime}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        border: '1px solid #ddd',
+                        borderRadius: '6px',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+
+                  {assignmentDetails.startTime && assignmentDetails.endTime && (
+                    <div style={{ 
+                      padding: '10px 16px',
+                      backgroundColor: '#FFF3E0',
+                      borderRadius: '6px',
+                      fontSize: '13px', 
+                      color: '#E65100',
+                      fontWeight: '600',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      ⏰ {(() => {
+                        const [startHour, startMin] = assignmentDetails.startTime.split(':').map(Number);
+                        const [endHour, endMin] = assignmentDetails.endTime.split(':').map(Number);
+                        const totalMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);
+                        const hours = Math.floor(totalMinutes / 60);
+                        const minutes = totalMinutes % 60;
+                        return hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
+                      })()}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {loadingMaterials ? (
@@ -1494,6 +1631,22 @@ export default function InstructorsManagementPage() {
                                     📅 {new Date(group.startDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} ~ {new Date(group.endDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
                                   </div>
                                 </div>
+                                {group.dayOfWeek && group.dayOfWeek.length > 0 && (
+                                  <div>
+                                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>강의 요일</div>
+                                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>
+                                      📆 {group.dayOfWeek.join(', ')}
+                                    </div>
+                                  </div>
+                                )}
+                                {group.startTime && group.endTime && (
+                                  <div>
+                                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>강의 시간</div>
+                                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>
+                                      ⏰ {group.startTime} ~ {group.endTime}
+                                    </div>
+                                  </div>
+                                )}
                                 <div>
                                   <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>상태</div>
                                   <div>
