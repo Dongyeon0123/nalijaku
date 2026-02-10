@@ -1,6 +1,6 @@
 .container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -13,7 +13,7 @@
     padding: 40px 30px;
     width: 100%;
     max-width: 400px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .logoSection {
@@ -56,21 +56,22 @@
 
 .input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #916AFF;
+    box-shadow: 0 0 0 3px rgba(145, 106, 255, 0.1);
 }
 
 .error {
-    background: #fee;
-    color: #c33;
+    background: #fff0f0;
+    color: #ff4444;
     padding: 12px;
     border-radius: 8px;
     font-size: 14px;
     text-align: center;
+    border: 1px solid #ffcccc;
 }
 
 .loginButton {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #916AFF 0%, #7B4FE8 100%);
     color: white;
     border: none;
     padding: 16px;
@@ -84,7 +85,7 @@
 
 .loginButton:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 20px rgba(145, 106, 255, 0.3);
 }
 
 .loginButton:active {

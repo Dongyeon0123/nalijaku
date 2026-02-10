@@ -1,0 +1,106 @@
+.container {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    height: 100vh;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fff;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: #333;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 20px;
+}
+
+.infoBox {
+    padding: 20px;
+    background: #f5f0ff;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.infoTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #916AFF;
+    margin: 0 0 12px 0;
+}
+
+.infoText {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666;
+    margin: 0;
+}
+
+.warningBox {
+    padding: 20px;
+    background: #fff3e0;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.warningText {
+    font-size: 14px;
+    font-weight: 500;
+    color: #ff9800;
+    margin: 0 0 12px 0;
+}
+
+.warningList {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.8;
+}
+
+.deleteButton {
+    width: 100%;
+    padding: 16px;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: auto;
+    transition: opacity 0.2s;
+}
+
+.deleteButton:hover {
+    opacity: 0.9;
+}
+
+.deleteButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

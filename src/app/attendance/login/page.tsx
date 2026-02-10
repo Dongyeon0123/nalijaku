@@ -18,24 +18,31 @@ export default function AttendanceLoginPage() {
         setIsLoading(true);
 
         try {
-            const response = await fetch('/auth/login', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password }),
+                credentials: 'include',
             });
 
             const data = await response.json();
+            console.log('📥 로그인 응답:', data);
 
-            if (response.ok && data.user) {
+            if (response.ok && data.success && data.data) {
                 // 로그인 성공
-                localStorage.setItem('user', JSON.stringify(data.user));
-                router.push('/attendance');
+                console.log('✅ 로그인 성공:', data.data);
+                localStorage.setItem('user', JSON.stringify(data.data));
+                
+                // 페이지 이동
+                window.location.href = '/attendance';
             } else {
+                console.error('❌ 로그인 실패:', data);
                 setError(data.message || '로그인에 실패했습니다.');
             }
         } catch (err) {
+            console.error('❌ 서버 연결 실패:', err);
             setError('서버 연결에 실패했습니다.');
         } finally {
             setIsLoading(false);

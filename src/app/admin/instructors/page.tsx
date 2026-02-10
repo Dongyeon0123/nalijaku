@@ -96,6 +96,8 @@ export default function InstructorsManagementPage() {
     imageUrl: '',
     profileDescription: '',
     hourlyRate: 0, // 시급 추가
+    bankName: '', // 은행명 추가
+    accountNumber: '', // 계좌번호 추가
     education: [] as Array<{ school: string; major: string; degree: string; graduationYear: number }>,
     certificates: [] as Array<{ name: string; issuer: string; issueDate: string }>,
     experience: [] as Array<{ company: string; position: string; startDate: string; endDate: string; description: string }>,
@@ -219,7 +221,10 @@ export default function InstructorsManagementPage() {
       schoolName: '',
       studentCount: 0,
       startDate: '',
-      endDate: ''
+      endDate: '',
+      dayOfWeek: [],
+      startTime: '',
+      endTime: ''
     });
   };
 
@@ -672,8 +677,12 @@ export default function InstructorsManagementPage() {
     setEditingInstructor(instructor);
     const profileDesc = (instructor as Instructor & { profileDescription?: string }).profileDescription || '';
     const hourlyRate = (instructor as Instructor & { hourlyRate?: number }).hourlyRate || 0;
+    const bankName = (instructor as Instructor & { bankName?: string }).bankName || '';
+    const accountNumber = (instructor as Instructor & { accountNumber?: string }).accountNumber || '';
     console.log('로드된 소개말:', profileDesc);
     console.log('로드된 시급:', hourlyRate);
+    console.log('로드된 은행:', bankName);
+    console.log('로드된 계좌:', accountNumber);
 
     setFormData({
       userId: instructor.userId || 0,
@@ -684,6 +693,8 @@ export default function InstructorsManagementPage() {
       imageUrl: instructor.imageUrl,
       profileDescription: profileDesc,
       hourlyRate: hourlyRate,
+      bankName: bankName,
+      accountNumber: accountNumber,
       education: (Array.isArray(instructor.education) ? instructor.education : []) as Array<{ school: string; major: string; degree: string; graduationYear: number }>,
       certificates: (Array.isArray(instructor.certificates) ? instructor.certificates : []) as Array<{ name: string; issuer: string; issueDate: string }>,
       experience: (Array.isArray(instructor.experience) ? instructor.experience : []) as Array<{ company: string; position: string; startDate: string; endDate: string; description: string }>,
@@ -711,6 +722,8 @@ export default function InstructorsManagementPage() {
       imageUrl: '',
       profileDescription: '',
       hourlyRate: 0,
+      bankName: '',
+      accountNumber: '',
       education: [],
       certificates: [],
       experience: [],
@@ -765,6 +778,8 @@ export default function InstructorsManagementPage() {
       submitData.append('subtitle', formData.subtitle);
       submitData.append('hourlyRate', formData.hourlyRate.toString());
       submitData.append('profileDescription', formData.profileDescription || '');
+      submitData.append('bankName', formData.bankName || '');
+      submitData.append('accountNumber', formData.accountNumber || '');
       // 배열을 JSON 문자열로 변환
       submitData.append('education', JSON.stringify(formData.education || []));
       submitData.append('certificates', JSON.stringify(formData.certificates || []));
@@ -2062,6 +2077,30 @@ export default function InstructorsManagementPage() {
                     💰 {formData.hourlyRate.toLocaleString('ko-KR')}원 / 시간
                   </p>
                 )}
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>은행명</label>
+                <input
+                  type="text"
+                  name="bankName"
+                  value={formData.bankName || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, bankName: e.target.value }))}
+                  placeholder="은행명을 입력하세요 (예: 국민은행)"
+                  style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '8px', fontSize: '14px' }}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>계좌번호</label>
+                <input
+                  type="text"
+                  name="accountNumber"
+                  value={formData.accountNumber || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, accountNumber: e.target.value }))}
+                  placeholder="계좌번호를 입력하세요 (예: 123456-78-901234)"
+                  style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '8px', fontSize: '14px' }}
+                />
               </div>
 
               <div className={styles.formGroup}>

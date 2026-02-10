@@ -1,21 +1,21 @@
 {
   "name": "날리자쿠 강사 출근부",
-  "short_name": "강사출근부",
-  "description": "날리자쿠 강사 출근 관리 시스템",
+  "short_name": "출근부",
+  "description": "날리자쿠 강사님들을 위한 출퇴근 관리 앱",
   "start_url": "/attendance",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4F46E5",
+  "theme_color": "#916AFF",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "/nallijaku.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/logo.png",
+      "src": "/nallijaku.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

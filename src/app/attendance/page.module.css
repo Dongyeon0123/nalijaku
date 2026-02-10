@@ -217,6 +217,41 @@
     border-radius: 50%;
 }
 
+/* 날짜별 일정 */
+.dateScheduleHeader {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.backButton {
+    background: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #916AFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.backButton:active {
+    transform: scale(0.95);
+}
+
+.dateTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
 /* 홈 탭 */
 .homeContent {
     padding: 24px 20px;
@@ -365,4 +400,324 @@
         margin: 0 auto;
         box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
     }
+}
+
+/* 마이 탭 */
+.myContent {
+    padding: 20px;
+}
+
+.profileSection {
+    margin-bottom: 24px;
+}
+
+.sectionLabel {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 12px 0;
+}
+
+.profileCard {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.profileRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.profileRow:last-of-type {
+    border-bottom: none;
+    margin-bottom: 16px;
+}
+
+.profileLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+}
+
+.profileValue {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.editButton {
+    width: 100%;
+    padding: 12px;
+    background: #916AFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editButton:active {
+    transform: scale(0.98);
+}
+
+.divider {
+    height: 8px;
+    background: #f0f0f0;
+    margin: 0 -20px 24px -20px;
+}
+
+.settlementSection {
+    margin-bottom: 80px;
+}
+
+.settlementHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.historyButton {
+    background: white;
+    border: 1px solid #916AFF;
+    color: #916AFF;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.historyButton:active {
+    transform: scale(0.98);
+}
+
+.totalCard {
+    background: linear-gradient(135deg, #916AFF 0%, #7c5ce6 100%);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(145, 106, 255, 0.3);
+}
+
+.totalLabel {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 8px;
+}
+
+.totalAmount {
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+}
+
+.monthlySection {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.monthlyTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 16px 0;
+}
+
+.settlementList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.settlementItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.settlementInfo {
+    flex: 1;
+}
+
+.settlementMonth {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.settlementAmount {
+    font-size: 18px;
+    font-weight: 700;
+    color: #916AFF;
+}
+
+.settlementStatus {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.statusPending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.statusCompleted {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* 설정 탭 */
+.settingsContent {
+    padding: 20px;
+    padding-bottom: 100px;
+}
+
+.settingsSection {
+    margin-bottom: 24px;
+}
+
+.settingsSectionTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #999;
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.settingsList {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.settingsItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    gap: 12px;
+}
+
+.settingsItem:last-child {
+    border-bottom: none;
+}
+
+.settingsItem:active {
+    background: #f8f9fa;
+}
+
+.settingsLabel {
+    font-size: 15px;
+    color: #333;
+    font-weight: 500;
+    flex: 1;
+}
+
+.settingsValue {
+    font-size: 14px;
+    color: #999;
+    flex-shrink: 0;
+}
+
+.settingsArrow {
+    font-size: 20px;
+    color: #ccc;
+    flex-shrink: 0;
+}
+
+/* 토글 스위치 */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 28px;
+    flex-shrink: 0;
+    margin-right: 30px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 28px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.switch input:checked + .slider {
+    background-color: #916AFF;
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* 로그아웃 버튼 */
+.logoutButton {
+    width: 100%;
+    padding: 16px;
+    background: white;
+    color: #ff5252;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+}
+
+.logoutButton:active {
+    transform: scale(0.98);
+    background: #fff5f5;
 }

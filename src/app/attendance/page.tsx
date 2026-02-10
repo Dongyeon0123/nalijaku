@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { IoHomeOutline, IoCalendarOutline, IoPersonOutline, IoSettingsOutline, IoHome, IoCalendar, IoPerson, IoSettings, IoNotificationsOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoCalendarOutline, IoPersonOutline, IoSettingsOutline, IoHome, IoCalendar, IoPerson, IoSettings, IoNotificationsOutline, IoChevronBack } from 'react-icons/io5';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
+import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import styles from './page.module.css';
 
 export default function AttendancePage() {
@@ -20,9 +21,35 @@ export default function AttendancePage() {
     // 캘린더 상태
     const [currentDate, setCurrentDate] = useState(new Date());
     const [allCourseGroups, setAllCourseGroups] = useState<any[]>([]);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [selectedDateLectures, setSelectedDateLectures] = useState<any[]>([]);
+
+    // 사용자 상세 정보
+    const [userDetail, setUserDetail] = useState<any>(null);
 
     // 임시 강의 데이터 (나중에 API로 교체)
     const [todayLectures, setTodayLectures] = useState<any[]>([]);
+
+    // URL 파라미터로 탭 설정
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        if (tab) {
+            setActiveTab(tab);
+        }
+
+        // Service Worker 등록
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('/sw.js')
+                .then((registration) => {
+                    console.log('Service Worker 등록 성공:', registration);
+                })
+                .catch((error) => {
+                    console.log('Service Worker 등록 실패:', error);
+                });
+        }
+    }, []);
 
     // 로그인 체크 및 강의 데이터 로드
     useEffect(() => {
@@ -42,6 +69,9 @@ export default function AttendancePage() {
                     await loadInstructorCourses(userData.id);
                 }
                 
+                // 사용자 상세 정보 조회
+                await loadUserDetail(userData.id);
+                
                 setIsLoading(false);
             } catch (error) {
                 console.error('사용자 정보 파싱 실패:', error);
@@ -60,41 +90,107 @@ export default function AttendancePage() {
             if (response.data.success) {
                 const courseGroups = response.data.data;
                 
+                console.log('📚 전체 강의 그룹:', courseGroups);
+                
                 // 전체 강의 그룹 저장 (캘린더용)
                 setAllCourseGroups(courseGroups);
                 
                 // 오늘 날짜의 강의만 필터링
                 const today = new Date();
+                today.setHours(0, 0, 0, 0); // 시간 제거
                 const todayDay = today.getDay(); // 0(일) ~ 6(토)
                 const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
                 const todayDayName = dayNames[todayDay];
                 
+                console.log('📅 오늘:', today, '요일:', todayDayName);
+                
                 const todayCourses: any[] = [];
                 
                 courseGroups.forEach((group: any) => {
+                    console.log('🔍 그룹 체크:', group.schoolName);
+                    console.log('  - dayOfWeek:', group.dayOfWeek);
+                    console.log('  - startDate:', group.startDate);
+                    console.log('  - endDate:', group.endDate);
+                    
                     // dayOfWeek 배열에 오늘 요일이 포함되어 있는지 확인
-                    if (group.dayOfWeek && group.dayOfWeek.includes(todayDayName)) {
-                        // 그룹의 모든 강좌 카테고리를 합쳐서 하나의 항목으로 표시
-                        const subjects = group.courses?.map((course: any) => 
-                            course.category || course.title
-                        ).filter((s: string, i: number, arr: string[]) => 
-                            arr.indexOf(s) === i // 중복 제거
-                        ).join(', ') || '강의';
-                        
-                        todayCourses.push({
-                            id: group.id,
-                            time: `${group.startTime || '00:00'} ~ ${group.endTime || '00:00'}`,
-                            school: group.schoolName,
-                            subject: subjects
-                        });
+                    if (!group.dayOfWeek || !group.dayOfWeek.includes(todayDayName)) {
+                        console.log('  ❌ 요일 불일치');
+                        return;
                     }
+                    
+                    // 날짜 범위 체크
+                    const startDate = group.startDate ? new Date(group.startDate) : null;
+                    const endDate = group.endDate ? new Date(group.endDate) : null;
+                    
+                    if (startDate) {
+                        startDate.setHours(0, 0, 0, 0);
+                        if (today < startDate) {
+                            console.log('  ❌ 시작일 이전');
+                            return;
+                        }
+                    }
+                    
+                    if (endDate) {
+                        endDate.setHours(0, 0, 0, 0);
+                        if (today > endDate) {
+                            console.log('  ❌ 종료일 이후');
+                            return;
+                        }
+                    }
+                    
+                    console.log('  ✅ 오늘 강의 맞음!');
+                    
+                    // 그룹의 모든 강좌 카테고리를 합쳐서 하나의 항목으로 표시
+                    const subjects = group.courses?.map((course: any) => 
+                        course.category || course.title
+                    ).filter((s: string, i: number, arr: string[]) => 
+                        arr.indexOf(s) === i // 중복 제거
+                    ).join(', ') || '강의';
+                    
+                    todayCourses.push({
+                        id: group.id,
+                        time: `${group.startTime || '00:00'} ~ ${group.endTime || '00:00'}`,
+                        school: group.schoolName,
+                        subject: subjects
+                    });
                 });
                 
+                console.log('✅ 오늘의 강의:', todayCourses);
                 setTodayLectures(todayCourses);
             }
         } catch (error) {
             console.error('강의 목록 로드 실패:', error);
             setTodayLectures([]);
+        }
+    };
+
+    // 사용자 상세 정보 로드
+    const loadUserDetail = async (userId: number) => {
+        try {
+            // 먼저 강사 정보 조회 (계좌 정보 포함)
+            try {
+                const instructorResponse = await api.get(`/api/instructors/by-user/${userId}`);
+                console.log('👤 강사 정보:', instructorResponse.data);
+                
+                if (instructorResponse.data.success && instructorResponse.data.data) {
+                    const instructorData = instructorResponse.data.data;
+                    console.log('✅ 강사 데이터:', instructorData);
+                    setUserDetail(instructorData);
+                    return;
+                }
+            } catch (instructorError) {
+                console.log('강사 정보 조회 실패, 일반 사용자 정보 조회 시도');
+            }
+            
+            // 강사 정보가 없으면 일반 사용자 정보 조회
+            const userResponse = await api.get(`/api/users/${userId}`);
+            console.log('👤 사용자 정보:', userResponse.data);
+            if (userResponse.data.success) {
+                console.log('✅ 사용자 데이터:', userResponse.data.data);
+                setUserDetail(userResponse.data.data);
+            }
+        } catch (error) {
+            console.error('사용자 정보 로드 실패:', error);
         }
     };
 
@@ -263,6 +359,56 @@ export default function AttendancePage() {
         });
     };
 
+    // 날짜 클릭 핸들러
+    const handleDateClick = (year: number, month: number, date: number, isCurrentMonth: boolean) => {
+        if (!isCurrentMonth) return;
+        
+        const clickedDate = new Date(year, month, date);
+        setSelectedDate(clickedDate);
+        
+        // 해당 날짜의 강의 목록 가져오기
+        const dayOfWeek = clickedDate.getDay();
+        const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+        const dayName = dayNames[dayOfWeek];
+        
+        const lectures: any[] = [];
+        
+        allCourseGroups.forEach((group: any) => {
+            // 요일 체크
+            if (!group.dayOfWeek || !group.dayOfWeek.includes(dayName)) {
+                return;
+            }
+            
+            // 날짜 범위 체크
+            const startDate = group.startDate ? new Date(group.startDate) : null;
+            const endDate = group.endDate ? new Date(group.endDate) : null;
+            
+            if (startDate && clickedDate < startDate) return;
+            if (endDate && clickedDate > endDate) return;
+            
+            // 강의 추가
+            const subjects = group.courses?.map((course: any) => 
+                course.category || course.title
+            ).filter((s: string, i: number, arr: string[]) => 
+                arr.indexOf(s) === i
+            ).join(', ') || '강의';
+            
+            lectures.push({
+                id: group.id,
+                time: `${group.startTime || '00:00'} ~ ${group.endTime || '00:00'}`,
+                school: group.schoolName,
+                subject: subjects
+            });
+        });
+        
+        setSelectedDateLectures(lectures);
+    };
+
+    // 날짜 포맷 (년월일)
+    const formatFullDate = (date: Date) => {
+        return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+    };
+
     // 로딩 중이면 표시
     if (isLoading) {
         return (
@@ -282,9 +428,11 @@ export default function AttendancePage() {
     }
 
     return (
-        <div className={styles.container}>
-            {/* 헤더 */}
-            <header className={styles.header}>
+        <>
+            <PWAInstallPrompt />
+            <div className={styles.container}>
+                {/* 헤더 */}
+                <header className={styles.header}>
                 <Image 
                     src="/nallijaku.png" 
                     alt="날리자쿠" 
@@ -350,73 +498,347 @@ export default function AttendancePage() {
 
                 {activeTab === 'schedule' && (
                     <div className={styles.scheduleContent}>
-                        {/* 월 선택 */}
-                        <div className={styles.monthSelector}>
-                            <button className={styles.monthButton} onClick={goToPrevMonth}>
-                                ←
-                            </button>
-                            <h2 className={styles.monthTitle}>
-                                {formatYearMonth(currentDate)}
-                            </h2>
-                            <button className={styles.monthButton} onClick={goToNextMonth}>
-                                →
-                            </button>
-                        </div>
+                        {!selectedDate ? (
+                            <>
+                                {/* 월 선택 */}
+                                <div className={styles.monthSelector}>
+                                    <button className={styles.monthButton} onClick={goToPrevMonth}>
+                                        ←
+                                    </button>
+                                    <h2 className={styles.monthTitle}>
+                                        {formatYearMonth(currentDate)}
+                                    </h2>
+                                    <button className={styles.monthButton} onClick={goToNextMonth}>
+                                        →
+                                    </button>
+                                </div>
 
-                        {/* 캘린더 */}
-                        <div className={styles.calendar}>
-                            {/* 요일 헤더 */}
-                            <div className={styles.weekDays}>
-                                {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
-                                    <div 
-                                        key={day} 
-                                        className={`${styles.weekDay} ${
-                                            index === 0 ? styles.sunday : 
-                                            index === 6 ? styles.saturday : ''
-                                        }`}
-                                    >
-                                        {day}
+                                {/* 캘린더 */}
+                                <div className={styles.calendar}>
+                                    {/* 요일 헤더 */}
+                                    <div className={styles.weekDays}>
+                                        {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
+                                            <div 
+                                                key={day} 
+                                                className={`${styles.weekDay} ${
+                                                    index === 0 ? styles.sunday : 
+                                                    index === 6 ? styles.saturday : ''
+                                                }`}
+                                            >
+                                                {day}
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
 
-                            {/* 날짜 그리드 */}
-                            <div className={styles.daysGrid}>
-                                {getCalendarDays().map((day, index) => {
-                                    const year = currentDate.getFullYear();
-                                    const month = currentDate.getMonth();
-                                    const hasLecture = day.isCurrentMonth && hasLectureOnDate(year, month, day.date);
-                                    
-                                    return (
-                                        <div
-                                            key={index}
-                                            className={`${styles.dayCell} ${
-                                                !day.isCurrentMonth ? styles.otherMonth : ''
-                                            } ${
-                                                index % 7 === 0 ? styles.sunday :
-                                                index % 7 === 6 ? styles.saturday : ''
-                                            } ${
-                                                hasLecture ? styles.hasLecture : ''
-                                            }`}
-                                        >
-                                            <span className={styles.dayNumber}>{day.date}</span>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
+                                    {/* 날짜 그리드 */}
+                                    <div className={styles.daysGrid}>
+                                        {getCalendarDays().map((day, index) => {
+                                            const year = currentDate.getFullYear();
+                                            const month = currentDate.getMonth();
+                                            const hasLecture = day.isCurrentMonth && hasLectureOnDate(year, month, day.date);
+                                            
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className={`${styles.dayCell} ${
+                                                        !day.isCurrentMonth ? styles.otherMonth : ''
+                                                    } ${
+                                                        index % 7 === 0 ? styles.sunday :
+                                                        index % 7 === 6 ? styles.saturday : ''
+                                                    } ${
+                                                        hasLecture ? styles.hasLecture : ''
+                                                    }`}
+                                                    onClick={() => handleDateClick(year, month, day.date, day.isCurrentMonth)}
+                                                >
+                                                    <span className={styles.dayNumber}>{day.date}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                {/* 날짜별 일정 */}
+                                <div className={styles.dateScheduleHeader}>
+                                    <button 
+                                        className={styles.backButton} 
+                                        onClick={() => setSelectedDate(null)}
+                                    >
+                                        <IoChevronBack size={24} />
+                                    </button>
+                                    <h2 className={styles.dateTitle}>
+                                        {formatFullDate(selectedDate)} 일정
+                                    </h2>
+                                </div>
+
+                                {selectedDateLectures.length > 0 ? (
+                                    <div className={styles.lectureList}>
+                                        {selectedDateLectures.map((lecture) => (
+                                            <div 
+                                                key={lecture.id} 
+                                                className={styles.lectureCard}
+                                                onClick={() => router.push(`/attendance/lecture/${lecture.id}`)}
+                                            >
+                                                <div className={styles.lectureTime}>
+                                                    {lecture.time}
+                                                </div>
+                                                <div className={styles.lectureInfo}>
+                                                    <div className={styles.lectureSchool}>
+                                                        {lecture.school}
+                                                    </div>
+                                                    <div className={styles.lectureSubject}>
+                                                        <span className={styles.subjectBadge}>
+                                                            {lecture.subject}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className={styles.emptyState}>
+                                        <div className={styles.emptyIcon}>📅</div>
+                                        <p className={styles.emptyText}>이 날은 예정된 강의가 없습니다</p>
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
                 )}
 
                 {activeTab === 'my' && (
-                    <div className={styles.tabContent}>
-                        <h2>마이</h2>
+                    <div className={styles.myContent}>
+                        {/* 내 정보 */}
+                        <div className={styles.profileSection}>
+                            <h3 className={styles.sectionLabel}>내 정보</h3>
+                            
+                            <div className={styles.profileCard}>
+                                <div className={styles.profileRow}>
+                                    <span className={styles.profileLabel}>아이디</span>
+                                    <span className={styles.profileValue}>
+                                        {userDetail?.username || userInfo?.username || '이름 없음'}
+                                    </span>
+                                </div>
+                                
+                                <div className={styles.profileRow}>
+                                    <span className={styles.profileLabel}>연락처</span>
+                                    <span className={styles.profileValue}>
+                                        {userDetail?.phone || userDetail?.phoneNumber || '연락처 없음'}
+                                    </span>
+                                </div>
+                                
+                                <div className={styles.profileRow}>
+                                    <span className={styles.profileLabel}>계좌 정보</span>
+                                    <span className={styles.profileValue}>
+                                        {(() => {
+                                            console.log('💳 계좌 정보 체크:', {
+                                                bankName: userDetail?.bankName,
+                                                accountNumber: userDetail?.accountNumber,
+                                                전체데이터: userDetail
+                                            });
+                                            
+                                            if (userDetail?.bankName && userDetail?.accountNumber) {
+                                                return `${userDetail.bankName} ${userDetail.accountNumber}`;
+                                            }
+                                            return '계좌 정보 없음';
+                                        })()}
+                                    </span>
+                                </div>
+                                
+                                <button 
+                                    className={styles.editButton}
+                                    onClick={() => router.push('/attendance/settings/account')}
+                                >
+                                    계좌 정보 변경
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className={styles.divider}></div>
+
+                        {/* 정산 정보 */}
+                        <div className={styles.settlementSection}>
+                            <div className={styles.settlementHeader}>
+                                <h3 className={styles.sectionLabel}>정산 정보</h3>
+                                <button 
+                                    className={styles.historyButton}
+                                    onClick={() => router.push('/attendance/my/history')}
+                                >
+                                    내 강의 이력
+                                </button>
+                            </div>
+
+                            {/* 이번 달 누적 */}
+                            <div className={styles.totalCard}>
+                                <div className={styles.totalLabel}>이번 달 누적 정산 금액</div>
+                                <div className={styles.totalAmount}>1,240,000원</div>
+                            </div>
+
+                            {/* 월별 정산 내역 */}
+                            <div className={styles.monthlySection}>
+                                <h4 className={styles.monthlyTitle}>월별 정산 내역</h4>
+                                
+                                <div className={styles.settlementList}>
+                                    {[
+                                        { month: '2026년 2월', amount: 1240000, status: 'pending' },
+                                        { month: '2026년 1월', amount: 980000, status: 'completed' },
+                                        { month: '2025년 12월', amount: 1150000, status: 'completed' }
+                                    ].map((item, index) => (
+                                        <div key={index} className={styles.settlementItem}>
+                                            <div className={styles.settlementInfo}>
+                                                <div className={styles.settlementMonth}>{item.month}</div>
+                                                <div className={styles.settlementAmount}>
+                                                    {item.amount.toLocaleString()}원
+                                                </div>
+                                            </div>
+                                            <div className={`${styles.settlementStatus} ${
+                                                item.status === 'completed' 
+                                                    ? styles.statusCompleted 
+                                                    : styles.statusPending
+                                            }`}>
+                                                {item.status === 'completed' ? '지급 완료' : '관리자 확인중'}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
                 {activeTab === 'settings' && (
-                    <div className={styles.tabContent}>
-                        <h2>설정</h2>
+                    <div className={styles.settingsContent}>
+                        {/* 계정 설정 */}
+                        <div className={styles.settingsSection}>
+                            <h3 className={styles.settingsSectionTitle}>계정 설정</h3>
+                            <div className={styles.settingsList}>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/attendance/settings/password')}
+                                >
+                                    <span className={styles.settingsLabel}>비밀번호 변경</span>
+                                    <span className={styles.settingsArrow}>›</span>
+                                </button>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/attendance/settings/phone')}
+                                >
+                                    <span className={styles.settingsLabel}>연락처 변경</span>
+                                    <span className={styles.settingsArrow}>›</span>
+                                </button>
+                                <div className={styles.settingsItem}>
+                                    <span className={styles.settingsLabel}>알림 설정</span>
+                                    <label className={styles.switch}>
+                                        <input type="checkbox" defaultChecked />
+                                        <span className={styles.slider}></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 출근 설정 */}
+                        <div className={styles.settingsSection}>
+                            <h3 className={styles.settingsSectionTitle}>출근 설정</h3>
+                            <div className={styles.settingsList}>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/attendance/settings/alarm-time')}
+                                >
+                                    <span className={styles.settingsLabel}>출근 알림 시간</span>
+                                    <span className={styles.settingsValue}>수업 10분 전</span>
+                                </button>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/attendance/settings/location-range')}
+                                >
+                                    <span className={styles.settingsLabel}>위치 허용 범위</span>
+                                    <span className={styles.settingsValue}>100m</span>
+                                </button>
+                                <div className={styles.settingsItem}>
+                                    <span className={styles.settingsLabel}>자동 퇴근 체크</span>
+                                    <label className={styles.switch}>
+                                        <input type="checkbox" />
+                                        <span className={styles.slider}></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 앱 설정 */}
+                        <div className={styles.settingsSection}>
+                            <h3 className={styles.settingsSectionTitle}>앱 설정</h3>
+                            <div className={styles.settingsList}>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/attendance/settings/theme')}
+                                >
+                                    <span className={styles.settingsLabel}>테마 설정</span>
+                                    <span className={styles.settingsValue}>라이트</span>
+                                </button>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/attendance/settings/language')}
+                                >
+                                    <span className={styles.settingsLabel}>언어 설정</span>
+                                    <span className={styles.settingsValue}>한국어</span>
+                                </button>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/attendance/settings/cache')}
+                                >
+                                    <span className={styles.settingsLabel}>캐시 삭제</span>
+                                    <span className={styles.settingsArrow}>›</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* 정보 */}
+                        <div className={styles.settingsSection}>
+                            <h3 className={styles.settingsSectionTitle}>정보</h3>
+                            <div className={styles.settingsList}>
+                                <div className={styles.settingsItem}>
+                                    <span className={styles.settingsLabel}>앱 버전</span>
+                                    <span className={styles.settingsValue} style={{marginRight:"40px"}}>1.0.0</span>
+                                </div>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/attendance/settings/terms')}
+                                >
+                                    <span className={styles.settingsLabel}>이용약관</span>
+                                    <span className={styles.settingsArrow}>›</span>
+                                </button>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/attendance/settings/privacy')}
+                                >
+                                    <span className={styles.settingsLabel}>개인정보 처리방침</span>
+                                    <span className={styles.settingsArrow}>›</span>
+                                </button>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/attendance/settings/notice')}
+                                >
+                                    <span className={styles.settingsLabel}>공지사항</span>
+                                    <span className={styles.settingsArrow}>›</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* 로그아웃 */}
+                        <div className={styles.settingsSection}>
+                            <button 
+                                className={styles.logoutButton}
+                                onClick={() => {
+                                    if (confirm('로그아웃 하시겠습니까?')) {
+                                        localStorage.removeItem('user');
+                                        router.push('/attendance/login');
+                                    }
+                                }}
+                            >
+                                로그아웃
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
@@ -453,5 +875,6 @@ export default function AttendancePage() {
                 </button>
             </nav>
         </div>
+        </>
     );
 }
