@@ -26,12 +26,18 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
  */
 export const showLocalNotification = (title: string, options?: NotificationOptions) => {
   if (Notification.permission === 'granted') {
-    const notification = new Notification(title, {
+    const notificationOptions: NotificationOptions & { vibrate?: number[] } = {
       icon: '/nallijaku.png',
       badge: '/nallijaku.png',
-      vibrate: [200, 100, 200],
       ...options,
-    });
+    };
+    
+    const notification = new Notification(title, notificationOptions);
+
+    // 진동 (별도 처리)
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200]);
+    }
 
     notification.onclick = () => {
       window.focus();
@@ -46,21 +52,21 @@ export const showLocalNotification = (title: string, options?: NotificationOptio
  * Service Worker를 통한 Push 알림 구독
  */
 export const subscribeToPushNotifications = async (userId: number): Promise<string | null> => {
+  // VAPID 공개 키 체크 (가장 먼저)
+  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  
+  if (!vapidPublicKey || vapidPublicKey.trim() === '') {
+    console.warn('⚠️ VAPID 공개 키가 설정되지 않았습니다. Push 알림을 사용하려면 환경 변수를 설정하세요.');
+    return null;
+  }
+
   try {
     const registration = await navigator.serviceWorker.ready;
-
-    // VAPID 공개 키 (백엔드에서 생성 필요)
-    const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
-    
-    if (!vapidPublicKey) {
-      console.error('VAPID 공개 키가 설정되지 않았습니다.');
-      return null;
-    }
 
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-    });
+    } as PushSubscriptionOptionsInit);
 
     // 구독 정보를 백엔드로 전송
     const subscriptionData = JSON.stringify(subscription);
@@ -68,7 +74,7 @@ export const subscribeToPushNotifications = async (userId: number): Promise<stri
 
     return subscriptionData;
   } catch (error) {
-    console.error('Push 구독 실패:', error);
+    console.error('❌ Push 구독 실패:', error);
     return null;
   }
 };

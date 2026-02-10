@@ -29,6 +29,14 @@ export default function NotificationSettingsPage() {
         const granted = await requestNotificationPermission();
         if (granted) {
             setPermissionStatus('granted');
+            
+            // VAPID 키가 설정되어 있는지 확인
+            const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+            if (!vapidKey) {
+                alert('알림 권한이 허용되었습니다.\n\n⚠️ Push 알림 기능은 백엔드 설정 후 사용 가능합니다.');
+                return;
+            }
+            
             alert('알림 권한이 허용되었습니다.');
             
             // Push 구독
@@ -47,7 +55,7 @@ export default function NotificationSettingsPage() {
                         });
                         console.log('✅ Push 구독 정보 저장 완료');
                     } catch (error) {
-                        console.error('Push 구독 정보 저장 실패:', error);
+                        console.error('⚠️ Push 구독 정보 저장 실패 (백엔드 미구현 가능):', error);
                     }
                 }
             }
