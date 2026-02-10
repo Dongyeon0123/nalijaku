@@ -1,9 +1,30 @@
 import axios from 'axios';
 import { getAccessToken, getRefreshToken, setTokens, logout } from '@/utils/auth';
 
+// API URL 결정 함수
+const getApiUrl = () => {
+  // 브라우저 환경에서만 실행
+  if (typeof window !== 'undefined') {
+    // PWA로 실행 중인지 확인
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                  (window.navigator as any).standalone === true;
+    
+    console.log('🌐 PWA 모드:', isPWA);
+    console.log('🌐 현재 origin:', window.location.origin);
+    
+    // PWA 모드에서는 현재 도메인 사용 (Next.js rewrites 활용)
+    if (isPWA) {
+      return window.location.origin;
+    }
+  }
+  
+  // 일반 브라우저나 서버 사이드에서는 환경 변수 사용
+  return process.env.NEXT_PUBLIC_API_URL || 'https://api.nallijaku.com';
+};
+
 // Axios 인스턴스 생성
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.nallijaku.com',
+  baseURL: getApiUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,10 +34,16 @@ const api = axios.create({
 // 요청 인터셉터: 모든 요청에 토큰 자동 추가
 api.interceptors.request.use(
   (config) => {
+    // 동적으로 baseURL 업데이트 (PWA 모드 변경 대응)
+    config.baseURL = getApiUrl();
+    
     const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    console.log('📤 API 요청:', config.method?.toUpperCase(), config.baseURL + config.url);
+    
     return config;
   },
   (error) => {
@@ -26,8 +53,13 @@ api.interceptors.request.use(
 
 // 응답 인터셉터: 401 에러 시 토큰 자동 갱신
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('📥 API 응답:', response.config.url, response.status);
+    return response;
+  },
   async (error) => {
+    console.error('❌ API 에러:', error.config?.url, error.response?.status, error.message);
+    
     const originalRequest = error.config;
 
     // 로그인 요청은 인터셉터 무시
@@ -48,7 +80,9 @@ api.interceptors.response.use(
           logout();
           if (typeof window !== 'undefined') {
             // 출근부 페이지에서는 출근부 로그인으로
-            if (window.location.pathname.startsWith('/attendance')) {
+            if (window.location.pathname.startsWith('/teacher')) {
+              window.location.href = '/teacher/login';
+            } else if (window.location.pathname.startsWith('/attendance')) {
               window.location.href = '/attendance/login';
             } else {
               window.location.href = '/';
@@ -61,7 +95,7 @@ api.interceptors.response.use(
 
         // Refresh Token으로 새 Access Token 발급
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL || 'https://api.nallijaku.com'}/api/auth/refresh`,
+          `${getApiUrl()}/api/auth/refresh`,
           { refreshToken }
         );
 
@@ -84,7 +118,9 @@ api.interceptors.response.use(
         if (typeof window !== 'undefined') {
           alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
           // 출근부 페이지에서는 출근부 로그인으로
-          if (window.location.pathname.startsWith('/attendance')) {
+          if (window.location.pathname.startsWith('/teacher')) {
+            window.location.href = '/teacher/login';
+          } else if (window.location.pathname.startsWith('/attendance')) {
             window.location.href = '/attendance/login';
           } else {
             window.location.href = '/';
