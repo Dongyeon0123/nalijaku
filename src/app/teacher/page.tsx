@@ -15,7 +15,7 @@ export default function AttendancePage() {
     const [checkInTime, setCheckInTime] = useState<string | null>(null);
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [activeTab, setActiveTab] = useState('home');
-    const [userInfo, setUserInfo] = useState<{ username: string; role?: string } | null>(null);
+    const [userInfo, setUserInfo] = useState<{ username: string; role?: string; email?: string; phone?: string } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     // 캘린더 상태
@@ -637,9 +637,16 @@ export default function AttendancePage() {
                                 </div>
                                 
                                 <div className={styles.profileRow}>
+                                    <span className={styles.profileLabel}>이메일</span>
+                                    <span className={styles.profileValue}>
+                                        {userDetail?.email || userInfo?.email || '이메일 없음'}
+                                    </span>
+                                </div>
+                                
+                                <div className={styles.profileRow}>
                                     <span className={styles.profileLabel}>연락처</span>
                                     <span className={styles.profileValue}>
-                                        {userDetail?.phone || userDetail?.phoneNumber || '연락처 없음'}
+                                        {userDetail?.phone || userDetail?.phoneNumber || userInfo?.phone || '연락처 없음'}
                                     </span>
                                 </div>
                                 
@@ -647,12 +654,6 @@ export default function AttendancePage() {
                                     <span className={styles.profileLabel}>계좌 정보</span>
                                     <span className={styles.profileValue}>
                                         {(() => {
-                                            console.log('💳 계좌 정보 체크:', {
-                                                bankName: userDetail?.bankName,
-                                                accountNumber: userDetail?.accountNumber,
-                                                전체데이터: userDetail
-                                            });
-                                            
                                             if (userDetail?.bankName && userDetail?.accountNumber) {
                                                 return `${userDetail.bankName} ${userDetail.accountNumber}`;
                                             }
