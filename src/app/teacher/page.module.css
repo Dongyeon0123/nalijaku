@@ -721,3 +721,42 @@
     transform: scale(0.98);
     background: #fff5f5;
 }
+
+/* 출근/퇴근 버튼 */
+.lectureActions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.checkInButton,
+.checkOutButton {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.checkInButton {
+    background: #916AFF;
+    color: white;
+}
+
+.checkInButton:active {
+    transform: scale(0.95);
+    background: #7d5ae0;
+}
+
+.checkOutButton {
+    background: #ff6b6b;
+    color: white;
+}
+
+.checkOutButton:active {
+    transform: scale(0.95);
+    background: #e85555;
+}

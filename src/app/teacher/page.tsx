@@ -13,8 +13,11 @@ export default function AttendancePage() {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [isCheckedIn, setIsCheckedIn] = useState(false);
     const [checkInTime, setCheckInTime] = useState<string | null>(null);
+    const [checkOutTime, setCheckOutTime] = useState<string | null>(null);
+    const [currentAttendanceId, setCurrentAttendanceId] = useState<number | null>(null);
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [activeTab, setActiveTab] = useState('home');
+    const [autoCheckout, setAutoCheckout] = useState(false);
     const [userInfo, setUserInfo] = useState<{ username: string; role?: string; email?: string; phone?: string } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -33,6 +36,14 @@ export default function AttendancePage() {
 
     // 임시 강의 데이터 (나중에 API로 교체)
     const [todayLectures, setTodayLectures] = useState<any[]>([]);
+
+    // 자동 퇴근 설정 로드
+    useEffect(() => {
+        const savedAutoCheckout = localStorage.getItem('autoCheckout');
+        if (savedAutoCheckout === 'true') {
+            setAutoCheckout(true);
+        }
+    }, []);
 
     // URL 파라미터로 탭 설정
     useEffect(() => {
@@ -335,36 +346,109 @@ export default function AttendancePage() {
     };
 
     // 출근 체크
-    const handleCheckIn = () => {
+    const handleCheckIn = async (lectureId: number) => {
         if (!location) {
             requestLocation();
             return;
         }
 
-        const now = new Date();
-        setIsCheckedIn(true);
-        setCheckInTime(now.toLocaleTimeString('ko-KR'));
-        
-        // 진동 피드백
-        if (navigator.vibrate) {
-            navigator.vibrate(200);
+        try {
+            // 강사 정보 조회
+            const savedUser = localStorage.getItem('user');
+            if (!savedUser) return;
+            
+            const userData = JSON.parse(savedUser);
+            const user = userData.user || userData;
+            
+            const instructorResponse = await api.get(`/api/instructors/by-user/${user.id}`);
+            if (!instructorResponse.data.success) {
+                alert('강사 정보를 찾을 수 없습니다.');
+                return;
+            }
+            
+            const instructorId = instructorResponse.data.data.id;
+            
+            // 출근 체크 API 호출
+            const response = await api.post('/api/attendances', {
+                instructorId: instructorId,
+                courseGroupId: lectureId,
+                checkInTime: new Date().toISOString(),
+                latitude: location.lat,
+                longitude: location.lng
+            });
+            
+            if (response.data.success) {
+                const now = new Date();
+                setIsCheckedIn(true);
+                setCheckInTime(now.toLocaleTimeString('ko-KR'));
+                setCurrentAttendanceId(response.data.data.id);
+                
+                // 진동 피드백
+                if (navigator.vibrate) {
+                    navigator.vibrate(200);
+                }
+                
+                alert('출근 체크가 완료되었습니다!');
+                
+                // 강의 목록 새로고침
+                await loadInstructorCourses(user.id);
+            }
+        } catch (error: any) {
+            console.error('출근 체크 실패:', error);
+            alert(error.response?.data?.message || '출근 체크에 실패했습니다.');
         }
-
-        // TODO: 서버에 출근 기록 저장
-        console.log('출근 체크:', {
-            time: now,
-            location: location
-        });
     };
 
     // 퇴근 체크
-    const handleCheckOut = () => {
-        if (navigator.vibrate) {
-            navigator.vibrate(200);
+    const handleCheckOut = async () => {
+        if (!currentAttendanceId) {
+            alert('출근 기록을 찾을 수 없습니다.');
+            return;
         }
         
-        // TODO: 서버에 퇴근 기록 저장
-        alert('퇴근 처리되었습니다!');
+        try {
+            const response = await api.put(`/api/attendances/${currentAttendanceId}`, {
+                checkOutTime: new Date().toISOString()
+            });
+            
+            if (response.data.success) {
+                const now = new Date();
+                setCheckOutTime(now.toLocaleTimeString('ko-KR'));
+                
+                // 진동 피드백
+                if (navigator.vibrate) {
+                    navigator.vibrate(200);
+                }
+                
+                alert('퇴근 처리되었습니다!');
+                
+                // 상태 초기화
+                setIsCheckedIn(false);
+                setCheckInTime(null);
+                setCurrentAttendanceId(null);
+                
+                // 강의 목록 새로고침
+                const savedUser = localStorage.getItem('user');
+                if (savedUser) {
+                    const userData = JSON.parse(savedUser);
+                    const user = userData.user || userData;
+                    await loadInstructorCourses(user.id);
+                }
+            }
+        } catch (error: any) {
+            console.error('퇴근 체크 실패:', error);
+            alert(error.response?.data?.message || '퇴근 체크에 실패했습니다.');
+        }
+    };
+    
+    // 자동 퇴근 토글
+    const handleAutoCheckoutToggle = (checked: boolean) => {
+        setAutoCheckout(checked);
+        localStorage.setItem('autoCheckout', checked.toString());
+        
+        if (checked) {
+            alert('자동 퇴근이 활성화되었습니다.\n강의 종료 시간에 자동으로 퇴근 처리됩니다.');
+        }
     };
 
     const formatDate = (date: Date) => {
@@ -544,6 +628,7 @@ export default function AttendancePage() {
                     width={120} 
                     height={40}
                     className={styles.logo}
+                    priority
                 />
                 <button className={styles.notificationButton}>
                     <IoNotificationsOutline size={24} />
@@ -566,28 +651,47 @@ export default function AttendancePage() {
                                     <div 
                                         key={lecture.id} 
                                         className={styles.lectureCard}
-                                        onClick={() => router.push(`/teacher/lecture/${lecture.id}`)}
                                     >
-                                        <div className={styles.lectureTime}>
-                                            {lecture.time}
-                                        </div>
-                                        <div className={styles.lectureInfo}>
-                                            <div className={styles.lectureSchool}>
-                                                {lecture.school}
+                                        <div 
+                                            onClick={() => router.push(`/teacher/lecture/${lecture.id}`)}
+                                            style={{ flex: 1 }}
+                                        >
+                                            <div className={styles.lectureTime}>
+                                                {lecture.time}
                                             </div>
-                                            <div className={styles.lectureSubject}>
-                                                <span className={styles.subjectBadge}>
-                                                    {lecture.subject}
-                                                </span>
+                                            <div className={styles.lectureInfo}>
+                                                <div className={styles.lectureSchool}>
+                                                    {lecture.school}
+                                                </div>
+                                                <div className={styles.lectureSubject}>
+                                                    <span className={styles.subjectBadge}>
+                                                        {lecture.subject}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className={styles.lectureStatus}>
-                                            <span className={`${styles.statusBadge} ${styles.statusBefore}`}>
-                                                출근전
-                                            </span>
-                                            <span className={`${styles.statusBadge} ${styles.statusCompleted}`}>
-                                                강의완료
-                                            </span>
+                                        <div className={styles.lectureActions}>
+                                            {!isCheckedIn ? (
+                                                <button 
+                                                    className={styles.checkInButton}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleCheckIn(lecture.id);
+                                                    }}
+                                                >
+                                                    출근
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    className={styles.checkOutButton}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleCheckOut();
+                                                    }}
+                                                >
+                                                    퇴근
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
@@ -866,7 +970,11 @@ export default function AttendancePage() {
                                 <div className={styles.settingsItem}>
                                     <span className={styles.settingsLabel}>자동 퇴근 체크</span>
                                     <label className={styles.switch}>
-                                        <input type="checkbox" />
+                                        <input 
+                                            type="checkbox" 
+                                            checked={autoCheckout}
+                                            onChange={(e) => handleAutoCheckoutToggle(e.target.checked)}
+                                        />
                                         <span className={styles.slider}></span>
                                     </label>
                                 </div>

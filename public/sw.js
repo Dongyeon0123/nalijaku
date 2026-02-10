@@ -45,6 +45,12 @@ self.addEventListener('activate', (event) => {
 
 // Fetch 이벤트 - 네트워크 우선 전략 (항상 최신 데이터)
 self.addEventListener('fetch', (event) => {
+  // POST, PUT, DELETE 요청은 캐시하지 않음 (GET만 캐시)
+  if (event.request.method !== 'GET') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   // API 요청은 항상 네트워크 사용 (캐시 안 함)
   if (event.request.url.includes('/api/')) {
     event.respondWith(fetch(event.request));
