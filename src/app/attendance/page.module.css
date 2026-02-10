@@ -45,7 +45,7 @@
 
 .notificationButton:active {
     transform: scale(0.95);
-    color: #667eea;
+    color: #916AFF;
 }
 
 /* 하단 네비게이션 */
@@ -83,7 +83,7 @@
 }
 
 .navItem.active {
-    color: #667eea;
+    color: #916AFF;
 }
 
 .navLabel {
@@ -96,40 +96,163 @@
     padding: 20px;
 }
 
+/* 내 일정 탭 */
+.scheduleContent {
+    padding: 20px;
+}
+
+.monthSelector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 0 8px;
+}
+
+.monthButton {
+    background: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #916AFF;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+}
+
+.monthButton:active {
+    transform: scale(0.95);
+}
+
+.monthTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.calendar {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.weekDays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.weekDay {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    padding: 8px 0;
+}
+
+.weekDay.sunday {
+    color: #ff5252;
+}
+
+.weekDay.saturday {
+    color: #2196f3;
+}
+
+.daysGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.dayCell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.dayCell:hover {
+    background: #f5f5f5;
+}
+
+.dayNumber {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.dayCell.otherMonth .dayNumber {
+    color: #ccc;
+}
+
+.dayCell.sunday .dayNumber {
+    color: #ff5252;
+}
+
+.dayCell.saturday .dayNumber {
+    color: #2196f3;
+}
+
+.dayCell.hasLecture::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 6px;
+    height: 6px;
+    background: #ff5252;
+    border-radius: 50%;
+}
+
 /* 홈 탭 */
 .homeContent {
     padding: 24px 20px;
 }
 
 .pageTitle {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
     color: #333;
-    margin: 0 0 20px 0;
+    margin: 0 0 16px 0;
 }
 
 .todayDate {
     text-align: center;
-    font-size: 16px;
-    color: #666;
+    font-size: 15px;
+    color: white;
     margin-bottom: 24px;
-    padding: 12px;
-    background: white;
-    border-radius: 12px;
+    padding: 14px;
+    background: #916AFF;
+    border-radius: 16px;
+    font-weight: 500;
 }
 
 .lectureList {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .lectureCard {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .lectureCard:active {
@@ -138,57 +261,104 @@
 }
 
 .lectureTime {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
-    color: #667eea;
+    color: #916AFF;
     margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.lectureTime::before {
+    content: '🕐';
+    font-size: 18px;
 }
 
 .lectureInfo {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .lectureSchool {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lectureSchool::before {
+    content: '🏫';
+    font-size: 20px;
 }
 
 .lectureSubject {
     font-size: 14px;
     color: #666;
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .subjectBadge {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 6px 14px;
     background: #f0f0f0;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #916AFF;
+}
+
+.lectureStatus {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.statusBadge {
+    flex: 1;
+    padding: 10px;
     border-radius: 12px;
     font-size: 13px;
     font-weight: 600;
-    color: #667eea;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.statusBefore {
+    background: #f5f5f5;
+    color: #999;
+}
+
+.statusCompleted {
+    background: #916AFF;
+    color: white;
 }
 
 .emptyState {
     text-align: center;
-    padding: 60px 20px;
+    padding: 80px 20px;
     color: #999;
 }
 
 .emptyIcon {
-    font-size: 64px;
-    margin-bottom: 16px;
+    font-size: 72px;
+    margin-bottom: 20px;
 }
 
 .emptyText {
     font-size: 16px;
     color: #666;
+    font-weight: 500;
 }
+
 @media (min-width: 768px) {
     .container {
         max-width: 480px;
