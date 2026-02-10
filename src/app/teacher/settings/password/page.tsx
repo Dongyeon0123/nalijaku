@@ -47,8 +47,15 @@ export default function PasswordChangePage() {
             }
 
             const userData = JSON.parse(savedUser);
+            const user = userData.user || userData;
+            const userId = user.id;
             
-            await api.put(`/api/users/${userData.id}/password`, {
+            if (!userId) {
+                setError('사용자 정보를 찾을 수 없습니다.');
+                return;
+            }
+            
+            await api.put(`/api/users/${userId}/password`, {
                 currentPassword: formData.currentPassword,
                 newPassword: formData.newPassword
             });

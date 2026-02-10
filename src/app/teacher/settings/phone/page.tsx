@@ -19,13 +19,28 @@ export default function PhoneChangePage() {
     const loadCurrentPhone = async () => {
         try {
             const savedUser = localStorage.getItem('user');
+            console.log('📦 localStorage user:', savedUser);
+            
             if (!savedUser) {
                 router.push('/teacher/login');
                 return;
             }
 
             const userData = JSON.parse(savedUser);
-            const response = await api.get(`/api/users/${userData.id}`);
+            console.log('👤 파싱된 사용자 데이터:', userData);
+            
+            // user 객체가 중첩되어 있는 경우 처리
+            const user = userData.user || userData;
+            const userId = user.id;
+            
+            console.log('🆔 사용자 ID:', userId);
+            
+            if (!userId) {
+                console.error('❌ 사용자 ID가 없습니다');
+                return;
+            }
+            
+            const response = await api.get(`/api/users/${userId}`);
             
             if (response.data.success) {
                 setPhone(response.data.data.phone || response.data.data.phoneNumber || '');
@@ -67,8 +82,15 @@ export default function PhoneChangePage() {
             }
 
             const userData = JSON.parse(savedUser);
+            const user = userData.user || userData;
+            const userId = user.id;
             
-            await api.put(`/api/users/${userData.id}`, {
+            if (!userId) {
+                console.error('❌ 사용자 ID가 없습니다');
+                return;
+            }
+            
+            await api.put(`/api/users/${userId}`, {
                 phone: numbers
             });
 

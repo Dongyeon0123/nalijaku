@@ -776,13 +776,13 @@ export default function AttendancePage() {
                                     <span className={styles.settingsLabel}>연락처 변경</span>
                                     <span className={styles.settingsArrow}>›</span>
                                 </button>
-                                <div className={styles.settingsItem}>
+                                <button 
+                                    className={styles.settingsItem}
+                                    onClick={() => router.push('/teacher/settings/notification')}
+                                >
                                     <span className={styles.settingsLabel}>알림 설정</span>
-                                    <label className={styles.switch}>
-                                        <input type="checkbox" defaultChecked />
-                                        <span className={styles.slider}></span>
-                                    </label>
-                                </div>
+                                    <span className={styles.settingsArrow}>›</span>
+                                </button>
                             </div>
                         </div>
 
@@ -790,13 +790,6 @@ export default function AttendancePage() {
                         <div className={styles.settingsSection}>
                             <h3 className={styles.settingsSectionTitle}>출근 설정</h3>
                             <div className={styles.settingsList}>
-                                <button 
-                                    className={styles.settingsItem}
-                                    onClick={() => router.push('/teacher/settings/alarm-time')}
-                                >
-                                    <span className={styles.settingsLabel}>출근 알림 시간</span>
-                                    <span className={styles.settingsValue}>수업 10분 전</span>
-                                </button>
                                 <button 
                                     className={styles.settingsItem}
                                     onClick={() => router.push('/teacher/settings/location-range')}

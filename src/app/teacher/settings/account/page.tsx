@@ -28,9 +28,16 @@ export default function AccountChangePage() {
             }
 
             const userData = JSON.parse(savedUser);
+            const user = userData.user || userData;
+            const userId = user.id;
+            
+            if (!userId) {
+                console.error('❌ 사용자 ID가 없습니다');
+                return;
+            }
             
             try {
-                const response = await api.get(`/api/instructors/by-user/${userData.id}`);
+                const response = await api.get(`/api/instructors/by-user/${userId}`);
                 if (response.data.success && response.data.data) {
                     setFormData({
                         bankName: response.data.data.bankName || '',
@@ -71,9 +78,16 @@ export default function AccountChangePage() {
             }
 
             const userData = JSON.parse(savedUser);
+            const user = userData.user || userData;
+            const userId = user.id;
+            
+            if (!userId) {
+                setError('사용자 정보를 찾을 수 없습니다.');
+                return;
+            }
             
             // 강사 정보 업데이트
-            const instructorResponse = await api.get(`/api/instructors/by-user/${userData.id}`);
+            const instructorResponse = await api.get(`/api/instructors/by-user/${userId}`);
             if (instructorResponse.data.success && instructorResponse.data.data) {
                 const instructorId = instructorResponse.data.data.id;
                 

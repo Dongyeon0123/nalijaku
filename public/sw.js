@@ -98,3 +98,65 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
+
+// Push 이벤트 - 백엔드에서 보낸 알림 수신
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push 알림 수신:', event);
+
+  let data = {
+    title: '날리자쿠',
+    body: '새로운 알림이 있습니다.',
+    icon: '/nallijaku.png',
+    badge: '/nallijaku.png',
+    data: {}
+  };
+
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: data.body,
+    icon: data.icon || '/nallijaku.png',
+    badge: data.badge || '/nallijaku.png',
+    vibrate: [200, 100, 200],
+    data: data.data || {},
+    actions: data.actions || [],
+    tag: data.tag || 'default',
+    requireInteraction: data.requireInteraction || false,
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// 알림 클릭 이벤트
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] 알림 클릭:', event);
+
+  event.notification.close();
+
+  // 알림 데이터에 따라 다른 페이지로 이동
+  const urlToOpen = event.notification.data?.url || '/teacher';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // 이미 열린 창이 있으면 포커스
+        for (const client of clientList) {
+          if (client.url === urlToOpen && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // 없으면 새 창 열기
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
+      })
+  );
+});
