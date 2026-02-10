@@ -771,6 +771,17 @@ export default function AttendancePage() {
                             <div className={styles.settingsList}>
                                 <button 
                                     className={styles.settingsItem}
+                                    onClick={() => {
+                                        // PWA 설치 프롬프트 표시
+                                        const event = new Event('show-install-prompt');
+                                        window.dispatchEvent(event);
+                                    }}
+                                >
+                                    <span className={styles.settingsLabel}>홈 화면에 추가</span>
+                                    <span className={styles.settingsArrow}>›</span>
+                                </button>
+                                <button 
+                                    className={styles.settingsItem}
                                     onClick={() => router.push('/attendance/settings/theme')}
                                 >
                                     <span className={styles.settingsLabel}>테마 설정</span>

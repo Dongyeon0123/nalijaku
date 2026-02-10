@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import api from '@/lib/axios';
 import styles from './page.module.css';
 
 export default function AttendanceLoginPage() {
@@ -18,32 +19,31 @@ export default function AttendanceLoginPage() {
         setIsLoading(true);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-                credentials: 'include',
+            const response = await api.post('/auth/login', {
+                username,
+                password
             });
 
-            const data = await response.json();
-            console.log('📥 로그인 응답:', data);
+            console.log('📥 로그인 응답:', response.data);
 
-            if (response.ok && data.success && data.data) {
+            if (response.data.success && response.data.data) {
                 // 로그인 성공
-                console.log('✅ 로그인 성공:', data.data);
-                localStorage.setItem('user', JSON.stringify(data.data));
+                console.log('✅ 로그인 성공:', response.data.data);
+                localStorage.setItem('user', JSON.stringify(response.data.data));
                 
                 // 페이지 이동
                 window.location.href = '/attendance';
             } else {
-                console.error('❌ 로그인 실패:', data);
-                setError(data.message || '로그인에 실패했습니다.');
+                console.error('❌ 로그인 실패:', response.data);
+                setError(response.data.message || '로그인에 실패했습니다.');
             }
-        } catch (err) {
-            console.error('❌ 서버 연결 실패:', err);
-            setError('서버 연결에 실패했습니다.');
+        } catch (err: any) {
+            console.error('❌ 로그인 에러:', err);
+            if (err.response?.data?.message) {
+                setError(err.response.data.message);
+            } else {
+                setError('서버 연결에 실패했습니다.');
+            }
         } finally {
             setIsLoading(false);
         }

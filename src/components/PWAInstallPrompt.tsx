@@ -18,16 +18,16 @@ export default function PWAInstallPrompt() {
       return;
     }
 
-    // 이전에 닫았는지 확인
-    const dismissed = localStorage.getItem('pwa-prompt-dismissed');
-    if (dismissed) {
-      return;
-    }
-
     const handler = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowPrompt(true);
+      const promptEvent = e as BeforeInstallPromptEvent;
+      setDeferredPrompt(promptEvent);
+      
+      // 이전에 닫았는지 확인
+      const dismissed = localStorage.getItem('pwa-prompt-dismissed');
+      if (!dismissed) {
+        setShowPrompt(true);
+      }
     };
 
     window.addEventListener('beforeinstallprompt', handler);
@@ -36,6 +36,28 @@ export default function PWAInstallPrompt() {
       window.removeEventListener('beforeinstallprompt', handler);
     };
   }, []);
+
+  useEffect(() => {
+    // 수동으로 프롬프트 표시하는 이벤트 리스너
+    const showManualPrompt = () => {
+      if (deferredPrompt) {
+        setShowPrompt(true);
+      } else {
+        // iOS Safari 안내
+        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+          alert('Safari 브라우저에서:\n1. 하단 공유 버튼 클릭\n2. "홈 화면에 추가" 선택');
+        } else {
+          alert('브라우저 메뉴에서 "홈 화면에 추가"를 선택하세요.');
+        }
+      }
+    };
+
+    window.addEventListener('show-install-prompt', showManualPrompt);
+
+    return () => {
+      window.removeEventListener('show-install-prompt', showManualPrompt);
+    };
+  }, [deferredPrompt]);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
