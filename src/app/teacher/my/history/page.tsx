@@ -19,44 +19,49 @@ export default function LectureHistoryPage() {
     const loadLectureHistory = async () => {
         try {
             const savedUser = localStorage.getItem('user');
+            console.log('📦 localStorage user:', savedUser);
+            
             if (!savedUser) {
                 router.push('/teacher/login');
                 return;
             }
 
             const userData = JSON.parse(savedUser);
-            const response = await api.get(`/api/instructors/by-user/${userData.id}/courses`);
+            console.log('👤 파싱된 사용자 데이터:', userData);
+            
+            // user 객체가 중첩되어 있는 경우 처리
+            const user = userData.user || userData;
+            const userId = user.id;
+            
+            console.log('🆔 사용자 ID:', userId);
+            
+            if (!userId) {
+                console.error('❌ 사용자 ID가 없습니다');
+                return;
+            }
+
+            // 강사 정보 조회
+            const instructorResponse = await api.get(`/api/instructors/by-user/${userId}`);
+            if (!instructorResponse.data.success || !instructorResponse.data.data) {
+                console.error('강사 정보를 찾을 수 없습니다');
+                return;
+            }
+            
+            const instructorId = instructorResponse.data.data.id;
+            
+            // 출근 이력 조회 (최근 3개월)
+            const threeMonthsAgo = new Date();
+            threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+            
+            const startDate = threeMonthsAgo.toISOString().split('T')[0];
+            const endDate = new Date().toISOString().split('T')[0];
+            
+            const response = await api.get(
+                `/api/instructors/${instructorId}/attendances?startDate=${startDate}&endDate=${endDate}`
+            );
             
             if (response.data.success) {
-                const courseGroups = response.data.data;
-                
-                // 모든 강의를 날짜별로 펼치기
-                const allLectures: any[] = [];
-                
-                courseGroups.forEach((group: any) => {
-                    const subjects = group.courses?.map((course: any) => 
-                        course.category || course.title
-                    ).filter((s: string, i: number, arr: string[]) => 
-                        arr.indexOf(s) === i
-                    ).join(', ') || '강의';
-                    
-                    allLectures.push({
-                        id: group.id,
-                        date: group.startDate || new Date().toISOString(),
-                        time: `${group.startTime || '00:00'} ~ ${group.endTime || '00:00'}`,
-                        school: group.schoolName,
-                        subject: subjects,
-                        status: Math.random() > 0.5 ? 'completed' : 'pending', // 임시
-                        amount: 80000 // 임시
-                    });
-                });
-                
-                // 날짜순 정렬 (최신순)
-                allLectures.sort((a, b) => 
-                    new Date(b.date).getTime() - new Date(a.date).getTime()
-                );
-                
-                setLectures(allLectures);
+                setLectures(response.data.data);
             }
         } catch (error) {
             console.error('강의 이력 로드 실패:', error);
@@ -67,7 +72,9 @@ export default function LectureHistoryPage() {
 
     const filteredLectures = lectures.filter(lecture => {
         if (filter === 'all') return true;
-        return lecture.status === filter;
+        if (filter === 'completed') return lecture.status === 'COMPLETED';
+        if (filter === 'pending') return lecture.status === 'PENDING';
+        return true;
     });
 
     const formatDate = (dateString: string) => {
@@ -122,22 +129,23 @@ export default function LectureHistoryPage() {
                                         {formatDate(lecture.date)}
                                     </span>
                                     <span className={`${styles.statusBadge} ${
-                                        lecture.status === 'completed' 
+                                        lecture.status === 'COMPLETED' 
                                             ? styles.statusCompleted 
                                             : styles.statusPending
                                     }`}>
-                                        {lecture.status === 'completed' ? '지급 완료' : '관리자 확인중'}
+                                        {lecture.status === 'COMPLETED' ? '지급 완료' : '관리자 확인중'}
                                     </span>
                                 </div>
                                 
                                 <div className={styles.lectureInfo}>
-                                    <div className={styles.lectureTime}>{lecture.time}</div>
-                                    <div className={styles.lectureSchool}>{lecture.school}</div>
-                                    <div className={styles.lectureSubject}>{lecture.subject}</div>
+                                    <div className={styles.lectureTime}>
+                                        {lecture.checkInTime} ~ {lecture.checkOutTime || '진행중'}
+                                    </div>
+                                    <div className={styles.lectureSchool}>{lecture.schoolName}</div>
                                 </div>
                                 
                                 <div className={styles.lectureAmount}>
-                                    {lecture.amount.toLocaleString()}원
+                                    {lecture.payment ? `${lecture.payment.toLocaleString()}원` : '-'}
                                 </div>
                             </div>
                         ))}

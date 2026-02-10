@@ -27,6 +27,10 @@ export default function AttendancePage() {
     // 사용자 상세 정보
     const [userDetail, setUserDetail] = useState<any>(null);
 
+    // 정산 정보
+    const [currentMonthSettlement, setCurrentMonthSettlement] = useState<any>(null);
+    const [settlementHistory, setSettlementHistory] = useState<any[]>([]);
+
     // 임시 강의 데이터 (나중에 API로 교체)
     const [todayLectures, setTodayLectures] = useState<any[]>([]);
 
@@ -114,6 +118,11 @@ export default function AttendancePage() {
                 
                 // 사용자 상세 정보 조회
                 await loadUserDetail(userId);
+                
+                // 정산 정보 조회 (강사인 경우)
+                if (user.role === 'TEACHER') {
+                    await loadSettlementInfo(userId);
+                }
                 
                 setIsLoading(false);
             } catch (error) {
@@ -239,6 +248,54 @@ export default function AttendancePage() {
             }
         } catch (error) {
             console.error('사용자 정보 로드 실패:', error);
+        }
+    };
+
+    // 정산 정보 로드
+    const loadSettlementInfo = async (userId: number) => {
+        try {
+            // 강사 정보 조회
+            const instructorResponse = await api.get(`/api/instructors/by-user/${userId}`);
+            if (!instructorResponse.data.success || !instructorResponse.data.data) {
+                return;
+            }
+            
+            const instructorId = instructorResponse.data.data.id;
+            
+            // 이번 달 정산 정보 조회
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+            
+            try {
+                const currentSettlementResponse = await api.get(
+                    `/api/instructors/${instructorId}/settlements?year=${currentYear}&month=${currentMonth}`
+                );
+                
+                if (currentSettlementResponse.data.success) {
+                    setCurrentMonthSettlement(currentSettlementResponse.data.data);
+                }
+            } catch (error: any) {
+                console.log('⚠️ 이번 달 정산 정보 조회 실패 (백엔드 미구현 가능):', error.response?.status);
+                // 에러가 나도 앱은 계속 작동
+            }
+            
+            // 정산 이력 조회 (최근 3개월)
+            try {
+                const historyResponse = await api.get(
+                    `/api/instructors/${instructorId}/settlement-history?limit=3`
+                );
+                
+                if (historyResponse.data.success) {
+                    setSettlementHistory(historyResponse.data.data);
+                }
+            } catch (error: any) {
+                console.log('⚠️ 정산 이력 조회 실패 (백엔드 미구현 가능):', error.response?.status);
+                // 에러가 나도 앱은 계속 작동
+            }
+        } catch (error) {
+            console.error('❌ 정산 정보 로드 실패:', error);
+            // 에러가 나도 앱은 계속 작동
         }
     };
 
@@ -721,7 +778,12 @@ export default function AttendancePage() {
                             {/* 이번 달 누적 */}
                             <div className={styles.totalCard}>
                                 <div className={styles.totalLabel}>이번 달 누적 정산 금액</div>
-                                <div className={styles.totalAmount}>1,240,000원</div>
+                                <div className={styles.totalAmount}>
+                                    {currentMonthSettlement 
+                                        ? `${currentMonthSettlement.totalAmount.toLocaleString()}원`
+                                        : '0원'
+                                    }
+                                </div>
                             </div>
 
                             {/* 월별 정산 내역 */}
@@ -729,27 +791,31 @@ export default function AttendancePage() {
                                 <h4 className={styles.monthlyTitle}>월별 정산 내역</h4>
                                 
                                 <div className={styles.settlementList}>
-                                    {[
-                                        { month: '2026년 2월', amount: 1240000, status: 'pending' },
-                                        { month: '2026년 1월', amount: 980000, status: 'completed' },
-                                        { month: '2025년 12월', amount: 1150000, status: 'completed' }
-                                    ].map((item, index) => (
-                                        <div key={index} className={styles.settlementItem}>
-                                            <div className={styles.settlementInfo}>
-                                                <div className={styles.settlementMonth}>{item.month}</div>
-                                                <div className={styles.settlementAmount}>
-                                                    {item.amount.toLocaleString()}원
+                                    {settlementHistory.length > 0 ? (
+                                        settlementHistory.map((item, index) => (
+                                            <div key={index} className={styles.settlementItem}>
+                                                <div className={styles.settlementInfo}>
+                                                    <div className={styles.settlementMonth}>
+                                                        {item.year}년 {item.month}월
+                                                    </div>
+                                                    <div className={styles.settlementAmount}>
+                                                        {item.totalAmount.toLocaleString()}원
+                                                    </div>
+                                                </div>
+                                                <div className={`${styles.settlementStatus} ${
+                                                    item.status === 'COMPLETED' 
+                                                        ? styles.statusCompleted 
+                                                        : styles.statusPending
+                                                }`}>
+                                                    {item.status === 'COMPLETED' ? '지급 완료' : '관리자 확인중'}
                                                 </div>
                                             </div>
-                                            <div className={`${styles.settlementStatus} ${
-                                                item.status === 'completed' 
-                                                    ? styles.statusCompleted 
-                                                    : styles.statusPending
-                                            }`}>
-                                                {item.status === 'completed' ? '지급 완료' : '관리자 확인중'}
-                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className={styles.emptyState}>
+                                            <p className={styles.emptyText}>정산 내역이 없습니다</p>
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                             </div>
                         </div>

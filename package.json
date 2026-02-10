@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "npm run update-sw && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "update-sw": "node scripts/update-sw-version.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
