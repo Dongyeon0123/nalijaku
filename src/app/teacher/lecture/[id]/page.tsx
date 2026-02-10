@@ -45,15 +45,31 @@ export default function LectureDetailPage() {
             
             // 사용자 정보 가져오기
             const savedUser = localStorage.getItem('user');
+            console.log('📦 localStorage user:', savedUser);
+            
             if (!savedUser) {
                 router.push('/teacher/login');
                 return;
             }
 
             const userData = JSON.parse(savedUser);
+            console.log('👤 파싱된 사용자 데이터:', userData);
+            
+            // user 객체가 중첩되어 있는 경우 처리
+            const user = userData.user || userData;
+            const userId = user.id;
+            
+            console.log('🆔 사용자 ID:', userId);
+            
+            if (!userId) {
+                console.error('❌ 사용자 ID가 없습니다');
+                alert('사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요.');
+                router.push('/teacher/login');
+                return;
+            }
             
             // 강의 목록 조회
-            const response = await api.get(`/api/instructors/by-user/${userData.id}/courses`);
+            const response = await api.get(`/api/instructors/by-user/${userId}/courses`);
             
             if (response.data.success) {
                 const courseGroups = response.data.data;
