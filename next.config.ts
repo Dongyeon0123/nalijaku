@@ -22,9 +22,26 @@ const nextConfig: NextConfig = {
 
     return {
       beforeFiles: [
+        // /api/auth/* 는 Next.js API 라우트로 처리하고, 나머지만 백엔드로 전달
         {
-          source: '/api/:path*',
-          destination: `${apiUrl}/api/:path*`,
+          source: '/api/users/:path*',
+          destination: `${apiUrl}/api/users/:path*`,
+        },
+        {
+          source: '/api/instructors/:path*',
+          destination: `${apiUrl}/api/instructors/:path*`,
+        },
+        {
+          source: '/api/courses/:path*',
+          destination: `${apiUrl}/api/courses/:path*`,
+        },
+        {
+          source: '/api/course-groups/:path*',
+          destination: `${apiUrl}/api/course-groups/:path*`,
+        },
+        {
+          source: '/api/attendances/:path*',
+          destination: `${apiUrl}/api/attendances/:path*`,
         },
         {
           source: '/auth/:path*',
