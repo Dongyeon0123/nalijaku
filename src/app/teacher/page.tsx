@@ -630,7 +630,10 @@ export default function AttendancePage() {
                     className={styles.logo}
                     priority
                 />
-                <button className={styles.notificationButton}>
+                <button 
+                    className={styles.notificationButton}
+                    onClick={() => router.push('/teacher/settings/notice')}
+                >
                     <IoNotificationsOutline size={24} />
                 </button>
             </header>
@@ -1040,13 +1043,6 @@ export default function AttendancePage() {
                                     onClick={() => router.push('/teacher/settings/privacy')}
                                 >
                                     <span className={styles.settingsLabel}>개인정보 처리방침</span>
-                                    <span className={styles.settingsArrow}>›</span>
-                                </button>
-                                <button 
-                                    className={styles.settingsItem}
-                                    onClick={() => router.push('/teacher/settings/notice')}
-                                >
-                                    <span className={styles.settingsLabel}>공지사항</span>
                                     <span className={styles.settingsArrow}>›</span>
                                 </button>
                             </div>
