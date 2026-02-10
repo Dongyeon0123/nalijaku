@@ -12,6 +12,7 @@ interface Instructor {
   subtitle: string;
   imageUrl: string;
   profileDescription?: string;
+  hourlyRate?: number; // 시급 추가
   education?: string | Array<{ school: string; major: string; degree: string; graduationYear: number }>;
   certificates?: string | Array<{ name: string; issuer: string; issueDate: string }>;
   experience?: string | Array<{ company: string; position: string; startDate: string; endDate: string; description: string }>;
@@ -94,6 +95,7 @@ export default function InstructorsManagementPage() {
     subtitle: '',
     imageUrl: '',
     profileDescription: '',
+    hourlyRate: 0, // 시급 추가
     education: [] as Array<{ school: string; major: string; degree: string; graduationYear: number }>,
     certificates: [] as Array<{ name: string; issuer: string; issueDate: string }>,
     experience: [] as Array<{ company: string; position: string; startDate: string; endDate: string; description: string }>,
@@ -669,7 +671,9 @@ export default function InstructorsManagementPage() {
 
     setEditingInstructor(instructor);
     const profileDesc = (instructor as Instructor & { profileDescription?: string }).profileDescription || '';
+    const hourlyRate = (instructor as Instructor & { hourlyRate?: number }).hourlyRate || 0;
     console.log('로드된 소개말:', profileDesc);
+    console.log('로드된 시급:', hourlyRate);
 
     setFormData({
       userId: instructor.userId || 0,
@@ -679,6 +683,7 @@ export default function InstructorsManagementPage() {
       subtitle: instructor.subtitle,
       imageUrl: instructor.imageUrl,
       profileDescription: profileDesc,
+      hourlyRate: hourlyRate,
       education: (Array.isArray(instructor.education) ? instructor.education : []) as Array<{ school: string; major: string; degree: string; graduationYear: number }>,
       certificates: (Array.isArray(instructor.certificates) ? instructor.certificates : []) as Array<{ name: string; issuer: string; issueDate: string }>,
       experience: (Array.isArray(instructor.experience) ? instructor.experience : []) as Array<{ company: string; position: string; startDate: string; endDate: string; description: string }>,
@@ -705,6 +710,7 @@ export default function InstructorsManagementPage() {
       subtitle: '',
       imageUrl: '',
       profileDescription: '',
+      hourlyRate: 0,
       education: [],
       certificates: [],
       experience: [],
@@ -757,6 +763,7 @@ export default function InstructorsManagementPage() {
       submitData.append('region', formData.region);
       submitData.append('category', formData.category);
       submitData.append('subtitle', formData.subtitle);
+      submitData.append('hourlyRate', formData.hourlyRate.toString());
       submitData.append('profileDescription', formData.profileDescription || '');
       // 배열을 JSON 문자열로 변환
       submitData.append('education', JSON.stringify(formData.education || []));
@@ -2035,6 +2042,26 @@ export default function InstructorsManagementPage() {
                   required
                   placeholder="강사 소개 부제목을 입력하세요"
                 />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>시급 (원) *</label>
+                <input
+                  type="number"
+                  name="hourlyRate"
+                  value={formData.hourlyRate || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, hourlyRate: parseInt(e.target.value) || 0 }))}
+                  required
+                  placeholder="시간당 강의료를 입력하세요 (예: 50000)"
+                  min="0"
+                  step="1000"
+                  style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '8px', fontSize: '14px' }}
+                />
+                {formData.hourlyRate > 0 && (
+                  <p style={{ fontSize: '12px', color: '#1976D2', margin: '8px 0 0 0', fontWeight: '600' }}>
+                    💰 {formData.hourlyRate.toLocaleString('ko-KR')}원 / 시간
+                  </p>
+                )}
               </div>
 
               <div className={styles.formGroup}>
