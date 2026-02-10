@@ -1205,7 +1205,9 @@ export default function MyPage() {
                           borderRadius: '8px',
                           border: '1px solid #bfdbfe',
                           color: '#1e40af',
-                          marginTop: '8px'
+                          marginTop: '8px',
+                          marginLeft: '8px',
+                          display: 'inline-block'
                         }}>
                           📆 매주 {selectedCourse.dayOfWeek.join(', ')}
                         </p>
@@ -1217,7 +1219,9 @@ export default function MyPage() {
                           borderRadius: '8px',
                           border: '1px solid #fde68a',
                           color: '#92400e',
-                          marginTop: '8px'
+                          marginTop: '8px',
+                          display: 'inline-block',
+                          marginLeft: '8px'
                         }}>
                           ⏰ {selectedCourse.startTime} ~ {selectedCourse.endTime}
                         </p>
