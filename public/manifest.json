@@ -2,7 +2,7 @@
   "name": "날리자쿠 강사 출근부",
   "short_name": "출근부",
   "description": "날리자쿠 강사님들을 위한 출퇴근 관리 앱",
-  "start_url": "/attendance",
+  "start_url": "/teacher/login",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#916AFF",

@@ -1,7 +1,7 @@
-const CACHE_NAME = 'nallijaku-attendance-v1';
+const CACHE_NAME = 'nallijaku-attendance-v2'; // 버전 업데이트
 const urlsToCache = [
-  '/attendance',
-  '/attendance/login',
+  '/teacher',
+  '/teacher/login',
   '/nallijaku.png',
   '/transparentLogo.png'
 ];
