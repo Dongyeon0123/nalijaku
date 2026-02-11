@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nallijaku-attendance-v3'; // 🔥 배포할 때마다 이 숫자를 올리세요!
+const CACHE_NAME = 'nallijaku-attendance-v4'; // 🔥 배포할 때마다 이 숫자를 올리세요!
 const urlsToCache = [
   '/teacher',
   '/teacher/login',
@@ -47,14 +47,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // POST, PUT, DELETE 요청은 캐시하지 않음 (GET만 캐시)
   if (event.request.method !== 'GET') {
-    event.respondWith(fetch(event.request));
-    return;
+    return; // Service Worker가 개입하지 않음
   }
 
-  // API 요청은 항상 네트워크 사용 (캐시 안 함)
-  if (event.request.url.includes('/api/')) {
-    event.respondWith(fetch(event.request));
-    return;
+  // API 요청은 Service Worker가 개입하지 않음 (브라우저가 직접 처리)
+  if (event.request.url.includes('/api/') || event.request.url.includes('api.nallijaku.com')) {
+    return; // Service Worker가 개입하지 않음
   }
 
   // HTML 페이지는 네트워크 우선, 실패 시 캐시

@@ -51,6 +51,25 @@
     width: 40px;
 }
 
+/* 빈 상태 */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+}
+
+.emptyIcon {
+    font-size: 48px;
+}
+
+.emptyText {
+    font-size: 16px;
+    color: #999;
+}
+
 /* 채팅 영역 */
 .chatArea {
     flex: 1;
