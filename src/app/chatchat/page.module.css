@@ -133,6 +133,7 @@
     line-height: 1.5;
     word-wrap: break-word;
     white-space: pre-wrap;
+    letter-spacing: -0.05em;
 }
 
 .messageTime {
@@ -269,4 +270,147 @@
     .messageText {
         font-size: 14px;
     }
+}
+
+/* 마크다운 스타일 (ChatGPT 스타일) */
+.markdownP {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.markdownP:first-child {
+    margin-top: 0;
+}
+
+.markdownP:last-child {
+    margin-bottom: 0;
+}
+
+.markdownUl,
+.markdownOl {
+    margin: 0;
+    margin-top: -1.8em;
+    margin-bottom: -1.8em;
+    padding: 0;
+    padding-left: 1.5em;
+    line-height: 1.5;
+    display: block;
+}
+
+.markdownLi {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+}
+
+.markdownLi::marker {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.markdownInlineCode {
+    background: rgba(255, 255, 255, 0.25);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.markdownPre {
+    margin: 0.15em 0;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.markdownCodeBlock {
+    display: block;
+    padding: 10px 14px;
+    background: transparent;
+    overflow-x: auto;
+    font-size: 0.9em;
+    line-height: 1.25;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.markdownCodeBlock::-webkit-scrollbar {
+    height: 6px;
+}
+
+.markdownCodeBlock::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+.markdownCodeBlock::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.markdownStrong {
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: -0.05em;
+}
+
+.markdownEm {
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: -0.05em;
+}
+
+.markdownH1 {
+    font-size: 1.4em;
+    font-weight: 700;
+    margin: 0.3em 0 0.15em 0;
+    line-height: 1.2;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 0.2em;
+}
+
+.markdownH1:first-child {
+    margin-top: 0;
+}
+
+.markdownH2 {
+    font-size: 1.25em;
+    font-weight: 700;
+    margin: 0.25em 0 0.1em 0;
+    line-height: 1.2;
+}
+
+.markdownH3 {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin: 0.2em 0 0.1em 0;
+    line-height: 1.2;
+}
+
+.markdownBlockquote {
+    margin: 0.15em 0;
+    padding: 0.4em 0.8em;
+    border-left: 4px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    font-style: italic;
+    line-height: 1.3;
+}
+
+.markdownLink {
+    color: rgba(255, 255, 255, 0.95);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 0.2s ease;
+}
+
+.markdownLink:hover {
+    opacity: 0.8;
+}
+
+.markdownHr {
+    margin: 0.2em 0;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
 }

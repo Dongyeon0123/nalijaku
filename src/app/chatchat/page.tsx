@@ -5,6 +5,8 @@ import { IoSend, IoArrowBack } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import styles from './page.module.css';
@@ -160,35 +162,46 @@ export default function ChatChatPage() {
                                 <div className={styles.messageText}>
                                     <ReactMarkdown
                                         components={{
-                                            p: ({node, ...props}) => <p style={{margin: '0.25em 0'}} {...props} />,
-                                            ul: ({node, ...props}) => <ul style={{marginLeft: '1.2em', marginTop: '0.25em', marginBottom: '0.25em'}} {...props} />,
-                                            ol: ({node, ...props}) => <ol style={{marginLeft: '1.2em', marginTop: '0.25em', marginBottom: '0.25em'}} {...props} />,
-                                            li: ({node, ...props}) => <li style={{marginBottom: '0.1em'}} {...props} />,
-                                            code: ({node, inline, ...props}: any) => 
-                                                inline ? (
-                                                    <code style={{
-                                                        backgroundColor: 'rgba(255,255,255,0.2)',
-                                                        padding: '2px 6px',
-                                                        borderRadius: '4px',
-                                                        fontSize: '0.9em'
-                                                    }} {...props} />
+                                            p: ({node, ...props}) => <p className={styles.markdownP} {...props} />,
+                                            ul: ({node, ...props}) => <ul className={styles.markdownUl} {...props} />,
+                                            ol: ({node, ...props}) => <ol className={styles.markdownOl} {...props} />,
+                                            li: ({node, ...props}) => <li className={styles.markdownLi} {...props} />,
+                                            code: ({node, inline, className, children, ...props}: any) => {
+                                                const match = /language-(\w+)/.exec(className || '');
+                                                const language = match ? match[1] : '';
+                                                
+                                                return !inline && language ? (
+                                                    <SyntaxHighlighter
+                                                        style={vscDarkPlus}
+                                                        language={language}
+                                                        PreTag="div"
+                                                        className={styles.markdownCodeBlock}
+                                                        customStyle={{
+                                                            margin: 0,
+                                                            padding: '12px 16px',
+                                                            background: 'rgba(0, 0, 0, 0.2)',
+                                                            borderRadius: '8px',
+                                                            fontSize: '0.9em',
+                                                        }}
+                                                        {...props}
+                                                    >
+                                                        {String(children).replace(/\n$/, '')}
+                                                    </SyntaxHighlighter>
                                                 ) : (
-                                                    <code style={{
-                                                        display: 'block',
-                                                        backgroundColor: 'rgba(255,255,255,0.2)',
-                                                        padding: '8px',
-                                                        borderRadius: '6px',
-                                                        marginTop: '0.25em',
-                                                        marginBottom: '0.25em',
-                                                        overflowX: 'auto',
-                                                        fontSize: '0.9em'
-                                                    }} {...props} />
-                                                ),
-                                            strong: ({node, ...props}) => <strong style={{fontWeight: 700}} {...props} />,
-                                            em: ({node, ...props}) => <em style={{fontStyle: 'italic'}} {...props} />,
-                                            h1: ({node, ...props}) => <h1 style={{fontSize: '1.3em', fontWeight: 700, marginTop: '0.3em', marginBottom: '0.3em'}} {...props} />,
-                                            h2: ({node, ...props}) => <h2 style={{fontSize: '1.2em', fontWeight: 700, marginTop: '0.3em', marginBottom: '0.3em'}} {...props} />,
-                                            h3: ({node, ...props}) => <h3 style={{fontSize: '1.1em', fontWeight: 700, marginTop: '0.3em', marginBottom: '0.3em'}} {...props} />,
+                                                    <code className={styles.markdownInlineCode} {...props}>
+                                                        {children}
+                                                    </code>
+                                                );
+                                            },
+                                            pre: ({node, children, ...props}) => <pre {...props}>{children}</pre>,
+                                            strong: ({node, ...props}) => <strong className={styles.markdownStrong} {...props} />,
+                                            em: ({node, ...props}) => <em className={styles.markdownEm} {...props} />,
+                                            h1: ({node, ...props}) => <h1 className={styles.markdownH1} {...props} />,
+                                            h2: ({node, ...props}) => <h2 className={styles.markdownH2} {...props} />,
+                                            h3: ({node, ...props}) => <h3 className={styles.markdownH3} {...props} />,
+                                            blockquote: ({node, ...props}) => <blockquote className={styles.markdownBlockquote} {...props} />,
+                                            a: ({node, ...props}) => <a className={styles.markdownLink} target="_blank" rel="noopener noreferrer" {...props} />,
+                                            hr: ({node, ...props}) => <hr className={styles.markdownHr} {...props} />,
                                         }}
                                     >
                                         {message.content}
