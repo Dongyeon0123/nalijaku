@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     console.log('🌐 API URL:', process.env.NEXT_PUBLIC_API_URL);
 
     // 백엔드 API 호출
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -33,7 +33,10 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({ username, password }),
     });
 
+    console.log('📡 백엔드 응답 상태:', response.status);
+    
     const data = await response.json();
+    console.log('📦 백엔드 응답 데이터:', data);
     
     // 응답에서 민감한 정보 제거 (필요시)
     if (data.data?.password) {
@@ -41,6 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!response.ok) {
+      console.error('❌ 백엔드 에러:', { status: response.status, data });
       // 에러 메시지를 일반화하여 정보 노출 방지
       return NextResponse.json(
         { 
