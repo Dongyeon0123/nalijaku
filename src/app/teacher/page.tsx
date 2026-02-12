@@ -55,15 +55,6 @@ export default function AttendancePage() {
 
         // Service Worker 등록 및 업데이트 감지
         if ('serviceWorker' in navigator) {
-            // 기존 Service Worker 제거 (개발 중에만 사용)
-            navigator.serviceWorker.getRegistrations().then((registrations) => {
-                for (let registration of registrations) {
-                    registration.unregister().then(() => {
-                        console.log('🗑️ 기존 Service Worker 제거됨');
-                    });
-                }
-            });
-
             navigator.serviceWorker
                 .register('/sw.js')
                 .then((registration) => {
