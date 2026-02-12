@@ -11,6 +11,10 @@ interface LectureDetail {
     schoolName: string;
     time: string;
     subject: string;
+    locationName?: string;
+    latitude?: number;
+    longitude?: number;
+    address?: string;
     courses: Array<{
         id: number;
         title: string;
@@ -113,6 +117,10 @@ export default function LectureDetailPage() {
                         schoolName: group.schoolName,
                         time: `${group.startTime || '00:00'} ~ ${group.endTime || '00:00'}`,
                         subject: subjects,
+                        locationName: group.locationName,
+                        latitude: group.latitude,
+                        longitude: group.longitude,
+                        address: group.address,
                         courses: normalizedCourses,
                         isCompleted: false, // TODO: 실제 완료 상태 확인
                         completedAt: undefined,
@@ -195,6 +203,20 @@ export default function LectureDetailPage() {
                         <span className={styles.infoLabel}>📚 강의 내용</span>
                         <span className={styles.subjectBadge}>{lecture.subject}</span>
                     </div>
+
+                    {lecture.locationName && (
+                        <div className={styles.infoRow}>
+                            <span className={styles.infoLabel}>📍 위치</span>
+                            <span className={styles.infoValue}>{lecture.locationName}</span>
+                        </div>
+                    )}
+
+                    {lecture.address && (
+                        <div className={styles.infoRow}>
+                            <span className={styles.infoLabel}>🗺️ 주소</span>
+                            <span className={styles.infoValue} style={{ fontSize: '14px' }}>{lecture.address}</span>
+                        </div>
+                    )}
                 </div>
 
                 {/* 학습자료 */}

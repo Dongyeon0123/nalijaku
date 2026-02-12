@@ -48,6 +48,10 @@ interface CourseGroup {
   dayOfWeek?: string[]; // 요일
   startTime?: string; // 시작 시간
   endTime?: string; // 종료 시간
+  locationName?: string; // 위치명
+  latitude?: number; // 위도
+  longitude?: number; // 경도
+  address?: string; // 주소
   status: string;
   courseCount: number;
   courses: Array<{
@@ -1224,6 +1228,30 @@ export default function MyPage() {
                           marginLeft: '8px'
                         }}>
                           ⏰ {selectedCourse.startTime} ~ {selectedCourse.endTime}
+                        </p>
+                      )}
+                      {selectedCourse.locationName && (
+                        <p style={{
+                          backgroundColor: '#fce7f3',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          border: '1px solid #fbcfe8',
+                          color: '#9f1239',
+                          marginTop: '8px',
+                          display: 'inline-block',
+                          marginLeft: '8px'
+                        }}>
+                          📍 {selectedCourse.locationName}
+                        </p>
+                      )}
+                      {selectedCourse.address && (
+                        <p style={{
+                          fontSize: '13px',
+                          color: '#6b7280',
+                          marginTop: '8px',
+                          marginLeft: '8px'
+                        }}>
+                          🗺️ {selectedCourse.address}
                         </p>
                       )}
                     </div>
