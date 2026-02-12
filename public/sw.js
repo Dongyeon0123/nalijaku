@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nallijaku-attendance-v11'; // 🔥 배포할 때마다 이 숫자를 올리세요!
+const CACHE_NAME = 'nallijaku-attendance-v12'; // 🔥 배포할 때마다 이 숫자를 올리세요!
 const urlsToCache = [
   '/teacher',
   '/teacher/login',
@@ -52,6 +52,17 @@ self.addEventListener('fetch', (event) => {
 
   // API 요청은 Service Worker가 개입하지 않음 (브라우저가 직접 처리)
   if (event.request.url.includes('/api/') || event.request.url.includes('api.nallijaku.com')) {
+    return; // Service Worker가 개입하지 않음
+  }
+
+  // 메인 페이지(/)는 Service Worker가 개입하지 않음 - 항상 네트워크에서 가져옴
+  const url = new URL(event.request.url);
+  if (url.pathname === '/' || url.pathname === '/index.html') {
+    return; // Service Worker가 개입하지 않음
+  }
+
+  // /teacher 경로가 아니면 Service Worker가 개입하지 않음
+  if (!url.pathname.startsWith('/teacher')) {
     return; // Service Worker가 개입하지 않음
   }
 
