@@ -56,6 +56,10 @@ interface CourseGroup {
   dayOfWeek?: string[]; // 요일
   startTime?: string; // 시작 시간
   endTime?: string; // 종료 시간
+  locationName?: string; // 위치명
+  latitude?: number; // 위도
+  longitude?: number; // 경도
+  address?: string; // 주소
   status: string;
   courseCount: number;
   courses: Array<{
@@ -1729,6 +1733,22 @@ export default function InstructorsManagementPage() {
                                     <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>강의 시간</div>
                                     <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>
                                       ⏰ {group.startTime} ~ {group.endTime}
+                                    </div>
+                                  </div>
+                                )}
+                                {group.locationName && (
+                                  <div>
+                                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>위치</div>
+                                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>
+                                      📍 {group.locationName}
+                                    </div>
+                                  </div>
+                                )}
+                                {group.address && (
+                                  <div style={{ gridColumn: '1 / -1' }}>
+                                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>주소</div>
+                                    <div style={{ fontSize: '13px', color: '#374151' }}>
+                                      🗺️ {group.address}
                                     </div>
                                   </div>
                                 )}
