@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import api from '@/lib/axios';
+import KakaoMapPicker from '@/components/KakaoMapPicker';
 
 interface Instructor {
   id: number;
@@ -120,7 +121,11 @@ export default function InstructorsManagementPage() {
     endDate: '',
     dayOfWeek: [] as string[], // 요일 (복수 선택 가능)
     startTime: '',      // 시작 시간
-    endTime: ''         // 종료 시간
+    endTime: '',        // 종료 시간
+    locationName: '',   // 강의 장소명
+    latitude: 0,        // 위도
+    longitude: 0,       // 경도
+    address: ''         // 주소
   });
 
   // 강의 관리 모달 상태
@@ -205,7 +210,11 @@ export default function InstructorsManagementPage() {
       endDate: '',
       dayOfWeek: [],
       startTime: '',
-      endTime: ''
+      endTime: '',
+      locationName: '',
+      latitude: 0,
+      longitude: 0,
+      address: ''
     });
     setShowAssignModal(true);
     fetchMaterials();
@@ -224,7 +233,11 @@ export default function InstructorsManagementPage() {
       endDate: '',
       dayOfWeek: [],
       startTime: '',
-      endTime: ''
+      endTime: '',
+      locationName: '',
+      latitude: 0,
+      longitude: 0,
+      address: ''
     });
   };
 
@@ -379,6 +392,11 @@ export default function InstructorsManagementPage() {
       return;
     }
 
+    if (!assignmentDetails.locationName || !assignmentDetails.latitude || !assignmentDetails.longitude) {
+      alert('강의 위치를 선택해주세요.');
+      return;
+    }
+
     // 날짜 유효성 검사
     const startDate = new Date(assignmentDetails.startDate);
     const endDate = new Date(assignmentDetails.endDate);
@@ -428,12 +446,16 @@ export default function InstructorsManagementPage() {
         dayOfWeek: assignmentDetails.dayOfWeek,
         startTime: assignmentDetails.startTime,
         endTime: assignmentDetails.endTime,
+        locationName: assignmentDetails.locationName,
+        latitude: assignmentDetails.latitude,
+        longitude: assignmentDetails.longitude,
+        address: assignmentDetails.address,
         materialIds: selectedMaterials,
         courseDetails
       });
 
       console.log('✅ 강의 그룹 할당 성공:', response.data);
-      alert(`${assigningInstructor.name} 강사에게 "${assignmentDetails.schoolName}" 강의 그룹이 할당되었습니다.\n\n📅 기간: ${assignmentDetails.startDate} ~ ${assignmentDetails.endDate}\n📆 요일: ${assignmentDetails.dayOfWeek.join(', ')}\n⏰ 시간: ${assignmentDetails.startTime} ~ ${assignmentDetails.endTime}`);
+      alert(`${assigningInstructor.name} 강사에게 "${assignmentDetails.schoolName}" 강의 그룹이 할당되었습니다.\n\n📅 기간: ${assignmentDetails.startDate} ~ ${assignmentDetails.endDate}\n📆 요일: ${assignmentDetails.dayOfWeek.join(', ')}\n⏰ 시간: ${assignmentDetails.startTime} ~ ${assignmentDetails.endTime}\n📍 위치: ${assignmentDetails.locationName}\n🗺️ 주소: ${assignmentDetails.address}`);
       handleCloseAssignModal();
     } catch (error: any) {
       console.error('❌ 강의 할당 실패:', error);
@@ -1185,6 +1207,46 @@ export default function InstructorsManagementPage() {
                     </div>
                   )}
                 </div>
+
+                {/* 강의 위치 선택 */}
+                <div style={{ marginTop: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                    📍 강의 위치 *
+                  </label>
+                  <KakaoMapPicker
+                    onLocationSelect={(location) => {
+                      setAssignmentDetails(prev => ({
+                        ...prev,
+                        locationName: location.locationName,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                        address: location.address
+                      }));
+                    }}
+                  />
+                  {assignmentDetails.locationName && (
+                    <div style={{
+                      marginTop: '12px',
+                      padding: '12px',
+                      backgroundColor: '#E8F5E9',
+                      borderRadius: '8px',
+                      border: '1px solid #4CAF50'
+                    }}>
+                      <p style={{ fontSize: '13px', fontWeight: '600', color: '#2E7D32', margin: '0 0 4px 0' }}>
+                        ✅ 선택된 위치
+                      </p>
+                      <p style={{ fontSize: '12px', color: '#555', margin: '0 0 2px 0' }}>
+                        📌 {assignmentDetails.locationName}
+                      </p>
+                      <p style={{ fontSize: '11px', color: '#666', margin: 0 }}>
+                        {assignmentDetails.address}
+                      </p>
+                      <p style={{ fontSize: '11px', color: '#999', margin: '4px 0 0 0' }}>
+                        좌표: {assignmentDetails.latitude.toFixed(6)}, {assignmentDetails.longitude.toFixed(6)}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {loadingMaterials ? (
@@ -1424,7 +1486,8 @@ export default function InstructorsManagementPage() {
                     !assignmentDetails.schoolName.trim() ||
                     !assignmentDetails.studentCount || 
                     !assignmentDetails.startDate || 
-                    !assignmentDetails.endDate
+                    !assignmentDetails.endDate ||
+                    !assignmentDetails.locationName
                   }
                 >
                   할당하기 ({selectedMaterials.length}개 강의)
