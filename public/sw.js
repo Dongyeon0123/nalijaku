@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nallijaku-attendance-v4'; // 🔥 배포할 때마다 이 숫자를 올리세요!
+const CACHE_NAME = 'nallijaku-attendance-v11'; // 🔥 배포할 때마다 이 숫자를 올리세요!
 const urlsToCache = [
   '/teacher',
   '/teacher/login',
