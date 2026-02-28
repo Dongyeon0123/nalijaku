@@ -9,9 +9,7 @@ const nextConfig: NextConfig = {
   
   // 프로덕션 빌드 시 console.log 제거
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'], // error와 warn은 유지
-    } : false,
+    removeConsole: false,
   },
   
   async rewrites() {
