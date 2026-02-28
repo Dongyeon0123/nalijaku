@@ -36,6 +36,7 @@
 
 .content {
     padding: 20px;
+    padding-bottom: 100px;
 }
 
 /* 기본 정보 */
@@ -199,7 +200,7 @@
     background: linear-gradient(135deg, #916AFF 0%, #7c5ce6 100%);
     border-radius: 16px;
     padding: 24px;
-    margin-bottom: 80px;
+    margin-bottom: 16px;
     box-shadow: 0 4px 12px rgba(145, 106, 255, 0.3);
 }
 
@@ -218,23 +219,37 @@
 }
 
 /* 완료 버튼 */
-.completeButton {
+.completeButtonContainer {
     position: fixed;
-    bottom: 80px;
-    left: 20px;
-    right: 20px;
-    max-width: 440px;
-    margin: 0 auto;
-    padding: 16px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 12px 20px 24px;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+    z-index: 50;
+}
+
+.completeButton {
+    width: 100%;
+    padding: 18px;
     background: #916AFF;
     color: white;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(145, 106, 255, 0.4);
+    box-shadow: 0 4px 16px rgba(145, 106, 255, 0.4);
     transition: all 0.2s ease;
+}
+
+.completeButton:hover {
+    background: #7c5ce6;
+}
+
+.completeButton:active {
+    transform: scale(0.98);
 }
 
 .completeButton:active {

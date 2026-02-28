@@ -287,9 +287,11 @@ export default function LectureDetailPage() {
 
                 {/* 강의 완료 버튼 (미완료 시) */}
                 {!lecture.isCompleted && (
-                    <button className={styles.completeButton} onClick={handleComplete}>
-                        강의 완료하기
-                    </button>
+                    <div className={styles.completeButtonContainer}>
+                        <button className={styles.completeButton} onClick={handleComplete}>
+                            강의 완료하기
+                        </button>
+                    </div>
                 )}
             </div>
         </div>
